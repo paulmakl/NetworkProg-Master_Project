@@ -1,3 +1,11 @@
+/*
+ *
+ * This was my HW 3. I did well on it so
+ * we should be able to use some of it 
+ * for our project.
+ *
+ */
+
 #include <iostream>
 #include <stdlib.h>
 #include <arpa/inet.h>
