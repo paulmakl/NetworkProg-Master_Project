@@ -8,26 +8,33 @@
 
 using namespace std;
 #include <iostream>;
-#include <Packet.h>; 
+#include <packet.h>; 
+#include <RF.h>;
 
 class Sender {
     public:
         /**
          * Constructor for objects of the Sender class
+         *@param RFLayer Pointer to the RF layer used when transmitting
+         *@param theQueue Pointer to the outgoing messages queue
+         *@param recievedFlag Pointer to the flag marking received Ack's
+         *@param ourMAC our MAC address
+         *param sendFlag Pointer to flag marking the destination to send an Ack to
          */
-        sender();
+        sender(RF* RFLayer, queue* theQueue, unsigned short* sendFlag,
+                unsigned short* receivedFlag, unsigned short ourMAC);
 
     private:
     //Fields
     //TODO Clean up * locations on fields
     //TODO Make field types align with flag types for ack methods
-        short *MacAddr; //Our MAC address
-        *ostream dataStream; //ostream provided to us
-        *queue<short,char,int> outgoing_Queue:  //pointer to outgoing message queue
-        short *MACAck; //Pointer to the MAC address of the most recently
-                       // received ack 
-        *bool ackReceived; //Pointer to flag for received acks
-        packet pachyderm; //The packet to send
+        RF* theRF; //Pointer to the RF layer
+        short* MacAddr; //Our MAC address
+        ostream* dataStream; //ostream provided to us
+        queue<short,char,int>* outgoing_Queue:  //pointer to outgoing message queue
+        unsigned short*  ackReceived; //Pointer to flag for received acks
+        unsigned short* ackToSend; //Pointer to destination addr to send Ack
+        Packet pachyderm; //The packet to send
 
     //Methods
         /**
@@ -75,22 +82,22 @@ class Sender {
          *Resends the current packet
          *@return 1 if packet was successfully sent
          */
-        int resend()
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+        int resend();
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
