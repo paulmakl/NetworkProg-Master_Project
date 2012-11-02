@@ -7,9 +7,10 @@
  */
 
 using namespace std;
-#include <iostream>;
-#include <packet.h>; 
-#include <RF.h>;
+#include <iostream>
+#include "packet.h"
+#include "RF.h"
+#include "CircularFifo.h"
 
 class Sender {
     public:
@@ -22,8 +23,9 @@ class Sender {
          *param sendFlag Pointer to flag marking the destination to send an Ack to
          */
         sender(RF* RFLayer, queue* theQueue, unsigned short* sendFlag,
-                unsigned short* receivedFlag, unsigned short ourMAC);
+                bool* receivedFlag, unsigned short ourMAC);
 
+    //TODO Make public MASTERSEND()
     private:
     //Fields
     //TODO Clean up * locations on fields
@@ -31,8 +33,9 @@ class Sender {
         RF* theRF; //Pointer to the RF layer
         short* MacAddr; //Our MAC address
         ostream* dataStream; //ostream provided to us
-        queue<short,char,int>* outgoing_Queue:  //pointer to outgoing message queue
-        unsigned short*  ackReceived; //Pointer to flag for received acks
+        CircularFifo //TODO Figure out this data structure
+        //queue<short,char,int>* outgoing_Queue:  //pointer to outgoing message queue
+        bool*  ackReceived; //Pointer to flag for received acks
         unsigned short* ackToSend; //Pointer to destination addr to send Ack
         Packet pachyderm; //The packet to send
 
