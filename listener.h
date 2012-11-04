@@ -7,7 +7,8 @@
 
 #include <iostream>;
 #include "RF.h";
-#include <Packet.h>; 
+#include <Packet.h>;
+#include "CircularFifo.h" 
 using namespace std;
 
 class Listener
@@ -22,17 +23,24 @@ public:
 
 private:
 
-	short *MACaddr; //a pointer to our MAC address
+	typedef tuple <short, int, char>// the tupal for handing to the layer above
+	*short MACaddr; //a pointer to our MAC address
 	*ostream streamy; //the given output stream for data to the layer above
 	*short MACACK;//a pointer to the MAC address of the most recent sender of data that has not been sent an ACK yet
 	// or assuming that none need to be sent a special case of zero should be used to indicate this
 	*queue incoming_Queue <short, char, int>;//pointer to the queue for incoming data to be held until the layer above ask for data
 	*bool ack_Received;// a pointer to a boolean that indicates whether or not a ACK has been recived 
+	char buf[MAXPACKETSIZE];// buffer for the incoming packet
+	int bytesReceived;// bytes from the last packet
+	int PRR;//short for Packed Read Result
+	const int MAXPACKETSIZE = 2048; //size guarenteed to hold all properly formated packets
+	RF* daRF = new RF();//our reference to the RF layer
+
 
 	/*
-	 * the heart of the listener watches activity on the RF layer and blocks until data is recived
+	 * the heart of the listener watches activity on the RF layer and blocks until a packet is recived
 	 */
-	int listen();
+	int UltraListen();
 
 	/*
 	 * looks at a packet to check for three things from every packet that comes across the the RF layer
