@@ -11,7 +11,7 @@ using namespace std;
 #include "circularfifo.h"
 #include "sender.h"
 
-Sender::sender(RF* RFLayer, queue* theQueue, unsigned short* sendFlag,
+Sender::Sender(RF* RFLayer, CircularFifo<int,2>* theQueue, unsigned short* sendFlag,
                 bool* receivedFlag, unsigned short ourMAC) {
     //Initialize fields
     theRF = RFLayer;
@@ -28,20 +28,28 @@ Sender::MasterSend() {
         if (ackToSend != 0) {
         //TODO Implement listen for Ack's to send
         }
-
+        
         //Check for data to send
         if (infoToSend.isEmpty() == true) {
-
+            //TODO Sleep
+        }
+        else {
+            
         }
     }
 }
 
 int
-Sender:: buildPacket(enum frm, bool resend, unsigned short seqNum,
-            unsigned short destAddr, unsiged short senderAddr, 
-            *char data int CS) {
-    
-
+Sender:: buildPacket(char frm, bool resend, unsigned short seqNum,
+            unsigned short destAddr, unsigned short senderAddr, 
+            char* data, int CS) {
+    pachyderm.frameType = frm;
+    pachyderm.resend = 0;
+    pachyderm.sequence_number = seqNum;
+    pachyderm.destination = destAddr;
+    pachyderm.sender = MacAddr;
+    pachyderm.data = data;
+    pachyderm.CRC = CS; 
 }
 
 int 

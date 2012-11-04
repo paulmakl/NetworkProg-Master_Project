@@ -22,7 +22,7 @@ class Sender {
          * @param ourMAC our MAC address
          * param sendFlag Pointer to flag marking the destination to send an Ack to
          */
-        sender(RF* RFLayer, queue* theQueue, unsigned short* sendFlag,
+        Sender(RF* RFLayer, CircularFifo<int, 2>* theQueue, unsigned short* sendFlag,
                 bool* receivedFlag, unsigned short ourMAC);
 
         /**
@@ -33,9 +33,9 @@ class Sender {
     private:
     //Fields
         RF* theRF; //Pointer to the RF layer
-        short* MacAddr; //Our MAC address
+        short MacAddr; //Our MAC address
         ostream* dataStream; //ostream provided to us
-        CircularFifoi<<short,char,int>*>* infoToSend //TODO is this syntactically correct? 
+        CircularFifo<int, 2>* infoToSend; //TODO is this syntactically correct? 
         //queue<short,char,int>* outgoing_Queue:  //pointer to outgoing message queue
         bool*  ackReceived; //Pointer to flag for received acks
         unsigned short* ackToSend; //Pointer to destination addr to send Ack
@@ -75,13 +75,13 @@ class Sender {
          * @param destAddr The destination's MAC address
          * @param sendAddr The sender's MAC address
          * @param data The data to transmit
-         * @param CS
+         * @param CS CRC
          //TODO What are CS and frm?
          * @return 1 if packet was successfully built
          */
-        int buildPacket(enum frm, bool resend, unsigned short seqNum, 
+        int buildPacket(char frm, bool resend, unsigned short seqNum, 
                 unsigned short destAddr, unsigned short senderAddr,
-                *char data, int CS);
+                char* data, int CS);
        
         /**
          * Sends a packet
@@ -95,7 +95,7 @@ class Sender {
          * @return 1 if packet was successfully sent
          */
         int resend();
-}
+};
 
 
 
