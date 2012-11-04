@@ -43,7 +43,7 @@ int
 Sender:: buildPacket(char frm, bool resend, unsigned short seqNum,
             unsigned short destAddr, unsigned short senderAddr, 
             char* data, int CS) {
-    pachyderm.frameType = frm;
+    pachyderm.frametype = frm;
     pachyderm.resend = 0;
     pachyderm.sequence_number = seqNum;
     pachyderm.destination = destAddr;
