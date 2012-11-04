@@ -40,9 +40,12 @@ class Sender {
         bool*  ackReceived; //Pointer to flag for received acks
         unsigned short* ackToSend; //Pointer to destination addr to send Ack
         Packet pachyderm; //The packet to send
-
+        unsigned short seqNum; //The sequence number for transmitted packets
+        static const unsigned short MAXSEQNUM = 4095;
+        static const int SLEEPTIME = 1000;  //Wait one second to check again if
+                                            //the network is free 
+    
     //Methods
-        
         //TODO Do you actuall need these top three methods because you are just checking fields?
         /**
          * Checks the sender queue for data to be sent and checks the Ack
@@ -80,8 +83,7 @@ class Sender {
          * @return 1 if packet was successfully built
          */
         int buildPacket(char frm, bool resend, unsigned short seqNum, 
-                unsigned short destAddr, unsigned short senderAddr,
-                char* data, int CS);
+                unsigned short destAddr, char* data, int CS);
        
         /**
          * Sends a packet
@@ -89,6 +91,11 @@ class Sender {
          * @return 1 if the packet was sent correctly
          */
         int send(Packet thePacket);
+
+        /**
+         * Increments the sequence number up to 4095 then wraps around to 0
+         */
+        void incrementSeqNum(); 
 
         /**
          * Resends the current packet
