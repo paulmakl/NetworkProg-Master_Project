@@ -1,4 +1,4 @@
-/**
+/* 
  * Author: Erin Jamroz
  * Dater: November 2012
  * class: CSCI 325 University of Puget Sound
@@ -7,6 +7,7 @@
 using namespace std;
 #include <iostream>
 #include "sender.h"
+#include <unistd.h>
 
 Sender::Sender(RF* RFLayer, CircularFifo<int,2>* theQueue, unsigned short* sendFlag,
                 bool* receivedFlag, unsigned short ourMAC) {
@@ -38,8 +39,8 @@ void Sender::MasterSend() {
             //Follow pointer
             //buildPacket
             buildPacket('1', false, seqNum, 111, test, 1111, 100); //FOR TESTING 
-            //Send()
-            //start Timer
+            Send(frame);
+            //start Timer to chech for timeouts
         }
 
         //TODO Handle case of timeout and resend
@@ -49,23 +50,30 @@ void Sender::MasterSend() {
 int
 Sender:: buildPacket(short frm, bool resend, unsigned short seqNum,
             unsigned short destAddr, unsigned char* data, int CS, int size) {
-    pachyderm = Packet(frm, resend, seqNum, destAddr, macAddr, data, CS, size);
+    Packet temp = Packet(frm, resend, seqNum, destAddr, macAddr, data, CS, size);
+    pachyderm = &temp; 
+    pachyderm->buildByteArray(frame); //Frame gets the byte array to transmit
 }
-
+/*
 int 
-Sender::send(Packet thePacket) {
+Sender::send(unsigned char* theFrame) {
     //Listen to see if channel is open
-    if (!theRF->inUse()) {
-        //Transmit        
+    if (!theRF->inUse()) { //The channel is clear
+        if (theRF->transmit(*theFrame) != pachyderm->frame_size) {
+            return 0; //Did not send all of frame or
+           }
+        else {
+            return 1; //Frame transmitted properly 
+        }
     }
-    else {
-        //sleep
+    else { //The channel is busy
+        sleep(SLEEPTIME); //sleep
     }
 }
-
+*/
 int 
 Sender::resend() {
-
+    //Build Packet with a 1 for resend
 }
 
 void

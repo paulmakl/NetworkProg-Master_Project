@@ -39,11 +39,12 @@ class Sender {
         //queue<short,char,int>* outgoing_Queue:  //pointer to outgoing message queue
         bool*  ackReceived; //Pointer to flag for received acks
         unsigned short* ackToSend; //Pointer to destination addr to send Ack
-        Packet pachyderm; //The packet to send
+        Packet* pachyderm; //The packet to send
         unsigned short seqNum; //The sequence number for transmitted packets
         static const unsigned short MAXSEQNUM = 4095;
-        static const int SLEEPTIME = 1000;  //Wait one second to check again if
+        static const unsigned int SLEEPTIME = 1;  //Wait time (second) to check again if
                                             //the network is free 
+        unsigned char* frame; //The byte array to be transmitted on RF
     
     //Methods
         //TODO Do you actuall need these top three methods because you are just checking fields?
@@ -91,7 +92,7 @@ class Sender {
          * @param thePacket The packet to send
          * @return 1 if the packet was sent correctly
          */
-        int send(Packet thePacket);
+        int send(unsigned char* theFrame);
 
         /**
          * Increments the sequence number up to 4095 then wraps around to 0
