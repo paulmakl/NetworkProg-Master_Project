@@ -1,0 +1,6 @@
+Newer systems: (Make sure you include all cpp files you are using!)
+g++ sender.cpp RF.cpp packet.cpp -o TEST -I/System/Library/Frameworks/JavaVM.framework/Headers -L/System/Library/Frameworks/JavaVM.framework/Libraries -ljvm -framework JavaVM
+
+
+Older systems:
+g++ sender.cpp RF.cpp -o TEST -I/usr/lib/jvm/java-1.5.0-gcj-1.5.0.0/include -L/usr/lib/jvm/java-1.5.0-gcj-1.5.0.0/jre/lib/i386/client -ljvm

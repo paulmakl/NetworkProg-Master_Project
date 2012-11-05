@@ -12,7 +12,7 @@ Sender::Sender(RF* RFLayer, CircularFifo<int,2>* theQueue, unsigned short* sendF
                 bool* receivedFlag, unsigned short ourMAC) {
     //Initialize fields
     theRF = RFLayer;
-    MacAddr = ourMAC;
+    macAddr = ourMAC;
     infoToSend = theQueue;
     ackReceived = receivedFlag;
     ackToSend = sendFlag;
@@ -21,8 +21,8 @@ Sender::Sender(RF* RFLayer, CircularFifo<int,2>* theQueue, unsigned short* sendF
 
 void Sender::MasterSend() {
     //FOR TESTING PURPOSES
-    char b = 'a';
-    char* test = &b;
+    unsigned char b = 'a';
+    unsigned char* test = &b;
 
     while (true) {
         //Check for Ack to send
@@ -37,7 +37,7 @@ void Sender::MasterSend() {
         else {
             //Follow pointer
             //buildPacket
-            buildPacket('1', 0, seqNum, 111, test, 1111); 
+            buildPacket('1', false, seqNum, 111, test, 1111, 100); //FOR TESTING 
             //Send()
             //start Timer
         }
@@ -47,15 +47,9 @@ void Sender::MasterSend() {
 }
 
 int
-Sender:: buildPacket(char frm, bool resend, unsigned short seqNum,
-            unsigned short destAddr, char* data, int CS) {
-    pachyderm.frametype = frm;
-    pachyderm.resend = 0;
-    pachyderm.sequence_number = seqNum;
-    pachyderm.destination = destAddr;
-    pachyderm.sender = MacAddr;
-    pachyderm.data = data;
-    pachyderm.CRC = CS; 
+Sender:: buildPacket(short frm, bool resend, unsigned short seqNum,
+            unsigned short destAddr, unsigned char* data, int CS, int size) {
+    pachyderm = Packet(frm, resend, seqNum, destAddr, macAddr, data, CS, size);
 }
 
 int 

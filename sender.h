@@ -33,7 +33,7 @@ class Sender {
     private:
     //Fields
         RF* theRF; //Pointer to the RF layer
-        short MacAddr; //Our MAC address
+        short macAddr; //Our MAC address
         ostream* dataStream; //ostream provided to us
         CircularFifo<int, 2>* infoToSend; //TODO is this syntactically correct? 
         //queue<short,char,int>* outgoing_Queue:  //pointer to outgoing message queue
@@ -79,11 +79,12 @@ class Sender {
          * @param sendAddr The sender's MAC address
          * @param data The data to transmit
          * @param CS CRC
+         * @param size The size(bytes) of the data to send
          //TODO What are CS and frm?
          * @return 1 if packet was successfully built
          */
-        int buildPacket(char frm, bool resend, unsigned short seqNum, 
-                unsigned short destAddr, char* data, int CS);
+        int buildPacket(short frm, bool resend, unsigned short seqNum, 
+                unsigned short destAddr, unsigned char* data, int CS, int size);
        
         /**
          * Sends a packet
