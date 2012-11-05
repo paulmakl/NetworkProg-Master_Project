@@ -1,6 +1,5 @@
 #include "listener.h"
 
-using namespace std;
 
 short MACACK; //global varribles
 bool ack_Received;
