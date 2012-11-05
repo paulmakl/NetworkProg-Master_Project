@@ -1,26 +1,33 @@
-#include <iostream>;
+#include <iostream>
 #include <tuple>
-#include "RF.h";
-#include <Packet.h>;
-#include "CircularFifo.h" 
+#include "RF.h"
+#include <Packet.h>
+#include "CircularFifo.h"
+#include "listener.h"
+
 using namespace std;
 
+short MACACK; //global varribles
+bool ack_Received;
+unsigned short MACaddr;
+static const int MAXPACKETSIZE = 2048; //size guarenteed to hold all properly formated packets
+char buf[MAXPACKETSIZE];// buffer for the incoming packets
+CircularFifo<int,10> daLoopLine;
+RF* daRF;
 
-Listener::Listener(RF* RFLayer, CircularFifo<int,10>* incomingQueue, unsigned short* sendFlag, bool* receivedFlag, unsigned short myMAC
+Listener::Listener(RF* RFLayer, CircularFifo<int,10>* incomingQueue, unsigned short* sendFlag, bool* receivedFlag, unsigned short myMAC)
 {
     daRF = RFLayer;//our reference to the RF layer
     MACACK = sendFlag;
     MACACK = 0;//special case no need to send an ACK
-    ack_Received = recivedFlag;
+    ack_Received = receivedFlag;
     ack_Received = false;// indicates if an ack comes in
     MACaddr = myMAC;
-    char buf[MAXPACKETSIZE];// buffer for the incoming packets
-    daLine = incomingQueue;
-
+    daLoopLine = incomingQueue;
 }
 
 int
-Listener::ultraListen()
+Listener::UltraListen()
 {
     while(true){
         int bytesReceived;// bytes from the last packet
@@ -37,7 +44,11 @@ Listener::ultraListen()
         PRR = read_Packet();
         if (PRR == 1)//if the packet is relevent to us and is data queue it up
         {
-            status = queue_data();//put data in the fifo
+            short dataSource = buf[4];//extract the source address
+            dataSource << 8;
+            dataSource = dataSource + buf[5];
+            MACACK = dataSource;//let the sender know to send an ACK for this data
+            queue_data();//put data in the cirfifo
         }
         if (PRR == 2)//if the packet is relevent and is an ACK adjust ack recived flag
         {
@@ -49,7 +60,7 @@ Listener::ultraListen()
 int
 Listener::read_Packet ()
 {
-    int status;//will be returned with different status code to help ultra listen react 
+    int status;//will be returned with different status code to help ultra listen react
     short packetDest = buf[2];//bitwise terribleness
     packetDest << 8;
     packetDest = packetDest + buf[3];
@@ -65,10 +76,6 @@ Listener::read_Packet ()
     {
         case 0:
             wcerr << "Data packet received." << endl;
-            short dataSource = buf[4];//extract the source address
-            dataSource << 8;
-            dataSource = dataSource + buf[5];
-            MACACK = dataSource;//let the sender know to send an ACK for this data
             status = 1;
             break;
 
