@@ -18,7 +18,7 @@ int bytes_to_send; // this is the size of the data char array.
 int frame_size; // this is the size of the frame. It is always 10 more that bytes_to_send. 
 
 // Basic constructor. CS is the value for CRC this will eventually be taken out
-Packet::Packet(short frm, bool resen, unsigned short sn, unsigned short dest, unsigned short sendr, unsigned char* dta, int CS, int size){
+void Packet::initPacket(short frm, bool resen, unsigned short sn, unsigned short dest, unsigned short sendr, unsigned char* dta, int CS, int size){
 	frametype = frm;
 	resend = resen;
 	sequence_number = sn;
@@ -112,3 +112,6 @@ int Packet::make_resend(){
 	resend = true;
 	return 1;
 }
+int Packet::get_crc(){
+	return CRC;
+}//TEMPORARY

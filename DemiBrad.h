@@ -21,8 +21,8 @@ class DemiBrad{
 		int status();
 		int dot11_recv(short *srcAddr, short *destAddr, char *buf, int bufSize);
 		int dot11_send(short destAddr, char *buf, int bufSize);
-		int create_sender_thread(bool *ack_);
-		int create_Receiver_Thread();
+		//void *create_sender_thread(void *cnt);
+		//void *create_Receiver_Thread(void *cnt);
 		void receiveRun();
 	private:
 		short MACaddr; // users mac address
@@ -31,6 +31,7 @@ class DemiBrad{
 		short MACACK; // the address that is associated with the most recent Acknowledgement
 		CircularFifo<int, 2> send_Queue;
 		CircularFifo<int, 2> receive_Queue;
+		int counts[2];
 		//RF* RFLayer;
 		//ncoming_Queue queue <short, char, int> // a queue for incoming data
 		//outgoing_Queue queue <short, char, int> // a queue for outgoing data 
