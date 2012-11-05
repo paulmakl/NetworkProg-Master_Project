@@ -19,8 +19,7 @@ Sender::Sender(RF* RFLayer, CircularFifo<int,2>* theQueue, unsigned short* sendF
     seqNum = 0; //Initialize sequnece number to 0
 }
 
-void
-Sender::MasterSend() {
+void Sender::MasterSend() {
     //FOR TESTING PURPOSES
     char b = 'a';
     char* test = &b;

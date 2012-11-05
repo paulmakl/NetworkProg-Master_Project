@@ -6,16 +6,17 @@
  *
  */
  
-
-#include <iostream>
-#include <pthread.h>
+#include "circularfifo.h"
+#include "packet.h"
+#ifndef DemiBrad_H
+#define DemiBrad_H
 using namespace std;
 
 class DemiBrad{
 
 	public:
-
-		DemiBrad(short MACaddr, ostream *streamy);
+		//DemiBrad();
+		int dot11_init(short MACaddr, ostream *streamy);
 		int dot11_command(int cmd, int val);
 		int status();
 		int dot11_recv(short *srcAddr, short *destAddr, char *buf, int bufSize);
@@ -28,8 +29,13 @@ class DemiBrad{
 		ostream *streamy; // provided ostream
 		bool ack_Received; // flag for acknowledgment received
 		short MACACK; // the address that is associated with the most recent Acknowledgement
+		CircularFifo<int, 2> send_Queue;
+		CircularFifo<int, 2> receive_Queue;
+		//RF* RFLayer;
 		//ncoming_Queue queue <short, char, int> // a queue for incoming data
 		//outgoing_Queue queue <short, char, int> // a queue for outgoing data 
 
 
 };
+
+#endif
