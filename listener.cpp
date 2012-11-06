@@ -27,7 +27,7 @@ Listener::read_Packet ()
     short packetDest = buf[2];//bitwise terribleness
     packetDest << 8;
     packetDest = packetDest + buf[3];
-    if (packetDest != MACaddr)//compare the destination of this packet to our MAC address
+    if (packetDest != *MACaddr)//compare the destination of this packet to our MAC address
     {
         status = 0;//this packet isn't for us
         wcerr << "Packet not addressed to current MAC address." << endl;
@@ -80,12 +80,13 @@ Listener::UltraListen()
             short dataSource = buf[4];//extract the source address
             dataSource << 8;
             dataSource = dataSource + buf[5];
-            MACACK = *dataSource;//let the sender know to send an ACK for this data
+            MACACK = dataSource;//let the sender know to send an ACK for this data
             queue_data();//put data in the cirfifo
         }
         if (PRR == 2)//if the packet is relevent and is an ACK adjust ack recived flag
         {
-            ack_Received = true;
+            bool temp = true
+            ack_Received = &temp;
         }
     }
 }
@@ -102,6 +103,9 @@ Listener::queue_data()
     {
         dataIn[i-6] = buf[i];//the offset of six is the front header being skipped in our buf and the four less is the CRC
     }
-    auto packetInfo = make_tuple (dataSource, size, dataIn);//bundle up our relevent data
-    daLoopLine->push(*packetInfo);
+    //need packet shit  daLoopLine->push(*packetInfo);
 }
+
+
+
+

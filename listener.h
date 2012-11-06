@@ -7,11 +7,9 @@
  */
 
 #include <iostream>
-#include <tuple>
 #include "RF.h"
-#include <Packet.h>
+#include <packet.h>
 #include "CircularFifo.h"
-#include <tuple>
 using namespace std;
 
 
@@ -51,7 +49,7 @@ private:
      * second it looks to see if the packet is addressed to our MAC address if not it disregards it
      * finally if the packet is for us it determines if it is an ACK or incoming data responding accordingly
      */
-     int read_packet();
+     int read_Packet();
 
      /*
       * if an incoming packet is for us and has data for us then this method packs the relevent information,

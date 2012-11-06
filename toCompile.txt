@@ -1,6 +1,5 @@
-Newer systems: (Make sure you include all cpp files you are using!)
-g++ sender.cpp RF.cpp packet.cpp -o TEST -I/System/Library/Frameworks/JavaVM.framework/Headers -L/System/Library/Frameworks/JavaVM.framework/Libraries -ljvm -framework JavaVM
+For SENDER: (Make sure you include all cpp files you are using!)
+g++ sender.cpp RF.cpp packet.cpp -o SEND_TEST -I/System/Library/Frameworks/JavaVM.framework/Headers -L/System/Library/Frameworks/JavaVM.framework/Libraries -ljvm -framework JavaVM -arch i386
 
-
-Older systems:
-g++ sender.cpp RF.cpp -o TEST -I/usr/lib/jvm/java-1.5.0-gcj-1.5.0.0/include -L/usr/lib/jvm/java-1.5.0-gcj-1.5.0.0/jre/lib/i386/client -ljvm
+For RECEIVER:
+g++ listener.cpp RF.cpp packet.cpp -o LIST_TEST -I/System/Library/Frameworks/JavaVM.framework/Headers -L/System/Library/Frameworks/JavaVM.framework/Libraries -ljvm -framework JavaVM
