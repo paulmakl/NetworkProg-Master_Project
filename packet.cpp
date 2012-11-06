@@ -38,6 +38,24 @@ void Packet::initPacket(short frm, bool resen, unsigned short sn, unsigned short
     buildByteArray(); //Build the frame
 }
 
+//Weston's Additions: overwritten "constructor" to unpack data from listener going to demi brad
+void Packet::initPacket(unsigned char *pac, int byts)
+{
+    int size = byts-10;//total size of incoming data minus 10 bytes of header and CRC
+    bytes_to_send = size;
+    unsigned char dataIn[size];//a new char array for just the incoming data
+    unsigned short dataSource = pac[4] + 0;//extract the source address
+    dataSource << 8;
+    dataSource = dataSource + pac[5];
+    sender = dataSource;
+    for (int i = 6; i < byts-4; ++i)//strip the headers and put just the data in our packet
+    {
+        dataIn[i-6] = pac[i];//the offset of six is the front header being skipped in our buf and the four less is the CRC
+    }
+    data = dataSource;
+    pointer_data_to_physical(); //Make the physical copy
+}
+
 void Packet::pointer_data_to_physical(){
 	int i = 0;
 	while(i < bytes_to_send){
