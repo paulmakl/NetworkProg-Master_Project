@@ -30,7 +30,7 @@ public:
 private:
 
 
-    unsigned short* MACaddr; //a pointer to our MAC address
+    unsigned short* MACaddr_listner; //a pointer to our MAC address
     ostream *streamy; //the given output stream for data to the layer above
     unsigned short* MACACK_listener;//a pointer to the MAC address of the most recent sender of data that has not been sent an ACK yet
     // or assuming that none need to be sent a special case of zero should be used to indicate this

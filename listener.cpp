@@ -2,8 +2,8 @@
 //#include "DemiBrad.h"
 
 short MACACK_listener; //global varribles
-bool ack_Received;
-unsigned short MACaddr;
+bool ack_Received_listener;
+unsigned short MACaddr_listner;
 static const int MAXPACKETSIZE = 2048; //size guarenteed to hold all properly formated packets
 char buf[MAXPACKETSIZE];// buffer for the incoming packets
 CircularFifo<Packet* ,10> daLoopLine;
@@ -28,7 +28,7 @@ Listener::read_Packet ()
     short packetDest = buf[2];//bitwise terribleness
     packetDest << 8;
     packetDest = packetDest + buf[3];
-    if (packetDest != *MACaddr)//compare the destination of this packet to our MAC address
+    if (packetDest != *MACaddr_listner)//compare the destination of this packet to our MAC address
     {
         status = 0;//this packet isn't for us
         wcerr << "Packet not addressed to current MAC address." << endl;
@@ -88,7 +88,7 @@ Listener::UltraListen()
         if (PRR == 2)//if the packet is relevent and is an ACK adjust ack recived flag
         {
             bool temp = true;
-            ack_Received = &temp;
+            ack_Received_listener = &temp;
         }
     }
 }
