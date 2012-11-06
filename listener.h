@@ -26,6 +26,7 @@ public:
      * starts the thread listening for imcoming messages
      */
     Listener(RF* RFLayer, CircularFifo<Packet* ,10>* incomingQueue, unsigned short* sendFlag, bool* receivedFlag, unsigned short myMAC);
+    int UltraListen();
 
 private:
 
@@ -46,7 +47,7 @@ private:
     /*
      * the heart of the listener watches activity on the RF layer and blocks until a packet is recived
      */
-    int UltraListen();
+    
 
     /*
      * looks at a packet to check for three things from every packet that comes across the the RF layer

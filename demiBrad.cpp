@@ -10,7 +10,8 @@ ostream* streamy_demibrad; // provided ostream
 bool ack_Received_demibrad; // flag for acknowledgment received
 short MACACK_demibrad; // the address that is associated with the most recent Acknowledgement
 //incoming_Queue queue <short, char, int> // a queue for incoming data
-//outgoing_Queue queue <short, char, int> // a queue for outgoing data 
+//outgoing_Queue queue <short, char, int> // a queue for outgoing data
+unsigned short test; 
 RF* RFLayer_demibrad;
 CircularFifo<Packet*, 10> send_Queue_demibrad;
 CircularFifo<Packet*, 10> receive_Queue_demibrad;
@@ -19,19 +20,15 @@ int memory_buffer_number_count_demibrad;
 void *create_sender_thread(void *cnt){
 	RFLayer_demibrad->attachThread();
 	wcerr << "sender thread";
-	int i = 0;
-	while(true){
-		i++;
-	}
+	Sender sendy(RFLayer_demibrad, &send_Queue_demibrad, &test, &ack_Received_demibrad, MACACK_demibrad);
 	return (void *)0;
 }
 void *create_Receiver_Thread(void *cnt){
 	RFLayer_demibrad->attachThread();
 	wcerr << "receiver thread";
-	int i = 0;
-	while(true){
-		i++;
-	}
+	bool hello = true;
+	Listener listen(RFLayer_demibrad, &receive_Queue_demibrad, &test, &ack_Received_demibrad, MACaddr_demibrad);
+	listen.UltraListen();
 	return (void *)0;
 }
 
@@ -40,7 +37,7 @@ int DemiBrad::dot11_init(short MACadr, ostream* stremy){
 	MACaddr_demibrad = MACadr;
 	streamy_demibrad = stremy;
 	RFLayer_demibrad = new RF();
-
+	test = 803;
 	pthread_t ids[3];
     pthread_attr_t attr;
     pthread_attr_init(&attr);
