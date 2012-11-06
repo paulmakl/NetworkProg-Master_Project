@@ -16,7 +16,8 @@ Listener::Listener(RF* RFLayer, CircularFifo<int,10>* incomingQueue, unsigned sh
     MACACK = 0;//special case no need to send an ACK
     ack_Received = receivedFlag;//flag for telling the sending an ACK has come in
     ack_Received = false;// indicates no ACKs recived
-    MACaddr = myMAC;//our mac address for knowing if packets have come to the right place
+    unsigned short temp = myMAC;//our mac address for knowing if packets have come to the right place
+    MACaddr = &temp;
     daLoopLine = incomingQueue;//where incoming data will be sent via pointers to tuples
 }
 
@@ -77,15 +78,16 @@ Listener::UltraListen()
         PRR = read_Packet();
         if (PRR == 1)//if the packet is relevent to us and is data queue it up
         {
-            short dataSource = buf[4];//extract the source address
+            unsigned short dataSource = buf[4];//extract the source address
             dataSource << 8;
-            dataSource = dataSource + buf[5];
-            MACACK = dataSource;//let the sender know to send an ACK for this data
+            dataSource = dataSource + buf[5] + 0;
+            unsigned short temp = dataSource;//let the sender know to send an ACK for this data
+            MACACK = &temp;
             queue_data();//put data in the cirfifo
         }
         if (PRR == 2)//if the packet is relevent and is an ACK adjust ack recived flag
         {
-            bool temp = true
+            bool temp = true;
             ack_Received = &temp;
         }
     }
@@ -94,6 +96,12 @@ Listener::UltraListen()
 int
 Listener::queue_data()
 {
+    Packet toDemiBrad;
+    toDemiBrad.initPacket(*buf, bytesReceived);
+    daLoopLine.push(*toDemiBrad);
+    
+    /*  
+     * this is the code that has moved over to packet now 
     int size = bytesReceived-10;//total size of incoming data minus 10 bytes of header and CRC
     char dataIn[size];//a new char array for just the incoming data
     short dataSource = buf[4];//extract the source address
@@ -103,6 +111,7 @@ Listener::queue_data()
     {
         dataIn[i-6] = buf[i];//the offset of six is the front header being skipped in our buf and the four less is the CRC
     }
+    */ 
     //need packet shit  daLoopLine->push(*packetInfo);
 }
 
