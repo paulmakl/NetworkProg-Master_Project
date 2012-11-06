@@ -18,10 +18,14 @@ int main(int argc, char const *argv[])
 	DemiBrad yar;
 	yar.dot11_init(MACaddrr, streamyy);
 	wcerr << "DOING IMPORTANT STUFF RIGHT HERE!!!!!";
-	int j = 0;
-	while(true){
-		j++;
-	}
+	char data[5];
+	data[0] = 'A';
+	data[1] = 'B';
+	data[2] = 'C';
+	data[3] = 'D';
+	data[4] = 'E';
+	yar.dot11_send(809, &data[0], 5);
+
     return 0;
 }
 
