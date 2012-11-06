@@ -5,19 +5,19 @@
 
 using namespace std;
 
-short MACaddr; // users mac address
-ostream* streamy; // provided ostream
+short MACaddr_demibrad; // users mac address
+ostream* streamy_demibrad; // provided ostream
 bool ack_Received_demibrad; // flag for acknowledgment received
-short MACACK; // the address that is associated with the most recent Acknowledgement
+short MACACK_demibrad; // the address that is associated with the most recent Acknowledgement
 //incoming_Queue queue <short, char, int> // a queue for incoming data
 //outgoing_Queue queue <short, char, int> // a queue for outgoing data 
-RF* RFLayer;
-CircularFifo<Packet*, 10> send_Queue;
-CircularFifo<Packet*, 10> receive_Queue;
-Packet memory_buffer[500];
-int memory_buffer_number_count;
+RF* RFLayer_demibrad;
+CircularFifo<Packet*, 10> send_Queue_demibrad;
+CircularFifo<Packet*, 10> receive_Queue_demibrad;
+Packet memory_buffer_demibrad[500];
+int memory_buffer_number_count_demibrad;
 void *create_sender_thread(void *cnt){
-	RFLayer->attachThread();
+	RFLayer_demibrad->attachThread();
 	wcerr << "sender thread";
 	int i = 0;
 	while(true){
@@ -26,7 +26,7 @@ void *create_sender_thread(void *cnt){
 	return (void *)0;
 }
 void *create_Receiver_Thread(void *cnt){
-	RFLayer->attachThread();
+	RFLayer_demibrad->attachThread();
 	wcerr << "receiver thread";
 	int i = 0;
 	while(true){
@@ -36,10 +36,10 @@ void *create_Receiver_Thread(void *cnt){
 }
 
 int DemiBrad::dot11_init(short MACadr, ostream* stremy){
-	memory_buffer_number_count = 0;
-	MACaddr = MACadr;
-	streamy = stremy;
-	RFLayer = new RF();
+	memory_buffer_number_count_demibrad = 0;
+	MACaddr_demibrad = MACadr;
+	streamy_demibrad = stremy;
+	RFLayer_demibrad = new RF();
 
 	pthread_t ids[3];
     pthread_attr_t attr;
@@ -47,7 +47,7 @@ int DemiBrad::dot11_init(short MACadr, ostream* stremy){
     pthread_attr_setscope(&attr, PTHREAD_SCOPE_SYSTEM);  
     pthread_setconcurrency(3);
     int counts[3];
-    RFLayer->attachThread();
+    RFLayer_demibrad->attachThread();
     pthread_create(&(ids[0]), &attr, create_sender_thread, &(counts[0]));
     pthread_create(&(ids[1]), &attr, create_Receiver_Thread, &(counts[1]));
     //pthread_join(ids[0], NULL);
@@ -63,7 +63,7 @@ int DemiBrad::status(){
 int DemiBrad::dot11_recv(short *srcAddr, short *destAddr, char *buf, int bufSize){
 	Packet * temp_pointer;
 	Packet temp;
-	receive_Queue.pop(temp_pointer);
+	receive_Queue_demibrad.pop(temp_pointer);
 	temp = *temp_pointer;
 	*srcAddr = temp.sender;
 	*destAddr = temp.destination;
@@ -75,16 +75,16 @@ int DemiBrad::dot11_recv(short *srcAddr, short *destAddr, char *buf, int bufSize
 }
 int DemiBrad::dot11_send(short destAddr, char *buf, int bufSize){
 	Packet temp;
-	memory_buffer[memory_buffer_number_count] = temp;
-	memory_buffer[memory_buffer_number_count].initPacket(0,false,0,destAddr,MACaddr,buf,0,bufSize);
-	Packet * temp_pointer = &memory_buffer[memory_buffer_number_count];
-	send_Queue.push(temp_pointer);
-	if (memory_buffer_number_count > 499)
+	memory_buffer_demibrad[memory_buffer_number_count_demibrad] = temp;
+	memory_buffer_demibrad[memory_buffer_number_count_demibrad].initPacket(0,false,0,destAddr,MACaddr_demibrad,buf,0,bufSize);
+	Packet * temp_pointer = &memory_buffer_demibrad[memory_buffer_number_count_demibrad];
+	send_Queue_demibrad.push(temp_pointer);
+	if (memory_buffer_number_count_demibrad > 499)
 	{
-		memory_buffer_number_count = 0;
+		memory_buffer_number_count_demibrad = 0;
 	}
 	else{
-		memory_buffer_number_count++;
+		memory_buffer_number_count_demibrad++;
 	}
 	return 1;
 }

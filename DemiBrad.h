@@ -34,15 +34,15 @@ class DemiBrad{
 		//void *create_Receiver_Thread(void *cnt);
 		void receiveRun();
 	private:
-		short MACaddr; // users mac address
-		ostream *streamy; // provided ostream
+		short MACaddr_demibrad; // users mac address
+		ostream *streamy_demibrad; // provided ostream
 		bool ack_Received_demibrad; // flag for acknowledgment received
-		short MACACK_Demi; // the address that is associated with the most recent Acknowledgement
-		CircularFifo<Packet*, 10> send_Queue;
-		CircularFifo<Packet*, 10> receive_Queue;
-		int counts[3];
-		int memory_buffer_number_count;
-		Packet memory_buffer[500];
+		short MACACK_demibrad; // the address that is associated with the most recent Acknowledgement
+		CircularFifo<Packet*, 10> send_Queue_demibrad;
+		CircularFifo<Packet*, 10> receive_Queue_demibrad;
+		int counts_demibrad[3];
+		int memory_buffer_number_count_demibrad;
+		Packet memory_buffer_demibrad[500];
 		//RF* RFLayer;
 		//ncoming_Queue queue <short, char, int> // a queue for incoming data
 		//outgoing_Queue queue <short, char, int> // a queue for outgoing data 
