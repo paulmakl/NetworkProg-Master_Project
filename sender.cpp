@@ -39,7 +39,7 @@ void Sender::MasterSend() {
             //Follow pointer
             //buildPacket
             buildPacket('1', false, seqNum, 111, test, 1111, 100); //FOR TESTING 
-            Send(frame);
+            //Send(frame);
             //start Timer to chech for timeouts
         }
 
@@ -59,7 +59,7 @@ int
 Sender::send(unsigned char* theFrame) {
     //Listen to see if channel is open
     if (!theRF->inUse()) { //The channel is clear
-        if (theRF->transmit(*theFrame) != pachyderm->frame_size) {
+        if (theRF->transmit(*theFrame, pachyderm->) != pachyderm->frame_size) {
             return 0; //Did not send all of frame or
            }
         else {
