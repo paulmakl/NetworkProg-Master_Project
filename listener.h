@@ -21,7 +21,7 @@ public:
      * constructor for the listener class that sets up all our sexy varribles and
      * starts the thread listening for imcoming messages
      */
-    Listener(RF* RFLayer, CircularFifo<int,10>* incomingQueue, unsigned short* sendFlag, bool* receivedFlag, unsigned short myMAC);
+    Listener(RF* RFLayer, CircularFifo<Packet* ,10>* incomingQueue, unsigned short* sendFlag, bool* receivedFlag, unsigned short myMAC);
 
 private:
 
@@ -33,7 +33,7 @@ private:
     bool* ack_Received;// a pointer to a boolean that indicates whether or not a ACK has been recived
     static const int MAXPACKETSIZE = 2048; //size guarenteed to hold all properly formated packets
     char buf[MAXPACKETSIZE];// buffer for the incoming packets
-    CircularFifo<int,2>* daLoopLine;//a queue for the outgoing data
+    CircularFifo<Packet*,10>* daLoopLine;//a queue for the outgoing data
     
     RF* daRF;//the reference to the RF layer
     int bytesReceived;// bytes from the last packet

@@ -6,10 +6,10 @@ bool ack_Received;
 unsigned short MACaddr;
 static const int MAXPACKETSIZE = 2048; //size guarenteed to hold all properly formated packets
 char buf[MAXPACKETSIZE];// buffer for the incoming packets
-CircularFifo<int,10> daLoopLine;
+CircularFifo<Packet* ,10> daLoopLine;
 RF* daRF;
 
-Listener::Listener(RF* RFLayer, CircularFifo<int,10>* incomingQueue, unsigned short* sendFlag, bool* receivedFlag, unsigned short myMAC)
+Listener::Listener(RF* RFLayer, CircularFifo<Packet* ,10>* incomingQueue, unsigned short* sendFlag, bool* receivedFlag, unsigned short myMAC)
 {
     daRF = RFLayer;//our reference to the RF layer
     MACACK = sendFlag;//where the address that requires an ACK goes
@@ -97,8 +97,9 @@ int
 Listener::queue_data()
 {
     Packet toDemiBrad;
-    toDemiBrad.initPacket(*buf, bytesReceived);
-    daLoopLine.push(*toDemiBrad);
+    toDemiBrad.initPacket(&buf[0], bytesReceived);
+    Packet * rawr = &toDemiBrad;
+    daLoopLine->push(rawr);
     
     /*  
      * this is the code that has moved over to packet now 
