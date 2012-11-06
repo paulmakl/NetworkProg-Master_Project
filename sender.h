@@ -35,7 +35,7 @@ class Sender {
     private:
     //Fields
         RF* theRF; //Pointer to the RF layer
-        short macAddr; //Our MAC address
+        short macAddr_Sender; //Our MAC address
         ostream* dataStream; //ostream provided to us
         CircularFifo<Packet*,10>* infoToSend; //A queue to check for outgoing data 
         //queue<short,char,int>* outgoing_Queue:  //pointer to outgoing message queue

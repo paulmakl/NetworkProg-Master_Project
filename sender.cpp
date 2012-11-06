@@ -14,7 +14,7 @@ Sender::Sender(RF* RFLayer, CircularFifo<Packet*,10>* theQueue, unsigned short* 
                 bool* receivedFlag, unsigned short ourMAC) {
     //Initialize fields
     theRF = RFLayer;
-    macAddr = ourMAC;
+    macAddr_Sender = ourMAC;
     infoToSend = theQueue;
     ackReceived = receivedFlag;
     ackToSend = sendFlag;
@@ -51,7 +51,7 @@ void Sender::MasterSend() {
 int
 Sender:: buildFrame(short frm, bool resend, unsigned short seqNum,
             unsigned short destAddr, char* data, int CS, int size) {
-    pachyderm.initPacket(frm, resend, seqNum, destAddr, macAddr, data, CS, size);
+    pachyderm.initPacket(frm, resend, seqNum, destAddr, macAddr_Sender, data, CS, size);
 }
 
 int 
