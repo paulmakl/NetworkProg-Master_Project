@@ -1,7 +1,7 @@
 #include "listener.h"
+//#include "DemiBrad.h"
 
-
-short MACACK; //global varribles
+short MACACK_listener; //global varribles
 bool ack_Received;
 unsigned short MACaddr;
 static const int MAXPACKETSIZE = 2048; //size guarenteed to hold all properly formated packets
@@ -12,8 +12,8 @@ RF* daRF;
 Listener::Listener(RF* RFLayer, CircularFifo<Packet* ,10>* incomingQueue, unsigned short* sendFlag, bool* receivedFlag, unsigned short myMAC)
 {
     daRF = RFLayer;//our reference to the RF layer
-    MACACK = sendFlag;//where the address that requires an ACK goes
-    MACACK = 0;//special case no need to send an ACK
+    MACACK_listener = sendFlag;//where the address that requires an ACK goes
+    MACACK_listener = 0;//special case no need to send an ACK
     ack_Received = receivedFlag;//flag for telling the sending an ACK has come in
     ack_Received = false;// indicates no ACKs recived
     unsigned short temp = myMAC;//our mac address for knowing if packets have come to the right place
@@ -82,7 +82,7 @@ Listener::UltraListen()
             dataSource << 8;
             dataSource = dataSource + buf[5] + 0;
             unsigned short temp = dataSource;//let the sender know to send an ACK for this data
-            MACACK = &temp;
+            MACACK_listener = &temp;
             queue_data();//put data in the cirfifo
         }
         if (PRR == 2)//if the packet is relevent and is an ACK adjust ack recived flag

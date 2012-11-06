@@ -6,12 +6,16 @@
  * Weston Thornburg
  */
 
+
+
 #include <iostream>
-#include "RF.h"
+//#include "DemiBrad.h"
 #include "packet.h"
 #include "CircularFifo.h"
+#include "RF.h"
+//#ifndef __RF_H_INCLUDED__   // if x.h hasn't been included yet...
+//#define __RF_H_INCLUDED__
 using namespace std;
-
 
 class Listener
 {
@@ -28,9 +32,9 @@ private:
 
     unsigned short* MACaddr; //a pointer to our MAC address
     ostream *streamy; //the given output stream for data to the layer above
-    unsigned short* MACACK;//a pointer to the MAC address of the most recent sender of data that has not been sent an ACK yet
+    unsigned short* MACACK_listener;//a pointer to the MAC address of the most recent sender of data that has not been sent an ACK yet
     // or assuming that none need to be sent a special case of zero should be used to indicate this
-    bool* ack_Received;// a pointer to a boolean that indicates whether or not a ACK has been recived
+    bool* ack_Received_listener;// a pointer to a boolean that indicates whether or not a ACK has been recived
     static const int MAXPACKETSIZE = 2048; //size guarenteed to hold all properly formated packets
     char buf[MAXPACKETSIZE];// buffer for the incoming packets
     CircularFifo<Packet*,10>* daLoopLine;//a queue for the outgoing data
@@ -59,3 +63,5 @@ private:
       */
       int queue_data();
 };
+//#endif
+

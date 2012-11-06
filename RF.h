@@ -15,7 +15,8 @@
  * Brad Richards, 9/2008
  */
 
-
+#ifndef __RF_H_INCLUDED__
+#define __RF_H_INCLUDED__
 #include <jni.h>
 #define  MAX_RF_PKT_SIZE  2048
 
@@ -112,3 +113,4 @@ class RF
     
     JNIEnv *getEnvPtr();
 };
+#endif

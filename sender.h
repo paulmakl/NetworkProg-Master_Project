@@ -8,10 +8,12 @@
 
 using namespace std;
 #include <iostream>
+//#include "DemiBrad.h"
 #include "packet.h"
+#include "CircularFifo.h"
 #include "RF.h"
-#include "circularfifo.h"
-
+//#ifndef __RF_H_INCLUDED__   // if x.h hasn't been included yet...
+//#define __RF_H_INCLUDED__
 class Sender {
     public:
         /**
@@ -37,7 +39,7 @@ class Sender {
         ostream* dataStream; //ostream provided to us
         CircularFifo<Packet*,10>* infoToSend; //A queue to check for outgoing data 
         //queue<short,char,int>* outgoing_Queue:  //pointer to outgoing message queue
-        bool*  ackReceived; //Pointer to flag for received acks
+        bool* ackReceived; //Pointer to flag for received acks
         unsigned short* ackToSend; //Pointer to destination addr to send Ack
         Packet pachyderm; //The packet to send
         unsigned short seqNum; //The sequence number for transmitted packets
@@ -105,20 +107,4 @@ class Sender {
          */
         int resend();
 };
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+//#endif
