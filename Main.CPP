@@ -26,14 +26,15 @@ int main(int argc, char const *argv[])
 	// create a pointer to the data
 	unsigned char* test = &data[0];
 	// create a packet
-	Packet packy(3,true,5,257,514,test,67372036,bytes_to_send);
+	Packet packy;
+	packy.initPacket(3,true,5,257,514,test,67372036,bytes_to_send);
 	// 
 	unsigned char data_with_frame[bytes_to_send + 10];
 	unsigned char* pointer_two = &data_with_frame[0];
-	packy.buildByteArray(pointer_two);
+	//packy.buildByteArray();
 	int i = 0;
 	while(i< (bytes_to_send+10)){
-		cout << ": " << data_with_frame[i] + 0 << " :";
+		cout << ": " << packy.physical_frame[i] + 0 << " :";
 		i++;
 	}
 	//Packet billy;
@@ -44,5 +45,5 @@ int main(int argc, char const *argv[])
 
 
 /* IGNORE THIS
-g++ sender.cpp RF.cpp packet.cpp -o bcast -I/System/Library/Frameworks/JavaVM.framework/Headers -L/System/Library/Frameworks/JavaVM.framework/Libraries -ljvm  -framework JavaVM
+g++ Main.cpp Demibrad.cpp packet.cpp RF.cpp -o bcast -I/System/Library/Frameworks/JavaVM.framework/Headers -L/System/Library/Frameworks/JavaVM.framework/Libraries -ljvm  -framework JavaVM
 */

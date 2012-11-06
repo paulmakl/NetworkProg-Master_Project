@@ -1,11 +1,5 @@
-#include <iostream>
-#include <tuple>
-#include "RF.h"
-#include <Packet.h>
-#include "CircularFifo.h"
 #include "listener.h"
 
-using namespace std;
 
 short MACACK; //global varribles
 bool ack_Received;
@@ -18,43 +12,12 @@ RF* daRF;
 Listener::Listener(RF* RFLayer, CircularFifo<int,10>* incomingQueue, unsigned short* sendFlag, bool* receivedFlag, unsigned short myMAC)
 {
     daRF = RFLayer;//our reference to the RF layer
-    MACACK = sendFlag;
+    MACACK = sendFlag;//where the address that requires an ACK goes
     MACACK = 0;//special case no need to send an ACK
-    ack_Received = receivedFlag;
-    ack_Received = false;// indicates if an ack comes in
-    MACaddr = myMAC;
-    daLoopLine = incomingQueue;
-}
-
-int
-Listener::UltraListen()
-{
-    while(true){
-        int bytesReceived;// bytes from the last packet
-        int PRR;//Packet Read Result
-        // wait for data
-        bytesReceived = daRF->receive(buf, MAXPACKETSIZE);//block until data comes our way
-            //print the bytes received and checks for errors
-        if (bytesReceived != MAXPACKETSIZE){
-            wcerr << "Received  partial Packet with " << bytesReceived << " bytes of data!" << endl;
-        }
-        else{
-            wcerr << bytesReceived << " !Full Packet Received! woo! ";
-        }
-        PRR = read_Packet();
-        if (PRR == 1)//if the packet is relevent to us and is data queue it up
-        {
-            short dataSource = buf[4];//extract the source address
-            dataSource << 8;
-            dataSource = dataSource + buf[5];
-            MACACK = dataSource;//let the sender know to send an ACK for this data
-            queue_data();//put data in the cirfifo
-        }
-        if (PRR == 2)//if the packet is relevent and is an ACK adjust ack recived flag
-        {
-            ack_Received = true;
-        }
-    }
+    ack_Received = receivedFlag;//flag for telling the sending an ACK has come in
+    ack_Received = false;// indicates no ACKs recived
+    MACaddr = myMAC;//our mac address for knowing if packets have come to the right place
+    daLoopLine = incomingQueue;//where incoming data will be sent via pointers to tuples
 }
 
 int
@@ -95,4 +58,50 @@ Listener::read_Packet ()
             break;
     }
     return status;
+}
+
+int
+Listener::UltraListen()
+{
+    while(true){
+        int PRR;//Packet Read Result
+        // wait for data
+        bytesReceived = daRF->receive(buf, MAXPACKETSIZE);//block until data comes our way
+            //print the bytes received and checks for errors
+        if (bytesReceived != MAXPACKETSIZE){
+            wcerr << "Received  partial Packet with " << bytesReceived << " bytes of data!" << endl;
+        }
+        else{
+            wcerr << bytesReceived << " !Full Packet Received! woo! ";
+        }
+        PRR = read_Packet();
+        if (PRR == 1)//if the packet is relevent to us and is data queue it up
+        {
+            short dataSource = buf[4];//extract the source address
+            dataSource << 8;
+            dataSource = dataSource + buf[5];
+            MACACK = *dataSource;//let the sender know to send an ACK for this data
+            queue_data();//put data in the cirfifo
+        }
+        if (PRR == 2)//if the packet is relevent and is an ACK adjust ack recived flag
+        {
+            ack_Received = true;
+        }
+    }
+}
+
+int
+Listener::queue_data()
+{
+    int size = bytesReceived-10;//total size of incoming data minus 10 bytes of header and CRC
+    char dataIn[size];//a new char array for just the incoming data
+    short dataSource = buf[4];//extract the source address
+    dataSource << 8;
+    dataSource = dataSource + buf[5];
+    for (int i = 6; i < bytesReceived-4; ++i)//strip the headers and put just the data in our tuple
+    {
+        dataIn[i-6] = buf[i];//the offset of six is the front header being skipped in our buf and the four less is the CRC
+    }
+    auto packetInfo = make_tuple (dataSource, size, dataIn);//bundle up our relevent data
+    daLoopLine->push(*packetInfo);
 }
