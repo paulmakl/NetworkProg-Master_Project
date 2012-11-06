@@ -29,8 +29,8 @@ class DemiBrad{
 		ostream *streamy; // provided ostream
 		bool ack_Received; // flag for acknowledgment received
 		short MACACK; // the address that is associated with the most recent Acknowledgement
-		CircularFifo<int, 2> send_Queue;
-		CircularFifo<int, 2> receive_Queue;
+		CircularFifo<Packet*, 10> send_Queue;
+		CircularFifo<Packet*, 10> receive_Queue;
 		int counts[2];
 		//RF* RFLayer;
 		//ncoming_Queue queue <short, char, int> // a queue for incoming data

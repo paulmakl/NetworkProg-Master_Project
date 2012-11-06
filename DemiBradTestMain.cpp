@@ -14,7 +14,7 @@ using namespace std;
 
 int main(int argc, char const *argv[])
 {
-	CircularFifo<Packet, 3> infoToSend;
+	/*CircularFifo<Packet*, 3> infoToSend;
 	const int bytes_to_send = 5;
 	unsigned char data[bytes_to_send];
 	// fill in the data array with dummy data
@@ -28,29 +28,13 @@ int main(int argc, char const *argv[])
 	// create a packet
 	Packet packy;
 	packy.initPacket(3,true,5,257,514,test,67372036,bytes_to_send);
-	infoToSend.push(packy);
-	Packet rawr;
-	rawr.initPacket(3,true,5,257,514,test,3,bytes_to_send);
+	Packet * packpoint = &packy;
+	infoToSend.push(packpoint);
+	Packet * rawr;
+	//rawr.initPacket(3,true,5,257,514,test,3,bytes_to_send);
 	infoToSend.pop(rawr);
-	cout << rawr.get_crc() << "\n";
-	
-
-
-	/*int a = 1;
-	int b = 2;
-	int c = 3;
-	int * e = &a;
-	int * f = &b;
-	int * g = &c;
-	infoToSend.push(e);
-	infoToSend.push(f);
-	infoToSend.push(g);
-	int i = 0;
-	while(i < 3){
-		int x = 0;
-		i++;
-	}*/
-	//int * y = &x[0];
+	Packet imback = *rawr;
+	//cout << rawr.get_crc() << "\n";*/
 
 
 	short MACaddrr = 3; // users mac address
