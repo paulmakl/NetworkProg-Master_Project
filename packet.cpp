@@ -32,7 +32,12 @@ void Packet::initPacket(short frm, bool resen, unsigned short sn, unsigned short
 	frame_size = size + 10;
 	pointer_data_to_physical();
 	buildByteArray();
+    
+    //FUNCTIONALITY ADDED BY ERIN: I want everything to be done in the "constructor"
+    pointer_data_to_physical(); //Make the physical copy
+    buildByteArray(); //Build the frame
 }
+
 void Packet::pointer_data_to_physical(){
 	int i = 0;
 	while(i < bytes_to_send){
@@ -116,11 +121,15 @@ int Packet::buildByteArray(){
 	}
 	//time for a nap...
 }
+
+/* TODO Sender handles this, it should be removed
 //make the resend variable true.
 int Packet::make_resend(){
 	resend = true;
 	return 1;
 }
+*/
+
 int Packet::get_crc(){
 	return CRC;
 }//TEMPORARY
