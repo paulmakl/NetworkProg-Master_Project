@@ -12,15 +12,15 @@ bool resend; // if true, this packet is a resend packet.
 unsigned short sequence_number; // the sequence number for the packet.
 unsigned short destination; // the destination mac address for everything
 unsigned short sender; // the sender mac address
-unsigned char* data; // a pointer to an unsigned char array. It cointains the data that the user wants to send
+char* data; // a pointer to an char array. It cointains the data that the user wants to send
 unsigned int CRC; // currently, you can pass in the CRC, this will eventually be taken out but until CRC is implemented it will remain in. 
 int bytes_to_send; // this is the size of the data char array.
 int frame_size; // this is the size of the frame. It is always 10 more that bytes_to_send.
-unsigned char physical_data_array[2048];
-unsigned char physical_frame[2048]; // THIS IS THE FRAME GRAB THIS!!!!!!!!
+char physical_data_array[2048];
+char physical_frame[2048]; // THIS IS THE FRAME GRAB THIS!!!!!!!!
 
 // Basic constructor. CS is the value for CRC this will eventually be taken out
-void Packet::initPacket(short frm, bool resen, unsigned short sn, unsigned short dest, unsigned short sendr, unsigned char* dta, int CS, int size){
+void Packet::initPacket(short frm, bool resen, unsigned short sn, unsigned short dest, unsigned short sendr, char* dta, int CS, int size){
 	frametype = frm;
 	resend = resen;
 	sequence_number = sn;
@@ -39,11 +39,11 @@ void Packet::initPacket(short frm, bool resen, unsigned short sn, unsigned short
 }
 
 //Weston's Additions: overwritten "constructor" to unpack data from listener going to demi brad
-void Packet::initPacket(unsigned char *pac, int byts)
+void Packet::initPacket(char *pac, int byts)
 {
     int size = byts-10;//total size of incoming data minus 10 bytes of header and CRC
     bytes_to_send = size;
-    unsigned char dataIn[size];//a new char array for just the incoming data
+    char dataIn[size];//a new char array for just the incoming data
     unsigned short dataSource = pac[4] + 0;//extract the source address
     dataSource << 8;
     dataSource = dataSource + pac[5];
@@ -52,7 +52,7 @@ void Packet::initPacket(unsigned char *pac, int byts)
     {
         dataIn[i-6] = pac[i];//the offset of six is the front header being skipped in our buf and the four less is the CRC
     }
-    unsigned char * king_of_france = &dataIn[0];
+    char * king_of_france = &dataIn[0];
     data = king_of_france;
     pointer_data_to_physical(); //Make the physical copy
 }
@@ -67,7 +67,7 @@ void Packet::pointer_data_to_physical(){
 // This is really confusing, carefully read each line and each comment.
 int Packet::buildByteArray(){
 	// we are passed a buffer that is equal to frame size.
-	// this is because this unsigned char array will be the final
+	// this is because this char array will be the final
 	// packet that will be sent across the network.
 
 	//These next few lines of code breaks the CRC into
