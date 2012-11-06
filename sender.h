@@ -22,7 +22,7 @@ class Sender {
          * @param ourMAC our MAC address
          * param sendFlag Pointer to flag marking the destination to send an Ack to
          */
-        Sender(RF* RFLayer, CircularFifo<int, 2>* theQueue, unsigned short* sendFlag,
+        Sender(RF* RFLayer, CircularFifo<Packet*, 2>* theQueue, unsigned short* sendFlag,
                 bool* receivedFlag, unsigned short ourMAC);
 
         /**
@@ -35,7 +35,7 @@ class Sender {
         RF* theRF; //Pointer to the RF layer
         short macAddr; //Our MAC address
         ostream* dataStream; //ostream provided to us
-        CircularFifo<Packet, 2>* infoToSend; //A queue to check for outgoing data 
+        CircularFifo<Packet*, 2>* infoToSend; //A queue to check for outgoing data 
         //queue<short,char,int>* outgoing_Queue:  //pointer to outgoing message queue
         bool*  ackReceived; //Pointer to flag for received acks
         unsigned short* ackToSend; //Pointer to destination addr to send Ack
@@ -44,7 +44,7 @@ class Sender {
         static const unsigned short MAXSEQNUM = 4095;
         static const unsigned int SLEEPTIME = 1;  //Wait time (second) to check again if
                                                     //the network is free 
-        unsigned char* frame; //The byte array to be transmitted on RF
+        char* frame; //The byte array to be transmitted on RF
     
     //Methods
         //TODO Do you actuall need these top three methods because you are just checking fields?
@@ -85,14 +85,14 @@ class Sender {
          * @return 1 if packet was successfully built
          */
         int buildFrame(short frm, bool resend, unsigned short seqNum, 
-                unsigned short destAddr, unsigned char* data, int CS, int size);
+                unsigned short destAddr, char* data, int CS, int size);
        
         /**
          * Sends a packet
          * @param thePacket The packet to send
          * @return 1 if the packet was sent correctly
          */
-        int send(unsigned char* theFrame);
+        int send(Packet theFrame);
 
         /**
          * Increments the sequence number up to 4095 then wraps around to 0

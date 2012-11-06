@@ -9,7 +9,7 @@ using namespace std;
 #include "sender.h"
 #include <unistd.h>
 
-Sender::Sender(RF* RFLayer, CircularFifo<Packet,2>* theQueue, unsigned short* sendFlag,
+Sender::Sender(RF* RFLayer, CircularFifo<Packet*,2>* theQueue, unsigned short* sendFlag,
                 bool* receivedFlag, unsigned short ourMAC) {
     //Initialize fields
     theRF = RFLayer;
@@ -22,8 +22,8 @@ Sender::Sender(RF* RFLayer, CircularFifo<Packet,2>* theQueue, unsigned short* se
 
 void Sender::MasterSend() {
     //FOR TESTING PURPOSES
-    unsigned char b = 'a';
-    unsigned char* test = &b;
+    char b = 'a';
+    char* test = &b;
 
     while (true) {
         //Check for Ack to send
@@ -37,10 +37,11 @@ void Sender::MasterSend() {
         }
         else {
             //Follow pointer
-            Packet temp
+            Packet* temp;
+            infoToSend->pop(temp); 
             //buildPacket
-            buildPacket('1', false, seqNum, 111, test, 1111, 100); //FOR TESTING 
-            //Send(frame);
+            //build('1', false, seqNum, 111, test, 1111, 100); //FOR TESTING 
+            send(*temp);
             //start Timer to chech for timeouts
         }
 
@@ -50,7 +51,7 @@ void Sender::MasterSend() {
 
 int
 Sender:: buildFrame(short frm, bool resend, unsigned short seqNum,
-            unsigned short destAddr, unsigned char* data, int CS, int size) {
+            unsigned short destAddr, char* data, int CS, int size) {
     pachyderm.initPacket(frm, resend, seqNum, destAddr, macAddr, data, CS, size);
 }
 
@@ -58,8 +59,8 @@ int
 Sender::send(Packet theFrame) {
     //Listen to see if channel is open
     if (!theRF->inUse()) { //The channel is clear
-        if (theRF->transmit(theFrame.physical_frame, pachyderm.frame_size) !=
-                pachyderm->frame_size) {    //Makes the transmission 
+        if (theRF->transmit(theFrame.physical_frame, theFrame.frame_size) !=
+                theFrame.frame_size) {    //Makes the transmission 
             return 0; //Did not send all of frame or
            }
         else {
