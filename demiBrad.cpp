@@ -18,9 +18,21 @@ CircularFifo<Packet*, 10> send_Queue;
 CircularFifo<Packet*, 10> receive_Queue;
 
 void *create_sender_thread(void *cnt){
+	RFLayer->attachThread();
+	wcerr << "sender thread";
+	int i = 0;
+	while(true){
+		i++;
+	}
 	return (void *)0;
 }
 void *create_Receiver_Thread(void *cnt){
+	RFLayer->attachThread();
+	wcerr << "receiver thread";
+	int i = 0;
+	while(true){
+		i++;
+	}
 	return (void *)0;
 }
 
@@ -28,21 +40,19 @@ int DemiBrad::dot11_init(short MACadr, ostream* stremy){
 	MACaddr = MACadr;
 	streamy = stremy;
 	RFLayer = new RF();
-	pthread_t ids[2];
+
+	pthread_t ids[3];
     pthread_attr_t attr;
     pthread_attr_init(&attr);
     pthread_attr_setscope(&attr, PTHREAD_SCOPE_SYSTEM);  
-    pthread_setconcurrency(2);
-    int counts[2];
-    //RFLayer->attachThread();
-    //Create the Threads
+    pthread_setconcurrency(3);
+    int counts[3];
+    RFLayer->attachThread();
     pthread_create(&(ids[0]), &attr, create_sender_thread, &(counts[0]));
     pthread_create(&(ids[1]), &attr, create_Receiver_Thread, &(counts[1]));
-
-    for (int i=0; i<2; i++){
-    	pthread_join(ids[i], NULL);
-    }
-
+    //pthread_join(ids[0], NULL);
+    //pthread_join(ids[1], NULL);
+    return 1;
 }
 int DemiBrad::dot11_command(int cmd, int val){
 	return 1;

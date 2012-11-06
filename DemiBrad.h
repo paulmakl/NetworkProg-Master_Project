@@ -31,7 +31,7 @@ class DemiBrad{
 		short MACACK; // the address that is associated with the most recent Acknowledgement
 		CircularFifo<Packet*, 10> send_Queue;
 		CircularFifo<Packet*, 10> receive_Queue;
-		int counts[2];
+		int counts[3];
 		//RF* RFLayer;
 		//ncoming_Queue queue <short, char, int> // a queue for incoming data
 		//outgoing_Queue queue <short, char, int> // a queue for outgoing data 
