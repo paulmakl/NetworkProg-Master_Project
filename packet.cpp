@@ -52,7 +52,8 @@ void Packet::initPacket(unsigned char *pac, int byts)
     {
         dataIn[i-6] = pac[i];//the offset of six is the front header being skipped in our buf and the four less is the CRC
     }
-    data = dataSource;
+    unsigned char * king_of_france = &dataIn[0];
+    data = king_of_france;
     pointer_data_to_physical(); //Make the physical copy
 }
 

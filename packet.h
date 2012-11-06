@@ -8,6 +8,7 @@ class Packet {
 	public:
 		void initPacket(short frm, bool resen, unsigned short sn, unsigned short dest, unsigned short sendr, unsigned char* dta, int CS, int size);//(short frametype, bool resend, unsigned short sequence_number, unsigned short destination, unsigned short sender, char* data, int CRC, int bytes_to_send);
 		//Packet(short frm, bool resen, unsigned short sn, unsigned short dest, unsigned short sendr, char *dta, int CS);
+        void initPacket(unsigned char *pac, int byts);
 		int make_resend(); // turns the resend bool to true
 		int buildByteArray();
 		int get_crc();// TEMPORARY
