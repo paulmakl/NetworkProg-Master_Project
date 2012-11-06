@@ -50,9 +50,9 @@ void Sender::MasterSend() {
 int
 Sender:: buildPacket(short frm, bool resend, unsigned short seqNum,
             unsigned short destAddr, unsigned char* data, int CS, int size) {
-    Packet temp = Packet(frm, resend, seqNum, destAddr, macAddr, data, CS, size);
+    Packet temp = initPacket(frm, resend, seqNum, destAddr, macAddr, data, CS, size);
     pachyderm = &temp; 
-    pachyderm->buildByteArray(frame); //Frame gets the byte array to transmit
+    pachyderm->buildByteArray(); //Frame gets the byte array to transmit
 }
 /*
 int 
