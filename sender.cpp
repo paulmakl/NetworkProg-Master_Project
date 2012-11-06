@@ -9,7 +9,7 @@ using namespace std;
 #include "sender.h"
 #include <unistd.h>
 
-Sender::Sender(RF* RFLayer, CircularFifo<Packet*,2>* theQueue, unsigned short* sendFlag,
+Sender::Sender(RF* RFLayer, CircularFifo<Packet*,10>* theQueue, unsigned short* sendFlag,
                 bool* receivedFlag, unsigned short ourMAC) {
     //Initialize fields
     theRF = RFLayer;
@@ -22,9 +22,6 @@ Sender::Sender(RF* RFLayer, CircularFifo<Packet*,2>* theQueue, unsigned short* s
 
 void Sender::MasterSend() {
     //FOR TESTING PURPOSES
-    char b = 'a';
-    char* test = &b;
-
     while (true) {
         //Check for Ack to send
         if (ackToSend != 0) {
@@ -43,6 +40,7 @@ void Sender::MasterSend() {
             //build('1', false, seqNum, 111, test, 1111, 100); //FOR TESTING 
             send(*temp);
             //start Timer to chech for timeouts
+            delete temp; //Free memory because this is c++
         }
 
         //TODO Handle case of timeout and resend

@@ -8,8 +8,8 @@ int main(int argc, char const *argv[]) {
     
     //Test Sender
     RF* RFtest = new RF();
-    CircularFifo<Packet*,2> fifo;
-    CircularFifo<Packet*,2>* fifoTest;
+    CircularFifo<Packet*,10> fifo;
+    CircularFifo<Packet*,10>* fifoTest;
     unsigned short flag = 1;
     unsigned short* flagTest = &flag;
     bool recFlag = false;
