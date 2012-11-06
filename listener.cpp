@@ -14,10 +14,10 @@ Listener::Listener(RF* RFLayer, CircularFifo<Packet* ,10>* incomingQueue, unsign
     daRF = RFLayer;//our reference to the RF layer
     MACACK_listener = sendFlag;//where the address that requires an ACK goes
     MACACK_listener = 0;//special case no need to send an ACK
-    ack_Received = receivedFlag;//flag for telling the sending an ACK has come in
-    ack_Received = false;// indicates no ACKs recived
+    ack_Received_listener = receivedFlag;//flag for telling the sending an ACK has come in
+    ack_Received_listener = false;// indicates no ACKs recived
     unsigned short temp = myMAC;//our mac address for knowing if packets have come to the right place
-    MACaddr = &temp;
+    MACaddr_listner = &temp;
     daLoopLine = incomingQueue;//where incoming data will be sent via pointers to tuples
 }
 
