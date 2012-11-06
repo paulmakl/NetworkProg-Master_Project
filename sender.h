@@ -35,15 +35,15 @@ class Sender {
         RF* theRF; //Pointer to the RF layer
         short macAddr; //Our MAC address
         ostream* dataStream; //ostream provided to us
-        CircularFifo<int, 2>* infoToSend; //TODO is this syntactically correct? 
+        CircularFifo<Packet, 2>* infoToSend; //A queue to check for outgoing data 
         //queue<short,char,int>* outgoing_Queue:  //pointer to outgoing message queue
         bool*  ackReceived; //Pointer to flag for received acks
         unsigned short* ackToSend; //Pointer to destination addr to send Ack
-        Packet* pachyderm; //The packet to send
+        Packet pachyderm; //The packet to send
         unsigned short seqNum; //The sequence number for transmitted packets
         static const unsigned short MAXSEQNUM = 4095;
         static const unsigned int SLEEPTIME = 1;  //Wait time (second) to check again if
-                                            //the network is free 
+                                                    //the network is free 
         unsigned char* frame; //The byte array to be transmitted on RF
     
     //Methods
@@ -84,7 +84,7 @@ class Sender {
          //TODO What are CS and frm?
          * @return 1 if packet was successfully built
          */
-        int buildPacket(short frm, bool resend, unsigned short seqNum, 
+        int buildFrame(short frm, bool resend, unsigned short seqNum, 
                 unsigned short destAddr, unsigned char* data, int CS, int size);
        
         /**

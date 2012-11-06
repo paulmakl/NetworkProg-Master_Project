@@ -22,6 +22,7 @@ class Packet {
 		int bytes_to_send;
 		unsigned char physical_data_array[2048];
 		unsigned char physical_frame[2048];
+        int frame_size; 
 	private:
 };
 
