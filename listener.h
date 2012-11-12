@@ -31,11 +31,11 @@ public:
 private:
 
 
-    unsigned short* MACaddr_listner; //a pointer to our MAC address
+    unsigned short* MACaddrList; //a pointer to our MAC address
     ostream *streamy; //the given output stream for data to the layer above
-    unsigned short* MACACK_listener;//a pointer to the MAC address of the most recent sender of data that has not been sent an ACK yet
+    unsigned short* MACACKList;//a pointer to the MAC address of the most recent sender of data that has not been sent an ACK yet
     // or assuming that none need to be sent a special case of zero should be used to indicate this
-    bool* ack_Received_listener;// a pointer to a boolean that indicates whether or not a ACK has been recived
+    bool* ackReceivedL;// a pointer to a boolean that indicates whether or not a ACK has been recived
     static const int MAXPACKETSIZE = 2048; //size guarenteed to hold all properly formated packets
     char buf[MAXPACKETSIZE];// buffer for the incoming packets
     CircularFifo<Packet*,10>* daLoopLine;//a queue for the outgoing data

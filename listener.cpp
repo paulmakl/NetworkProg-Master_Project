@@ -1,9 +1,9 @@
 #include "listener.h"
 //#include "DemiBrad.h"
 
-short MACACK_listener; //global varribles
-bool ack_Received_listener;
-unsigned short MACaddr_listner;
+short MACACKList; //global varribles
+bool ackReceivedL;//flag for telling the sender an ack has come in
+unsigned short MACaddrList;//a flag that tells the sender where to send acks
 static const int MAXPACKETSIZE = 2048; //size guarenteed to hold all properly formated packets
 char buf[MAXPACKETSIZE];// buffer for the incoming packets
 CircularFifo<Packet* ,10> daLoopLine;
@@ -12,12 +12,12 @@ RF* daRF;
 Listener::Listener(RF* RFLayer, CircularFifo<Packet* ,10>* incomingQueue, unsigned short* sendFlag, bool* receivedFlag, unsigned short myMAC)
 {
     daRF = RFLayer;//our reference to the RF layer
-    MACACK_listener = sendFlag;//where the address that requires an ACK goes
-    MACACK_listener = 0;//special case no need to send an ACK
-    ack_Received_listener = receivedFlag;//flag for telling the sending an ACK has come in
-    ack_Received_listener = false;// indicates no ACKs recived
+    MACACKList = sendFlag;//where the address that requires an ACK goes
+    MACACKList = 0;//special case no need to send an ACK
+    ackReceivedL = receivedFlag;//flag for telling the sending an ACK has come in
+    ackReceivedL = false;// indicates no ACKs recived
     unsigned short temp = myMAC;//our mac address for knowing if packets have come to the right place
-    MACaddr_listner = &temp;
+    MACaddrList = &temp;
     daLoopLine = incomingQueue;//where incoming data will be sent via pointers to tuples
 }
 
@@ -28,7 +28,7 @@ Listener::read_Packet ()
     short packetDest = buf[2];//bitwise terribleness
     packetDest << 8;
     packetDest = packetDest + buf[3];
-    if (packetDest != *MACaddr_listner)//compare the destination of this packet to our MAC address
+    if (packetDest != *MACaddrList)//compare the destination of this packet to our MAC address
     {
         status = 0;//this packet isn't for us
         wcerr << "Packet not addressed to current MAC address." << endl;
@@ -82,13 +82,13 @@ Listener::UltraListen()
             dataSource << 8;
             dataSource = dataSource + buf[5] + 0;
             unsigned short temp = dataSource;//let the sender know to send an ACK for this data
-            MACACK_listener = &temp;
+            MACACKList = &temp;
             queue_data();//put data in the cirfifo
         }
         if (PRR == 2)//if the packet is relevent and is an ACK adjust ack recived flag
         {
             bool temp = true;
-            ack_Received_listener = &temp;
+            ackReceivedL = &temp;
         }
     }
 }
@@ -96,10 +96,10 @@ Listener::UltraListen()
 int
 Listener::queue_data()
 {
-    Packet toDemiBrad;
-    toDemiBrad.initPacket(&buf[0], bytesReceived);
-    Packet * rawr = &toDemiBrad;
-    daLoopLine->push(rawr);
+    Packet toDemiBrad;//create a packet
+    toDemiBrad.initPacket(&buf[0], bytesReceived);//construct the guts of the packet using the buffer and total byets recived
+    Packet * temp = &toDemiBrad;//make a pointer to the packet with the data 
+    daLoopLine->push(temp);//send the pointer to the packet up to demibrad
     
     /*  
      * this is the code that has moved over to packet now 
@@ -113,7 +113,6 @@ Listener::queue_data()
         dataIn[i-6] = buf[i];//the offset of six is the front header being skipped in our buf and the four less is the CRC
     }
     */ 
-    //need packet shit  daLoopLine->push(*packetInfo);
 }
 
 
