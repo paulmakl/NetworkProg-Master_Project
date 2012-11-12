@@ -17,13 +17,14 @@ CircularFifo<Packet*, 10> send_Queue_demibrad;
 CircularFifo<Packet*, 10> receive_Queue_demibrad;
 Packet memory_buffer_demibrad[500];
 int memory_buffer_number_count_demibrad;
+
 void *create_sender_thread(void *cnt){
 	RFLayer_demibrad->attachThread();
 	wcerr << "sender thread";
 	Sender sendy(RFLayer_demibrad, &send_Queue_demibrad, &test, &ack_Received_demibrad, MACACK_demibrad);
 	return (void *)0;
 }
-void *create_Receiver_Thread(void *cnt){
+void *create_and_run_receiver_thread(void *cnt){
 	RFLayer_demibrad->attachThread();
 	wcerr << "receiver thread";
 	bool hello = true;
@@ -46,7 +47,7 @@ int DemiBrad::dot11_init(short MACadr, ostream* stremy){
     int counts[3];
     RFLayer_demibrad->attachThread();
     pthread_create(&(ids[0]), &attr, create_sender_thread, &(counts[0]));
-    pthread_create(&(ids[1]), &attr, create_Receiver_Thread, &(counts[1]));
+    pthread_create(&(ids[1]), &attr, create_and_run_receiver_thread, &(counts[1]));
     //pthread_join(ids[0], NULL);
     //pthread_join(ids[1], NULL);
     return 1;

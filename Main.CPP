@@ -25,6 +25,22 @@ int main(int argc, char const *argv[])
 	data[3] = 'D';
 	data[4] = 'E';
 	yar.dot11_send(809, &data[0], 5);
+	yar.dot11_send(809, &data[0], 6);
+	yar.dot11_send(809, &data[0], 7);
+	yar.dot11_send(809, &data[0], 8);
+	yar.dot11_send(809, &data[0], 9);
+	yar.dot11_send(809, &data[0], 0);
+	yar.dot11_send(809, &data[0], 1);
+	yar.dot11_send(809, &data[0], 2);
+	yar.dot11_send(809, &data[0], 3);
+	yar.dot11_send(809, &data[0], 4);
+	yar.dot11_send(809, &data[0], 5);
+	yar.dot11_send(809, &data[0], 6);
+	yar.dot11_send(809, &data[0], 7);
+	yar.dot11_send(809, &data[0], 8);
+	yar.dot11_send(809, &data[0], 9);
+	yar.dot11_send(809, &data[0], 10);
+	yar.dot11_send(809, &data[0], 11);
 
     return 0;
 }
@@ -35,4 +51,5 @@ int main(int argc, char const *argv[])
 g++ Main.cpp Demibrad.cpp packet.cpp sender.cpp listener.cpp RF.cpp -o bcast -I/System/Library/Frameworks/JavaVM.framework/Headers -L/System/Library/Frameworks/JavaVM.framework/Libraries -ljvm  -framework JavaVM
 
 g++ Demibrad.cpp Main.cpp packet.cpp sender.cpp listener.cpp RF.cpp -o bcast -I/System/Library/Frameworks/JavaVM.framework/Headers -L/System/Library/Frameworks/JavaVM.framework/Libraries -ljvm  -framework JavaVM
+g++ RF_test.cpp RF.cpp -o bcast -I/System/Library/Frameworks/JavaVM.framework/Headers -L/System/Library/Frameworks/JavaVM.framework/Libraries -ljvm  -framework JavaVM
 */

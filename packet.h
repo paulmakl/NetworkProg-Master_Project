@@ -10,7 +10,7 @@ class Packet {
 		//Packet(short frm, bool resen, unsigned short sn, unsigned short dest, unsigned short sendr, char *dta, int CS);
         void initPacket(char *pac, int byts);
 		int make_resend(); // turns the resend bool to true
-		int buildByteArray();
+		int buildByteArray(); // builds a byte array of the packet attached. 
 		int get_crc();// TEMPORARY
 		void pointer_data_to_physical();
 		short frametype;
