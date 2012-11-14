@@ -26,7 +26,11 @@ public:
      * starts the thread listening for imcoming messages
      */
     Listener(RF* RFLayer, CircularFifo<Packet* ,10>* incomingQueue, unsigned short* sendFlag, bool* receivedFlag, unsigned short myMAC);
-    int UltraListen();
+    
+    /*
+     * the heart of the listener watches activity on the RF layer and blocks until a packet is recived
+     */
+     int UltraListen();
 
 private:
 
@@ -37,16 +41,16 @@ private:
     // or assuming that none need to be sent a special case of zero should be used to indicate this
     bool* ackReceivedL;// a pointer to a boolean that indicates whether or not a ACK has been recived
     static const int MAXPACKETSIZE = 2048; //size guarenteed to hold all properly formated packets
+    static const int ADDRESSRANGE = 1800;//max number of different possible mac addresses
     char buf[MAXPACKETSIZE];// buffer for the incoming packets
+    char SNRec[ADDRESSRANGE];//an array that could hold differnet sequence numbers for every mac address
     CircularFifo<Packet*,10>* daLoopLine;//a queue for the outgoing data
     
     RF* daRF;//the reference to the RF layer
     int bytesReceived;// bytes from the last packet
 
 
-    /*
-     * the heart of the listener watches activity on the RF layer and blocks until a packet is recived
-     */
+    
     
 
     /*
