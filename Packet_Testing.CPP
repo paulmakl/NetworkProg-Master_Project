@@ -12,11 +12,21 @@ using namespace std;
 
 int main(int argc, char const *argv[])
 {
-	char dta[3]
-	dta[0] = 'a'
-	dta[1] = 'b'
-	dta[2] = 'c'
-	Packet john(44, char* dta, int size, unsigned short madder);
+	int data_size = 3;
+	char dta[data_size];
+	dta[0] = 'd';
+	dta[1] = 'b';
+	dta[2] = 'c';
+	Packet john;
+	john.initpacket(44, &dta[0], data_size, 1001);
+	char Byte_Array[data_size+10];
+	int q = john.buildByteArray(&Byte_Array[0]);
+	int i = 0;
+	while(i < (data_size+10)){
+		cout << Byte_Array[i] + 0 << " :: ";
+		i++;
+	}
+	cout << "\n";
 }
 
 

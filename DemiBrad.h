@@ -43,7 +43,6 @@ class DemiBrad{
 		int dot11_send(short destAddr, char *buf, int bufSize);
 		//void *create_and_run_sender_thread(void *cnt);
 		//void *create_and_run_receiver_thread(void *cnt);
-		void receiveRun();
 	private:
 		short MACaddr_demibrad; // users mac address
 		ostream *streamy_demibrad; // provided ostream

@@ -1,0 +1,35 @@
+Author: Erin Jamroz
+
+pthread::Sender
+---------------------------------------------------------
+        -RF* theRF; //Pointer to the RF layer 
+        -short macAddr_Sender; //Our MAC address
+        -ostream* dataStream; //ostream provided to us
+        -CircularFifo<Packet*,10>* infoToSend; //A queue to check for outgoing data 
+        -bool* ackReceived; //Pointer to flag for received acks
+        -unsigned short* ackToSend; //Pointer to destination addr to send Ack
+        -Packet pachyderm; //The packet to send
+        -unsigned short seqNum; //The sequence number for transmitted packets
+        -static const unsigned short MAXSEQNUM = 4095;
+        -static const unsigned int SLEEPTIME = 1;  //Wait time (second) to check again if
+                                                    //the network is free 
+        -char* frame; //The byte array to be transmitted on RF
+----------------------------------------------------------
+//Looks for outgoing data packets to send
+- check_QueueToSend():int
+//Looks to see if an ack for the most recently transmitted message has been received
+- check_ReceivedAck():unsigned short
+//Looks for destination address to send an ack to
+- check_SendAck():unsigned short 
+- buildFrame(short frm, bool resend, unsigned short seqNum, unsigned short destAddr, char* data, int CS, int size):int;
+//Transmits a frame
+- send(Packet theFrame):int
+//Increments the sequences number till MAXSEQNUM then resets
+- incrementSeqNum():int
+//Retransmits a frame 
+- resend():int 
+
+THIS IS HOW IT ALL LOOKS RIGHT NOW, BUT THINGS MIGHT CHANGE AFTER OUR DISCUSSION TONIGHT
+   
+
+

@@ -6,6 +6,8 @@ bool ackReceivedL;//flag for telling the sender an ack has come in
 unsigned short MACaddrList;//a flag that tells the sender where to send acks
 static const int MAXPACKETSIZE = 2048; //size guarenteed to hold all properly formated packets
 char buf[MAXPACKETSIZE];// buffer for the incoming packets
+static const int ADDRESSRANGE = 1800;//max number of different possible mac addresses
+char SNRec[ADDRESSRANGE];//an array that could hold differnet sequence numbers for every mac address
 CircularFifo<Packet* ,10> daLoopLine;
 RF* daRF;
 
