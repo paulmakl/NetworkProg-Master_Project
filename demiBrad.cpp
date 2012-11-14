@@ -9,7 +9,7 @@ short MACaddr_demibrad; // users mac address
 ostream* streamy_demibrad; // provided ostream
 bool ack_Received_demibrad; // flag for acknowledgment received
 short MACACK_demibrad; // the address that is associated with the most recent Acknowledgement
-unsigned short send_flag_demibrad; // flat that lets the sender know when to send
+//unsigned short send_flag_demibrad; // flat that lets the sender know when to send
 RF* RFLayer_demibrad; // the RF layer associated with Demibrad
 CircularFifo<Packet*, 10> send_Queue_demibrad; // the queue of packets to send
 CircularFifo<Packet*, 10> receive_Queue_demibrad; // the queu of packets received from the receiver class
@@ -24,7 +24,7 @@ void *create_sender_thread(void *cnt){
 	RFLayer_demibrad->attachThread();
 	wcerr << "sender thread";
 
-	Sender sendy(RFLayer_demibrad, &send_Queue_demibrad, &send_flag_demibrad, &ack_Received_demibrad, MACACK_demibrad);
+	Sender sendy(RFLayer_demibrad, &send_Queue_demibrad, &MACACK_demibrad, &ack_Received_demibrad, MACACK_demibrad);
 	return (void *)0;
 }
  /*

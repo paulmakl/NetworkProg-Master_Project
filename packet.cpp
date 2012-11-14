@@ -5,6 +5,9 @@
 #include "packet.h"
 using namespace std;
 
+//TODO make ACK init
+//     CONSTRUCTOR SHOULD ONLY TAKE A DESTINATION ADDRESS
+// look at IEEE to see what an acknowledgement looks like
 
 // DO NOT CHANGE THESE TYPES. IT WILL MAKE EVERYTHING BREAK.
 short frametype; // can either be 1-4 based on the type of frame.
@@ -20,22 +23,18 @@ char physical_data_array[2048];
 char physical_frame[2048]; // THIS IS THE FRAME GRAB THIS!!!!!!!!
 
 // Basic constructor. CS is the value for CRC this will eventually be taken out
-void Packet::initPacket(short frm, bool resen, unsigned short sn, unsigned short dest, unsigned short sendr, char* dta, int CS, int size){
-	frametype = frm;
-	resend = resen;
-	sequence_number = sn;
+void Packet::initPacket(unsigned short dest, char* dta, int size, unsigned short madder){
+	frametype = 0;
+	resend = 0;
+	sequence_number = 0;
 	destination = dest;
-	sender = sendr;
+	sender = madder;
 	data = dta;
-	CRC = CS;
+	CRC = 0;
 	bytes_to_send = size;
 	frame_size = size + 10;
-	pointer_data_to_physical();
-	buildByteArray();
-    
-    //FUNCTIONALITY ADDED BY ERIN: I want everything to be done in the "constructor"
     pointer_data_to_physical(); //Make the physical copy
-    buildByteArray(); //Build the frame
+    //buildByteArray(); //Build the frame
 }
 
 //Weston's Additions: overwritten "constructor" to unpack data from listener going to demi brad
@@ -141,14 +140,3 @@ int Packet::buildByteArray(){
 	//time for a nap...
 }
 
-/* TODO Sender handles this, it should be removed
-//make the resend variable true.
-int Packet::make_resend(){
-	resend = true;
-	return 1;
-}
-*/
-
-int Packet::get_crc(){
-	return CRC;
-}//TEMPORARY
