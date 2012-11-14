@@ -6,7 +6,7 @@ using namespace std;
 
 class Packet {
 	public:
-		void initpacket(unsigned short dest, char* dta, int size, unsigned short madder);//(short frametype, bool resend, unsigned short sequence_number, unsigned short destination, unsigned short sender, char* data, int CRC, int bytes_to_send);
+		void initpacket(unsigned short dest, char* dta, int size, unsigned short sender_mac);//(short frametype, bool resend, unsigned short sequence_number, unsigned short destination, unsigned short sender, char* data, int CRC, int bytes_to_send);
 		//Packet(short frm, bool resen, unsigned short sn, unsigned short dest, unsigned short sendr, char *dta, int CS);
         void init_Packet(char *pac, int byts);
 		int make_resend(); // turns the resend bool to true
