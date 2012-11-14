@@ -75,26 +75,20 @@ class Sender {
 
         /**
          * Builds a packet object for sending
-         * @param frm
+         * @param frm the frame typ
          * @param resend Indicates if this packet is part of  a retransmission
          * @param seqNum This packets sequence number
-         * @param destAddr The destination's MAC address
-         * @param sendAddr The sender's MAC address
-         * @param data The data to transmit
          * @param CS CRC
-         * @param size The size(bytes) of the data to send
-         //TODO What are CS and frm?
          * @return 1 if packet was successfully built
          */
-        int buildFrame(short frm, bool resend, unsigned short seqNum, 
-                unsigned short destAddr, char* data, int CS, int size);
+        int buildFrame(short frm, bool resend, unsigned short seqNum, int CS);
        
         /**
          * Sends a packet
          * @param thePacket The packet to send
          * @return 1 if the packet was sent correctly
          */
-        int send(Packet theFrame);
+        int send(char* frame, int size);
 
         /**
          * Increments the sequence number up to 4095 then wraps around to 0
