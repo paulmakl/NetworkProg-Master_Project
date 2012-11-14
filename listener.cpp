@@ -99,7 +99,7 @@ int
 Listener::queue_data()
 {
     Packet toDemiBrad;//create a packet
-    toDemiBrad.initPacket(&buf[0], bytesReceived);//construct the guts of the packet using the buffer and total byets recived
+    toDemiBrad.init_Packet(&buf[0], bytesReceived);//construct the guts of the packet using the buffer and total byets recived
     Packet * temp = &toDemiBrad;//make a pointer to the packet with the data 
     daLoopLine->push(temp);//send the pointer to the packet up to demibrad
     

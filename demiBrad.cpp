@@ -8,7 +8,7 @@ using namespace std;
 short MACaddr_demibrad; // users mac address
 ostream* streamy_demibrad; // provided ostream
 bool ack_Received_demibrad; // flag for acknowledgment received
-short MACACK_demibrad; // the address that is associated with the most recent Acknowledgement
+unsigned short MACACK_demibrad; // the address that is associated with the most recent Acknowledgement
 //unsigned short send_flag_demibrad; // flat that lets the sender know when to send
 RF* RFLayer_demibrad; // the RF layer associated with Demibrad
 CircularFifo<Packet*, 10> send_Queue_demibrad; // the queue of packets to send
@@ -25,6 +25,7 @@ void *create_sender_thread(void *cnt){
 	wcerr << "sender thread";
 
 	Sender sendy(RFLayer_demibrad, &send_Queue_demibrad, &MACACK_demibrad, &ack_Received_demibrad, MACACK_demibrad);
+	sendy.MasterSend();
 	return (void *)0;
 }
  /*
@@ -34,7 +35,7 @@ void *create_and_run_receiver_thread(void *cnt){
 	RFLayer_demibrad->attachThread();
 	wcerr << "receiver thread";
 	bool hello = true;
-	Listener listen(RFLayer_demibrad, &receive_Queue_demibrad, &test, &ack_Received_demibrad, MACaddr_demibrad);
+	Listener listen(RFLayer_demibrad, &send_Queue_demibrad, &MACACK_demibrad, &ack_Received_demibrad, MACACK_demibrad);
 	listen.UltraListen();
 	return (void *)0;
 }
@@ -47,7 +48,6 @@ int DemiBrad::dot11_init(short MACadr, ostream* stremy){
 	MACaddr_demibrad = MACadr;
 	streamy_demibrad = stremy;
 	RFLayer_demibrad = new RF();
-	test = 803;
 	// create the threads
 	pthread_t ids[3];
     pthread_attr_t attr;
@@ -95,10 +95,9 @@ int DemiBrad::dot11_recv(short *srcAddr, short *destAddr, char *buf, int bufSize
 int DemiBrad::dot11_send(short destAddr, char *buf, int bufSize){
 	Packet temp; // make a temporary packet
 	memory_buffer_demibrad[memory_buffer_number_count_demibrad] = temp; //put the temporary packet in the memory buffer
-	memory_buffer_demibrad[memory_buffer_number_count_demibrad].initPacket(0,false,0,destAddr,MACaddr_demibrad,buf,0,bufSize); // initialize the packet with the information to be sent
+	memory_buffer_demibrad[memory_buffer_number_count_demibrad].initpacket(destAddr,buf,bufSize); // initialize the packet with the information to be sent
 	Packet * temp_pointer = &memory_buffer_demibrad[memory_buffer_number_count_demibrad]; // create a temporary pointer to the packet
 	send_Queue_demibrad.push(temp_pointer); //push the temporary pointer onto the queue
-	send_flag_demibrad = true; // flags that something should be sent
 	// potentially reset the memory buffer number
 	if (memory_buffer_number_count_demibrad > 499)
 	{
