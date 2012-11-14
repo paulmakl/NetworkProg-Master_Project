@@ -22,7 +22,7 @@ int frame_size; // this is the size of the frame. It is always 10 more that byte
 char physical_data_array[2038];
 
 // Basic constructor. CS is the value for CRC this will eventually be taken out
-void Packet::initpacket(unsigned short dest, char* dta, int size, unsigned short sender_mac){
+void Packet::initpacket(unsigned short dest, char* dta, int size){
 	frametype = 3;
 	resend = 5;
 	sequence_number = 30;
