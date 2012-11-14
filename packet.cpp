@@ -23,15 +23,16 @@ char physical_data_array[2038];
 
 // Basic constructor. CS is the value for CRC this will eventually be taken out
 void Packet::initpacket(unsigned short dest, char* dta, int size){
-	frametype = 3;
-	resend = 5;
-	sequence_number = 30;
+	frametype = 3; // test value
+	resend = 5; // test value
+	sequence_number = 30; // test value
 	destination = dest;
-	sender = sender_mac;
+	sender = 1001; // test value
 	data = dta;
-	CRC = 46869594;
+	CRC = 46869594; // test value
 	bytes_to_send = size;
 	frame_size = size + 10;
+	resend = false; // test value
     pointer_data_to_physical(); //Make the physical copy
     //buildByteArray(); //Build the frame
 }
@@ -86,15 +87,15 @@ int Packet::buildByteArray(char *buffer){
 	temp_short = sender << 8; // shift the first byte of sender the the leftmost position of the short
 	temp_short = temp_short >> 8;// shift the previously mentioned byte back to its original position.
 								 // this removes all the unnesessary zeros.
-	buffer[4] = temp_short; // store this byte in the fifth position in the buffer
+	buffer[5] = temp_short; // store this byte in the fifth position in the buffer
 	temp_short = sender >> 8; // shift the second byte of the sender variable over to be the first byte.
-	buffer[5] = temp_short; // store the second byte in the sixth position.
+	buffer[4] = temp_short; // store the second byte in the sixth position.
 	// do the same process as above.
 	temp_short = destination << 8;
 	temp_short = temp_short >> 8;
-	buffer[2] = temp_short;
-	temp_short = destination >> 8;
 	buffer[3] = temp_short;
+	temp_short = destination >> 8;
+	buffer[2] = temp_short;
 
 	// this is kind of complicated.
 	// the first two bytes of information need to store three variables.
