@@ -165,4 +165,6 @@ int main(int argc, char const *argv[])
 
     return 0;
 }
-
+/*
+g++ RF_Test.cpp RF.cpp -o bcast -I/System/Library/Frameworks/JavaVM.framework/Headers -L/System/Library/Frameworks/JavaVM.framework/Libraries -ljvm  -framework JavaVM
+*/

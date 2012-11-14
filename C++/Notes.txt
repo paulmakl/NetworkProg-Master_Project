@@ -1,0 +1,14 @@
+Read the online documentation for more information about these files.  The
+short version is this:  Edit linklayer.cpp to add your project code and use
+the appropriate makefile to build a Java program out of the client GUI 
+driving your layer.  ("make -f Makefile.lab", for example, or rename the
+appropriate makefile as "Makefile" and simply run "make".)  Run the client
+as you would any Java program:  "java WiFiClient <MAC_addr>"
+
+Note that you might need to add this line to your .profile file on OSX:
+
+LD_LIBRARY_PATH=${LD_LIBRARY_PATH}:/System/Library/Frameworks/JavaVM.framework/Libraries/
+
+Something like this will be necessary on Linux machines:
+
+LD_LIBRARY_PATH=$LD_LIBRARY_PATH:/usr/lib/jvm/default-java/jre/lib/amd64/server

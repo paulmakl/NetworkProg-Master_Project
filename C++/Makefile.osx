@@ -1,0 +1,20 @@
+CC = g++
+CFLAGS = -c -g -Wall
+LAYER_SRCS = linklayer.cpp
+STUB_SRCS = RF.cpp cppStubs.cpp
+JVM_INCLUDE = -I/System/Library/Frameworks/JavaVM.framework/Headers
+JVM_LIBRARY = -L/System/Library/Frameworks/JavaVM.framework/Libraries
+LINKFLAGS = -dynamiclib -ljvm -framework JavaVM
+
+all: $(LAYER_SRCS) $(STUB_SRCS) WiFiClient.class rf/RF.class
+	$(CC) -arch i386 $(LAYER_SRCS) $(STUB_SRCS) -o libnativelib.jnilib $(JVM_INCLUDE) $(JVM_LIBRARY) $(LINKFLAGS)
+	
+
+WiFiClient.class: WiFiClient.java
+	javac WiFiClient.java 
+	
+rf/RF.class:
+	wget http://www.cs.pugetsound.edu/~brichards/Classes/325/Asmts/Project/Code/C++/rf/RF.class
+
+clean:
+	rm -f *.o *.so *.lib *.jnilib WiFiClient*.class
