@@ -15,11 +15,11 @@ bool resend; // if true, this packet is a resend packet.
 unsigned short sequence_number; // the sequence number for the packet.
 unsigned short destination; // the destination mac address for everything
 unsigned short sender; // the sender mac address
-//char* data; // a pointer to an char array. It cointains the data that the user wants to send
+char* data; // a pointer to an char array. It cointains the data that the user wants to send
 unsigned int CRC; // currently, you can pass in the CRC, this will eventually be taken out but until CRC is implemented it will remain in. 
 int bytes_to_send; // this is the size of the data char array.
 int frame_size; // this is the size of the frame. It is always 10 more that bytes_to_send.
-//char physical_data_array[MAXDATASIZE];
+char physical_data_array[2038];
 
 // Basic constructor. CS is the value for CRC this will eventually be taken out
 void Packet::initpacket(unsigned short dest, char* dta, int size){
@@ -28,12 +28,12 @@ void Packet::initpacket(unsigned short dest, char* dta, int size){
 	sequence_number = 30; // test value
 	destination = dest;
 	sender = 1001; // test value
-	//data = dta;
+	data = dta;
 	CRC = 46869594; // test value
 	bytes_to_send = size;
 	frame_size = size + 10;
 	resend = false; // test value
-    pointer_data_to_physical(dta); //Make the physical copy
+    pointer_data_to_physical(); //Make the physical copy
     //buildByteArray(); //Build the frame
 }
 
@@ -44,18 +44,19 @@ void Packet::init_Packet(char *pac, int byts)
     bytes_to_send = size;
     char dataIn[size];//a new char array for just the incoming data
     unsigned short dataSource = pac[4] + 0;//extract the source address
-    dataSource = dataSource << 8;
+    dataSource << 8;
     dataSource = dataSource + pac[5];
     sender = dataSource;
     for (int i = 6; i < byts-4; ++i)//strip the headers and put just the data in our packet
     {
         dataIn[i-6] = pac[i];//the offset of six is the front header being skipped in our buf and the four less is the CRC
     }
-    char* pointerToData = &dataIn[0];
-    pointer_data_to_physical(pointerToData); //Make the physical copy
+    char * king_of_france = &dataIn[0];
+    data = king_of_france;
+    pointer_data_to_physical(); //Make the physical copy
 }
 
-void Packet::pointer_data_to_physical(char* data){
+void Packet::pointer_data_to_physical(){
 	int i = 0;
 	while(i < bytes_to_send){
 		physical_data_array[i] = data[i];
@@ -133,7 +134,7 @@ int Packet::buildByteArray(char *buffer){
 	// after the header. we go through the data in 'data' and 
 	// put it in the buffer.
 	while(i < bytes_to_send){
-		buffer[i+6] = physical_data_array[i];
+		buffer[i+6] = data[i];
 		i++;
 	}
 	//time for a nap...

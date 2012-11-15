@@ -1,5 +1,4 @@
-/* 
- *
+/** 
  * THIS IS AN EXAMPLE OF USING PACKETS
  * - Paul
  */
@@ -18,7 +17,7 @@ int main(int argc, char const *argv[])
 	dta[1] = 'b';
 	dta[2] = 'c';
 	Packet john;
-	john.initpacket(44, &dta[0], data_size, 1001);
+	john.initpacket(44, &dta[0], data_size);
 	char Byte_Array[data_size+10];
 	int q = john.buildByteArray(&Byte_Array[0]);
 	int i = 0;
