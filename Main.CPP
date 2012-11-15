@@ -20,7 +20,7 @@ int main(int argc, char const *argv[])
 	buf[0] = 'a';
 	buf[1] = 'b';
 	buf[2] = 'c';
-	jesus.dot11_send(759, &buf[0], bufSize);
+	jesus.dot11_send(764, &buf[0], bufSize);
 	while(true){
 
 	}
