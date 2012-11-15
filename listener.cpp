@@ -21,7 +21,7 @@ Listener::Listener(RF* RFLayer, CircularFifo<Packet* ,10>* incomingQueue, unsign
     //unsigned short temp = myMAC;//our mac address for knowing if packets have come to the right place***********
     //MACaddrList = &temp;*****************
     MACaddrList = myMAC;//************
-    wcerr << "\n" << myMAC << endl;
+    //wcerr << "\n" << myMAC << endl;
     daLoopLine = incomingQueue;//where incoming data will be sent via pointers to tuples
 }
 

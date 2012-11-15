@@ -8,10 +8,11 @@ using namespace std;
 short MACaddr_demibrad; // users mac address
 ostream* streamy_demibrad; // provided ostream
 bool ack_Received_demibrad; // flag for acknowledgment received
-unsigned short MACACK_demibrad; // the address that is associated with the most recent Acknowledgement
+unsigned short MACACK_demibrad; // the address that is associated with the next Acknowledgement. Is zero if none need to be sent
 //unsigned short send_flag_demibrad; // flat that lets the sender know when to send
 RF* RFLayer_demibrad; // the RF layer associated with Demibrad
 CircularFifo<Packet*, 10> send_Queue_demibrad; // the queue of packets to send
+CircularFifo<Packet*, 10> * test;
 CircularFifo<Packet*, 10> receive_Queue_demibrad; // the queu of packets received from the receiver class
 Packet memory_buffer_demibrad[500]; // used to hold packets until they are used up
 int memory_buffer_number_count_demibrad; // current position of the memory buffer
@@ -22,9 +23,10 @@ int memory_buffer_number_count_demibrad; // current position of the memory buffe
  */
 void *create_sender_thread(void *cnt){
 	RFLayer_demibrad->attachThread();
-	wcerr << "sender thread";
+	//wcerr << "sender thread";
 
-	Sender sendy(RFLayer_demibrad, &send_Queue_demibrad, &MACACK_demibrad, &ack_Received_demibrad, MACACK_demibrad);
+	Sender sendy(RFLayer_demibrad, &send_Queue_demibrad, &MACACK_demibrad, &ack_Received_demibrad, MACaddr_demibrad);
+	wcerr << &send_Queue_demibrad << endl;
 	sendy.MasterSend();
 	wcerr << "This should not appear";
 	return (void *)0;
@@ -34,7 +36,7 @@ void *create_sender_thread(void *cnt){
   */
 void *create_and_run_receiver_thread(void *cnt){
 	RFLayer_demibrad->attachThread();
-	wcerr << "receiver thread";
+	//wcerr << "receiver thread";
 	bool hello = true;
 	Listener listen(RFLayer_demibrad, &receive_Queue_demibrad, &MACACK_demibrad, &ack_Received_demibrad, 103);
 	listen.UltraListen();
@@ -101,6 +103,9 @@ int DemiBrad::dot11_send(short destAddr, char *buf, int bufSize){
 	Packet * temp_pointer = &memory_buffer_demibrad[memory_buffer_number_count_demibrad]; // create a temporary pointer to the packet
 	send_Queue_demibrad.push(temp_pointer); //push the temporary pointer onto the queue
 	// potentially reset the memory buffer number
+	//wcerr << "\n" << send_Queue_demibrad.isEmpty() << endl;
+	test = &send_Queue_demibrad;
+	//wcerr << "\n" << test->isEmpty() << endl;
 	if (memory_buffer_number_count_demibrad > 499)
 	{
 		memory_buffer_number_count_demibrad = 0;
