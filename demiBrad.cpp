@@ -26,6 +26,7 @@ void *create_sender_thread(void *cnt){
 
 	Sender sendy(RFLayer_demibrad, &send_Queue_demibrad, &MACACK_demibrad, &ack_Received_demibrad, MACACK_demibrad);
 	sendy.MasterSend();
+	wcerr << "This should not appear";
 	return (void *)0;
 }
  /*
@@ -35,8 +36,9 @@ void *create_and_run_receiver_thread(void *cnt){
 	RFLayer_demibrad->attachThread();
 	wcerr << "receiver thread";
 	bool hello = true;
-	Listener listen(RFLayer_demibrad, &send_Queue_demibrad, &MACACK_demibrad, &ack_Received_demibrad, MACACK_demibrad);
+	Listener listen(RFLayer_demibrad, &receive_Queue_demibrad, &MACACK_demibrad, &ack_Received_demibrad, 103);
 	listen.UltraListen();
+	wcerr << "This should not appear again";
 	return (void *)0;
 }
 

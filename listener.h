@@ -35,9 +35,9 @@ public:
 private:
 
 
-    unsigned short* MACaddrList; //a pointer to our MAC address
+    unsigned short MACaddrList; //a pointer to our MAC address ************
     ostream *streamy; //the given output stream for data to the layer above
-    unsigned short* MACACKList;//a pointer to the MAC address of the most recent sender of data that has not been sent an ACK yet
+    unsigned short* MACACKList;//a pointer to the MAC address of the most recent sender of data that has not been sent an ACK yet 
     // or assuming that none need to be sent a special case of zero should be used to indicate this
     bool* ackReceivedL;// a pointer to a boolean that indicates whether or not a ACK has been recived
     static const int MAXPACKETSIZE = 2048; //size guarenteed to hold all properly formated packets

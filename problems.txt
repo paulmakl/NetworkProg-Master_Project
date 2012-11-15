@@ -1,0 +1,4 @@
+problems
+1. CRC is preventing us from testing with BRAD'S code
+2. Listener is not getting our mac address
+3. What is mac addr list
