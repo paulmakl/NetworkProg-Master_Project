@@ -18,6 +18,10 @@
  * Brad Richards, 10/2008
  */
 
+#ifndef __RF_H_INCLUDED__
+#define __RF_H_INCLUDED__
+
+
 // The SIFS inter-frame spacing time, in milliseconds 
 #define aSIFSTime    100
 
@@ -132,3 +136,4 @@ class RF
     
     JNIEnv *getEnvPtr();
 };
+#endif

@@ -1,7 +1,7 @@
 CC = g++
 CFLAGS = -c -g -Wall
-LAYER_SRCS = linklayer.cpp
-STUB_SRCS = RF.cpp cppStubs.cpp
+LAYER_SRCS = sender.cpp listener.cpp demiBrad.cpp packet.cpp
+STUB_SRCS = RF.cpp cppStubs.cpp 
 JVM_INCLUDE = -I/System/Library/Frameworks/JavaVM.framework/Headers
 JVM_LIBRARY = -L/System/Library/Frameworks/JavaVM.framework/Libraries
 LINKFLAGS = -dynamiclib -ljvm -framework JavaVM

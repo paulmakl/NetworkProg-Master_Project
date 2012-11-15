@@ -1,5 +1,4 @@
-/* 
- *
+/** 
  * THIS IS AN EXAMPLE OF USING PACKETS
  * - Paul
  */
