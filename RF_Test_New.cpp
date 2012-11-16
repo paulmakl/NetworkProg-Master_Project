@@ -26,18 +26,27 @@ void *send(void *cnt)
     //attach the thread
     RFLayer->attachThread();
     //create the buffer
-    char buf[10];
-
+    //  0 :: 0 :: 1 :: 44 :: 3 :: -23 :: 97 :: 98 :: 99 :: 22 :: -94 :: 54 :: -27 :: 
+    char buf[13];
+    buf[0] = 0;
+    buf[1] = 0;
+    buf[2] = 1;
+    buf[3] = 44;
+    buf[4] = 3;
+    buf[5] = -23;
+    buf[6] = 97;
+    buf[7] = 98;
+    buf[8] = 99;
+    buf[9] = 22;
+    buf[10] = -94;
+    buf[11] = 54;
+    buf[12] = -27;
     //make variables for the number of bytes sent
     //a time checkpoint
     // and a temperary short to manipulate the mac address
     int bytesSent;
     long long checkpointTime = RFLayer->clock();
     unsigned short temp = mac;
-    //store mac address in buffer
-    buf[0] = mac >> 8;
-    temp = mac << 8;
-    buf[1] = temp >> 8;
     //create a temp value for the upcoming while loop
     // so it can manipulate and store clock values.
     unsigned long long tempNEW;
@@ -57,14 +66,6 @@ void *send(void *cnt)
         //If the clock - the last checkpoint time is greater than the wait time, then transmit.
         if ( (RFLayer->clock() - checkpointTime) > waitTime * 3600.0)
         {
-            //create a packet to be sent
-            for (int i = 0; i < 8; ++i)
-            {
-                tempNEW = RFLayer->clock(); //start;
-                tempNEW = tempNEW << 56 - (8*i);
-                tempNEW = tempNEW >> 56;
-                buf[9-i] = tempNEW;
-            }
             //create a new random wait time
             waitTimeInt = rand() % 7;
             waitTimeDenominator = (rand() % 11) + 1;
@@ -72,12 +73,18 @@ void *send(void *cnt)
             tempFraction = waitTimeNumerator / waitTimeDenominator;
             waitTime = waitTimeInt + tempFraction;
             //send the packet
-            bytesSent = RFLayer->transmit(buf, 10);
+            bytesSent = RFLayer->transmit(buf, 13);
             //check for errors
-            if (bytesSent != 10)
+            if (bytesSent != 13)
                 wcerr << "Only sent " << bytesSent << " bytes of data!" << endl;
             else{
-                wcerr << "Yay!  We sent the entire packet!     " << mac << "     " << RFLayer->clock() << endl;
+                wcerr << "Yay!  We sent the entire packet!     " << mac << "     ";
+                int q = 0;
+                while(q < 13){
+                    wcerr << buf[q] + 0 << " :: ";
+                    q++;
+                }
+                wcerr << "" << endl;
             }
             //set the checkpoint time to the rf layer clock time
             checkpointTime = RFLayer->clock();
@@ -90,48 +97,24 @@ void *getPackets(void *cnt){
     //attach thread
     RFLayer->attachThread();
     //Create a buffer
-    char buf[10];
+    char buf[13];
     //create a bytes received integer
     int bytesReceived;
     while(true){
             // get the bytes received
-        bytesReceived = RFLayer->receive(buf, 10);
+        bytesReceived = RFLayer->receive(buf, 13);
             //print the bytes received and checks for errors
-        if (bytesReceived != 10)
+        if (bytesReceived != 13)
             wcerr << "Only Received " << bytesReceived << " bytes of data!" << endl;
         else{
             wcerr << bytesReceived << " bytes Received!     ";
+            int q = 0;
+            while(q < 13){
+                wcerr << buf[q] + 0 << " :: ";
+                q++;
+            }
+            wcerr << "" << endl;
         }
-        //start printing out the buffer
-        int x = 0;
-        wcerr << "[ ";
-        while(x<10){
-            unsigned char temp = buf[x];
-            wcerr << temp << ", ";
-            x++;
-        }
-        wcerr << " ]" << endl;
-        
-        //add all the bytes together to exctract the time from the packet received
-        unsigned long long receivedTime = 0;
-        unsigned long long temp;
-        unsigned char charTemp;
-        for (int i = 0; i < 8; ++i)
-        {
-             temp = buf[i+2] - 0;
-             //temp = charTemp;
-             temp = temp << 56 - (8 * i);
-             receivedTime = receivedTime + temp;
-        }
-
-        //extract the host name
-        unsigned short hostName;
-        unsigned short tempShort;
-        hostName = buf[1];
-        tempShort = buf[0] << 8;
-        hostName = hostName + tempShort;
-        //print host name and packet time sent stuff, time for bed
-        wcerr << "Host " << hostName << " says the time is " << receivedTime << endl;   
     }
     return (void *)0;
 }

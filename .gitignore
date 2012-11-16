@@ -10,3 +10,10 @@
 *.lai
 *.la
 *.a
+
+# Useless stuff that will never change
+*.pdf
+*.jar
+*.zip
+sender_UML.txt
+

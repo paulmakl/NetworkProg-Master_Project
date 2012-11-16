@@ -1,0 +1,4 @@
+problems
+1. Find out if sender is broken
+2. Find out if demibrad is broken
+3. find out if listener properly puts packets in the queue 

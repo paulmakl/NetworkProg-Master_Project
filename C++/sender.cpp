@@ -10,8 +10,6 @@ using namespace std;
 //#include "DemiBrad.h"
 #include <unistd.h>
 
-CircularFifo<Packet*,10>* infoToSend;
-
 Sender::Sender(RF* RFLayer, CircularFifo<Packet*,10>* theQueue, unsigned short* sendFlag,
                 bool* receivedFlag, unsigned short ourMAC) {
     //Initialize fields
@@ -25,7 +23,6 @@ Sender::Sender(RF* RFLayer, CircularFifo<Packet*,10>* theQueue, unsigned short* 
 
 void Sender::MasterSend() {
     //FOR TESTING PURPOSES
-    wcerr << infoToSend << endl;
     while (true) {
         //Check for Ack to send
         if (ackToSend != 0) {
@@ -33,12 +30,10 @@ void Sender::MasterSend() {
         }
 
         //Check for data to send
-        if (infoToSend->isEmpty()) {
+        if (infoToSend->isEmpty() == true) {
             //TODO Sleep
-            //wcerr << " QUEUE IS EMPTY" << endl;
         }
         else {
-            wcerr << " pop should happen" << endl;
             //Get incomplete packet to send
             Packet* temp;
             infoToSend->pop(temp); 

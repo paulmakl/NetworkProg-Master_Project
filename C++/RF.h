@@ -12,13 +12,36 @@
  * broadcast traffic.  This limits the use of the simulated RF layer to machines
  * within the same physical subnet.
  * 
- * Brad Richards, 9/2008
+ * By default, the IP broadcast address 255.255.255.255 is used.  This can 
+ * be changed by editing the bcastAddr array, defined at the top of RF.cpp.
+ * 
+ * Brad Richards, 10/2008
  */
 
 #ifndef __RF_H_INCLUDED__
 #define __RF_H_INCLUDED__
+
+
+// The SIFS inter-frame spacing time, in milliseconds 
+#define aSIFSTime    100
+
+// The slot time, in milliseconds 
+#define aSlotTime    200
+
+// The minimum size of the collision window 
+#define aCWmin       3
+
+// The maximum size of the collision window 
+#define aCWmax       31
+
+// The maximum nubmer of retransmission attempts 
+#define dot11RetryLimit    5
+
+// The maximum number of bytes allowed in an RF packet 
+#define aMPDUMaximumLength    2048
+
+
 #include <jni.h>
-#define  MAX_RF_PKT_SIZE  2048
 
 
 class RF
@@ -27,7 +50,7 @@ class RF
     
     /*
      * The constructor initializes the simulated RF transceiver and prepares it 
-     * for use.  An RF instance initializes its internal clock when created, and 
+     * for use.  An RF instance initializes its internal clock when created, and
      * reports all times as milliseconds since creation, so times are not 
      * directly comparable across RF transceivers.  (It prints the exact time 
      * of creation though, and this information could be used to convert local 
