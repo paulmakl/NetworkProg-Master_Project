@@ -11,9 +11,9 @@ bool ack_Received_demibrad; // flag for acknowledgment received
 unsigned short MACACK_demibrad; // the address that is associated with the next Acknowledgement. Is zero if none need to be sent
 //unsigned short send_flag_demibrad; // flat that lets the sender know when to send
 RF* RFLayer_demibrad; // the RF layer associated with Demibrad
-CircularFifo<Packet*, 10> send_Queue_demibrad; // the queue of packets to send
-CircularFifo<Packet*, 10> * test;
-CircularFifo<Packet*, 10> receive_Queue_demibrad; // the queu of packets received from the receiver class
+  CircularFifo<Packet*, 10> send_Queue_demibrad; // the queue of packets to send
+  CircularFifo<Packet*, 10> * test;
+  CircularFifo<Packet*, 10> receive_Queue_demibrad; // the queu of packets received from the receiver class
 Packet memory_buffer_demibrad[500]; // used to hold packets until they are used up
 int memory_buffer_number_count_demibrad; // current position of the memory buffer
 
@@ -84,6 +84,10 @@ int DemiBrad::dot11_recv(short *srcAddr, short *destAddr, char *buf, int bufSize
 	Packet * temp_pointer; // temporary pointer to a packet
 	Packet temp; // temporary packet
 	receive_Queue_demibrad.pop(temp_pointer); // pop of the first pointer to a packet
+
+    //TODO testing
+    wcerr << temp_pointer->destination << endl;
+
 	temp = *temp_pointer; // fill the temporary packet with the packet from the pointer
 	*srcAddr = temp.sender; // access the senders mac address and put it in the returned source address
 	*destAddr = temp.destination; // take the destination address out and put it in the destination address
@@ -103,7 +107,7 @@ int DemiBrad::dot11_send(short destAddr, char *buf, int bufSize){
 	Packet * temp_pointer = &memory_buffer_demibrad[memory_buffer_number_count_demibrad]; // create a temporary pointer to the packet
 	send_Queue_demibrad.push(temp_pointer); //push the temporary pointer onto the queue
 	// potentially reset the memory buffer number
-	//wcerr << "\n" << send_Queue_demibrad.isEmpty() << endl;
+	wcerr << "a" << send_Queue_demibrad.isEmpty() << endl;
 	test = &send_Queue_demibrad;
 	//wcerr << "\n" << test->isEmpty() << endl;
 	if (memory_buffer_number_count_demibrad > 499)

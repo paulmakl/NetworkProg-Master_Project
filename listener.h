@@ -25,7 +25,7 @@ public:
      * constructor for the listener class that sets up all our sexy varribles and
      * starts the thread listening for imcoming messages
      */
-    Listener(RF* RFLayer, CircularFifo<Packet* ,10>* incomingQueue, unsigned short* sendFlag, bool* receivedFlag, unsigned short myMAC);
+    Listener(RF* RFLayer,    CircularFifo<Packet* ,10>* incomingQueue, unsigned short* sendFlag, bool* receivedFlag, unsigned short myMAC);
     
     /*
      * the heart of the listener watches activity on the RF layer and blocks until a packet is recived
@@ -44,7 +44,7 @@ private:
     static const int ADDRESSRANGE = 1800;//max number of different possible mac addresses
     char buf[MAXPACKETSIZE];// buffer for the incoming packets
     char SNRec[ADDRESSRANGE];//an array that could hold differnet sequence numbers for every mac address
-    CircularFifo<Packet*,10>* daLoopLine;//a queue for the outgoing data
+      CircularFifo<Packet*,10>* daLoopLine;//a queue for the outgoing data
     
     RF* daRF;//the reference to the RF layer
     int bytesReceived;// bytes from the last packet
