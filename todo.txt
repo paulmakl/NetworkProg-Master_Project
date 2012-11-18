@@ -1,4 +1,0 @@
-Stuff we gotta do
-1. Redo the UML
-2. Figure out what sucks in our code.
-3. Make sure everyone can compile
