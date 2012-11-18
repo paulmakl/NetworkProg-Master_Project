@@ -13,6 +13,8 @@
 #include "packet.h"
 #include "CircularFifo.h"
 #include "RF.h"
+#include <queue>
+#include <pthread.h>
 //#ifndef __RF_H_INCLUDED__   // if x.h hasn't been included yet...
 //#define __RF_H_INCLUDED__
 using namespace std;
@@ -25,7 +27,7 @@ public:
      * constructor for the listener class that sets up all our sexy varribles and
      * starts the thread listening for imcoming messages
      */
-    Listener(RF* RFLayer,    CircularFifo<Packet* ,10>* incomingQueue, unsigned short* sendFlag, bool* receivedFlag, unsigned short myMAC);
+    Listener(RF* RFLayer, queue<Packet>* incomingQueue, unsigned short* sendFlag, bool* receivedFlag, unsigned short myMAC, pthread_mutex_t * mutexListenr);
     
     /*
      * the heart of the listener watches activity on the RF layer and blocks until a packet is recived
@@ -44,7 +46,7 @@ private:
     static const int ADDRESSRANGE = 1800;//max number of different possible mac addresses
     char buf[MAXPACKETSIZE];// buffer for the incoming packets
     char SNRec[ADDRESSRANGE];//an array that could hold differnet sequence numbers for every mac address
-      CircularFifo<Packet*,10>* daLoopLine;//a queue for the outgoing data
+    queue<Packet> * daLoopLine;//a queue for the outgoing data
     
     RF* daRF;//the reference to the RF layer
     int bytesReceived;// bytes from the last packet

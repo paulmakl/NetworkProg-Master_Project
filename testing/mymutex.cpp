@@ -13,7 +13,7 @@ queue<int*> sharedData;
 
 void *thready(void *parm){
 	pthread_mutex_lock(&mutex);
-	wcerr << pthread_self() << "IN THE HOUSE BITCH!!!!!!" << endl;
+	wcerr << pthread_self() << " IN THE HOUSE!!!!!!" << endl;
 	int * temp_buff[NUMTHREADS];
 	int i = 0;
 	while(!sharedData.empty()){
@@ -55,7 +55,7 @@ int main(int argc, char const *argv[])
 	wcerr << "done. Unlocking." << endl;
 	rc = pthread_mutex_unlock(&mutex);
 	i = 0;
-	for (int i=0; i<2; i++){
+	for (int i=0; i<3; i++){
         pthread_join(thread[i], NULL);
     }
     sleep(5);
