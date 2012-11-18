@@ -8,8 +8,9 @@
  * CSCI 325 University of Puget Sound
  */
 
-using namespace std;
+#include <iostream>
 #include <tr1/unordered_map>
+using std::tr1::unordered_map;
 
 
 class SeqNumManager {
@@ -24,17 +25,17 @@ class SeqNumManager {
          * initializes value for unseen MAC
          * param mac the MAC address to increment
          */
-        void increment(short mac);
+        void increment(unsigned short mac);
 
         /**
          * returns the sequence number for a given MAC address
          * param mac the MAC address to look up
          * return the seqNum or -1 is the address is not in list
          */
-        short getSeqNum(short mac);
+        short getSeqNum(unsigned short mac);
 
     private:
-        unordered_map<short, short> theMap; //Underlying data structure       
+        unordered_map<unsigned short, unsigned short> theMap; //Underlying data structure       
         unsigned short max; //Gets max sequence number
 };
 
@@ -43,11 +44,11 @@ SeqNumManager::SeqNumManager(unsigned short maxSeqNum) {
 }
 
 void
-SeqNumManager::increment(short mac) {
+SeqNumManager::increment(unsigned short mac) {
     short temp; //gets seqNum
     //check existance 
     if (theMap.count(mac)) {
-        if (theMap.at(mac) < max) {
+        if (theMap[mac] < max) {
             temp = theMap[mac] + 1; //Get previous seqNum and increment
             theMap.erase(mac);  //Get rid of previous value
             theMap[mac] = temp; //Set new incremented value
@@ -63,15 +64,14 @@ SeqNumManager::increment(short mac) {
 }
 
 short
-SeqNumManager::getSeqNum(short mac) {
+SeqNumManager::getSeqNum(unsigned short mac) {
     if (theMap.count(mac)) {
-        return theMap.at(mac);  //Return the sequNum
+        return theMap[mac];  //Return the sequNum
     }
     else {
         return -1;  //Address did not exist
     }
 }
-
 
 
 
