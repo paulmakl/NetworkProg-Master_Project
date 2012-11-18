@@ -21,6 +21,7 @@ int bytes_to_send; // this is the size of the data char array.
 int frame_size; // this is the size of the frame. It is always 10 more that bytes_to_send.
 //char physical_data_array[MAXDATASIZE];
 
+
 // Basic constructor. CS is the value for CRC this will eventually be taken out
 void Packet::initpacket(unsigned short dest, char* dta, int size){
 	frametype = 3; // test value
