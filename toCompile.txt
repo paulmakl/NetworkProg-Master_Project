@@ -1,23 +1,6 @@
-For Lab Computer:
-g++ (PUT .CPP FILES YOU WANT TO COMPILE HERE, DONT FORGET TO INCLUDE A CLAS THAT HAS A MAIN MEHTOD!) -o TEST -I/System/Library/Frameworks/JavaVM.framework/Headers -L/System/Library/Frameworks/JavaVM.framework/Libraries -ljvm -framework JavaVM
+For Listener: (Make sure you include all cpp files you are using!)
+g++ sender.cpp RF.cpp packet.cpp packet.cpp Main.cpp -o TEST -arch i386 -I/System/Library/Frameworks/JavaVM.framework/Headers -L/System/Library/Frameworks/JavaVM.framework/Libraries -ljvm -framework JavaVM
 
-to run executables use: ./(name of executable)
 
-Notes for comment line:
-use cd to navigate
-use ls to see what is in your current directory 
-use cd .. to go back 1 directory
-
-Git notes:
-precede all git commands with "git"
-Always pull before you push
-Must add . before you can commit
-Must commit before you push
-EX:
-git pull
-<WRITE CODE AND MESS WITH THINGS>
-git add .
-git commit -m "Weston: Blah Blah Blah"
-git push
-
-THERE IS LOTS OF HELP/DOCUMENTATION FOR GIT IN THE GOOGLES
+For Sender:
+g++ listener.cpp RF.cpp packet.cpp -o TEST -I/System/Library/Frameworks/JavaVM.framework/Headers -L/System/Library/Frameworks/JavaVM.framework/Libraries -ljvm -framework JavaVM
