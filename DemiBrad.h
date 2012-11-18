@@ -9,9 +9,12 @@
 // Inlcude everything we need
 #include "circularfifo.h"
 #include "packet.h"
+#include <pthread.h>
 #include "RF.h"
 #include "sender.h"
 #include "listener.h"
+#include <queue>
+#include <iostream>
 
 using namespace std;
 
@@ -48,11 +51,8 @@ class DemiBrad{
 		ostream *streamy_demibrad; // provided ostream
 		bool ack_Received_demibrad; // flag for acknowledgment received
 		short MACACK_demibrad; // the address that is associated with the most recent Acknowledgement
-		  CircularFifo<Packet*, 10> send_Queue_demibrad; // a queue containing the packets for the sender thread to send
-		  CircularFifo<Packet*, 10> receive_Queue_demibrad; // a queue containing the received sender packets.
-		int counts_demibrad[3]; //
-		int memory_buffer_number_count_demibrad;
-		Packet memory_buffer_demibrad[500];
+		queue<Packet> send_Queue_demibrad; // a queue containing the packets for the sender thread to send
+		queue<Packet> receive_Queue_demibrad; // a queue containing the received sender packets.
 		//RF* RFLayer;
 		//ncoming_Queue queue <short, char, int> // a queue for incoming data
 		//outgoing_Queue queue <short, char, int> // a queue for outgoing data 
