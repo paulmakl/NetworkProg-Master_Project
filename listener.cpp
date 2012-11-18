@@ -8,10 +8,11 @@ static const int MAXPACKETSIZE = 2048; //size guarenteed to hold all properly fo
 char buf[MAXPACKETSIZE];// buffer for the incoming packets
 static const int ADDRESSRANGE = 1800;//max number of different possible mac addresses
 char SNRec[ADDRESSRANGE];//an array that could hold differnet sequence numbers for every mac address
-  CircularFifo<Packet* ,10> daLoopLine;
+queue<Packet> * daLoopLine;
 RF* daRF;
+pthread_mutex_t * mutexListener;
 
-Listener::Listener(RF* RFLayer,   CircularFifo<Packet* ,10>* incomingQueue, unsigned short* sendFlag, bool* receivedFlag, unsigned short myMAC)
+Listener::Listener(RF* RFLayer, queue<Packet>* incomingQueue, unsigned short* sendFlag, bool* receivedFlag, unsigned short myMAC, pthread_mutex_t * mutexListenr)
 {
     daRF = RFLayer;//our reference to the RF layer
     MACACKList = sendFlag;//where the address that requires an ACK goes
@@ -23,6 +24,7 @@ Listener::Listener(RF* RFLayer,   CircularFifo<Packet* ,10>* incomingQueue, unsi
     MACaddrList = myMAC;//************
     //wcerr << "\n" << myMAC << endl;
     daLoopLine = incomingQueue;//where incoming data will be sent via pointers to tuples
+    mutexListener = mutexListenr;
 }
 
 int
@@ -108,8 +110,8 @@ Listener::queue_data()
         i++;
     }
     wcerr << "\n";
-    Packet * temp = &toDemiBrad;//make a pointer to the packet with the data 
-    daLoopLine->push(temp);//send the pointer to the packet up to demibrad
+    //Packet * temp = &toDemiBrad;//make a pointer to the packet with the data 
+    daLoopLine->push(toDemiBrad);//send the pointer to the packet up to demibrad
     
     /*  
      * this is the code that has moved over to packet now 

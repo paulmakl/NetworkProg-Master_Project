@@ -8,10 +8,12 @@
 
 using namespace std;
 #include <iostream>
+#include <pthread.h>
 //#include "DemiBrad.h"
 #include "packet.h"
 #include "CircularFifo.h"
 #include "RF.h"
+#include <queue>
 //#ifndef __RF_H_INCLUDED__   // if x.h hasn't been included yet...
 //#define __RF_H_INCLUDED__
 class Sender {
@@ -24,8 +26,7 @@ class Sender {
          * @param ourMAC our MAC address
          * param sendFlag Pointer to flag marking the destination to send an Ack to
          */
-        Sender(RF* RFLayer,   CircularFifo<Packet*,10>* theQueue, unsigned short* sendFlag,
-                bool* receivedFlag, unsigned short ourMAC);
+        Sender(RF* RFLayer, queue<Packet> * theQueue, unsigned short* sendFlag, bool* receivedFlag, unsigned short ourMAC, pthread_mutex_t * mutexSender);
 
         /**
          * Invokes the sender object to do all of its duties
@@ -37,7 +38,7 @@ class Sender {
         RF* theRF; //Pointer to the RF layer
         short macAddr_Sender; //Our MAC address
         ostream* dataStream; //ostream provided to us
-          CircularFifo<Packet*,10>* infoToSend; //A queue to check for outgoing data 
+        queue<Packet> * infoToSend; //A queue to check for outgoing data 
         //queue<short,char,int>* outgoing_Queue:  //pointer to outgoing message queue
         bool* ackReceived; //Pointer to flag for received acks
         unsigned short* ackToSend; //Pointer to destination addr to send Ack
@@ -47,7 +48,7 @@ class Sender {
         static const unsigned int SLEEPTIME = 1;  //Wait time (second) to check again if
                                                     //the network is free 
         char* frame; //The byte array to be transmitted on RF
-    
+        pthread_mutex_t * mutex;
     //Methods
         //TODO Do you actuall need these top three methods because you are just checking fields?
         /**

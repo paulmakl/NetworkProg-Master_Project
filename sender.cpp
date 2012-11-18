@@ -10,16 +10,18 @@ using namespace std;
 //#include "DemiBrad.h"
 #include <unistd.h>
 
-  CircularFifo<Packet*,10>* infoToSend;
+queue<Packet> * infoToSend;
+pthread_mutex_t * mutexSender;
 
-Sender::Sender(RF* RFLayer,   CircularFifo<Packet*,10>* theQueue, unsigned short* sendFlag,
-                bool* receivedFlag, unsigned short ourMAC) {
+Sender::Sender(RF* RFLayer, queue<Packet> * theQueue, unsigned short* sendFlag, bool* receivedFlag, unsigned short ourMAC, pthread_mutex_t * mutexSendr)
+{
     //Initialize fields
     theRF = RFLayer;
     macAddr_Sender = ourMAC;
     infoToSend = theQueue;
     ackReceived = receivedFlag;
     ackToSend = sendFlag;
+    mutexSender = mutexSendr;
     seqNum = 0; //Initialize sequnece number to 0
 }
 
@@ -33,7 +35,7 @@ void Sender::MasterSend() {
         }
 
         //Check for data to send
-        if (infoToSend->isEmpty()) {
+        if (infoToSend->empty()) {
             //TODO Sleep
             wcerr << "QUEUE IS EMPTY" << endl;
             sleep(SLEEPTIME);
@@ -41,9 +43,9 @@ void Sender::MasterSend() {
         else {
             wcerr << " pop should happen" << endl;
             //Get incomplete packet to send
-            Packet* temp;
-            infoToSend->pop(temp); 
-            pachyderm = *temp; //Dereference temp to save a local copy of it
+            pachyderm = infoToSend->front();
+            infoToSend->pop(); 
+             //Dereference temp to save a local copy of it
             
             //buildFrame(frameType, false,seqNum, CRC);
             buildFrame(1, false, seqNum, 1111); //FOR TESTING 
@@ -57,7 +59,7 @@ void Sender::MasterSend() {
             send(pointerToTheFrame, pachyderm.frame_size);
 
             //start Timer to check for timeouts
-            delete temp; //Free memory because this is c++
+            //delete temp; //Free memory because this is c++
             delete pointerToTheFrame;
             //TODO Memory leak: theFrame is not dealt with
         }
