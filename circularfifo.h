@@ -33,7 +33,7 @@ public:
    
 private:
    volatile unsigned int tail; // input index
-   Element array[Capacity];
+   volatile Element array[Capacity];
    volatile unsigned int head; // output index
 
    unsigned int increment(unsigned int idx_) const;

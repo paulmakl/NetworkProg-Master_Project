@@ -8,10 +8,10 @@ static const int MAXPACKETSIZE = 2048; //size guarenteed to hold all properly fo
 char buf[MAXPACKETSIZE];// buffer for the incoming packets
 static const int ADDRESSRANGE = 1800;//max number of different possible mac addresses
 char SNRec[ADDRESSRANGE];//an array that could hold differnet sequence numbers for every mac address
-CircularFifo<Packet* ,10> daLoopLine;
+  CircularFifo<Packet* ,10> daLoopLine;
 RF* daRF;
 
-Listener::Listener(RF* RFLayer, CircularFifo<Packet* ,10>* incomingQueue, unsigned short* sendFlag, bool* receivedFlag, unsigned short myMAC)
+Listener::Listener(RF* RFLayer,   CircularFifo<Packet* ,10>* incomingQueue, unsigned short* sendFlag, bool* receivedFlag, unsigned short myMAC)
 {
     daRF = RFLayer;//our reference to the RF layer
     MACACKList = sendFlag;//where the address that requires an ACK goes

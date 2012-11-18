@@ -24,7 +24,7 @@ class Sender {
          * @param ourMAC our MAC address
          * param sendFlag Pointer to flag marking the destination to send an Ack to
          */
-        Sender(RF* RFLayer, CircularFifo<Packet*,10>* theQueue, unsigned short* sendFlag,
+        Sender(RF* RFLayer,   CircularFifo<Packet*,10>* theQueue, unsigned short* sendFlag,
                 bool* receivedFlag, unsigned short ourMAC);
 
         /**
@@ -37,7 +37,7 @@ class Sender {
         RF* theRF; //Pointer to the RF layer
         short macAddr_Sender; //Our MAC address
         ostream* dataStream; //ostream provided to us
-        CircularFifo<Packet*,10>* infoToSend; //A queue to check for outgoing data 
+          CircularFifo<Packet*,10>* infoToSend; //A queue to check for outgoing data 
         //queue<short,char,int>* outgoing_Queue:  //pointer to outgoing message queue
         bool* ackReceived; //Pointer to flag for received acks
         unsigned short* ackToSend; //Pointer to destination addr to send Ack

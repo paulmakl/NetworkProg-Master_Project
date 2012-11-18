@@ -48,8 +48,8 @@ class DemiBrad{
 		ostream *streamy_demibrad; // provided ostream
 		bool ack_Received_demibrad; // flag for acknowledgment received
 		short MACACK_demibrad; // the address that is associated with the most recent Acknowledgement
-		CircularFifo<Packet*, 10> send_Queue_demibrad; // a queue containing the packets for the sender thread to send
-		CircularFifo<Packet*, 10> receive_Queue_demibrad; // a queue containing the received sender packets.
+		  CircularFifo<Packet*, 10> send_Queue_demibrad; // a queue containing the packets for the sender thread to send
+		  CircularFifo<Packet*, 10> receive_Queue_demibrad; // a queue containing the received sender packets.
 		int counts_demibrad[3]; //
 		int memory_buffer_number_count_demibrad;
 		Packet memory_buffer_demibrad[500];
