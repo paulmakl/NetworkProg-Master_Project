@@ -7,7 +7,6 @@
  */
 
 // Inlcude everything we need
-#include "circularfifo.h"
 #include "packet.h"
 #include <pthread.h>
 #include "RF.h"

@@ -11,7 +11,6 @@
 #include <iostream>
 //#include "DemiBrad.h"
 #include "packet.h"
-#include "CircularFifo.h"
 #include "RF.h"
 #include <queue>
 #include <pthread.h>
