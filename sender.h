@@ -5,6 +5,7 @@
  * Date: October 2012
  * Class: CSCI 325 University of Puget Sound
  */
+#pragma once
 
 using namespace std;
 #include <iostream>
@@ -16,7 +17,7 @@ using namespace std;
 
 //#ifndef __RF_H_INCLUDED__   // if x.h hasn't been included yet...
 //#define __RF_H_INCLUDED__
-class Sender : public SeqNumManager {
+class Sender {
     public:
         /**
          * Constructor for objects of the Sender class
@@ -30,21 +31,12 @@ class Sender : public SeqNumManager {
                 bool* receivedFlag, unsigned short ourMAC, 
                 unsigned short *expSeq, pthread_mutex_t * mutex, 
                 unsigned short *macAckSeq) 
-                    : SeqNumManager(MAXSEQNUM) {};  //BRAD: here is where I attempt to 
-                                                    //specify the SeqNumManager
-                                                    //constructor to use
-                        
-                        /*
-                         * Ignore this, was trying to implicitly instantiate 
-                         * the sender class, but it failed
-                         *
-                         * theRf(RFLayer), macAddr_Sender(ourMac),
+                : seqTable(MAXSEQNUM),  
+                    theRF(RFLayer), macAddr_Sender(ourMAC),
                     infoToSend(theQueue), expSeqNum(expSeq),
-                    macAckSender(macAckSeq), ackRecieved(recievedFlag), 
-                    ackToSend(sendFlag), mutexSender(mutex),
-                    seqTable(SeqNumManager(MAXSEQNUM)) {};//TODO Figure out inisializer lists
-
-                    */
+                    macAckSeqNum(macAckSeq), ackReceived(receivedFlag), 
+                    ackToSend(sendFlag), mutexSender(mutex) {}
+        
         /**
          * Invokes the sender object to do all of its duties
          */
@@ -54,7 +46,7 @@ class Sender : public SeqNumManager {
     //Fields
         RF* theRF; //Pointer to the RF layer
         short macAddr_Sender; //Our MAC address
-        ostream* dataStream; //ostream provided to us
+        //ostream* dataStream; //ostream provided to us
         queue<Packet> *infoToSend; //A queue to check for outgoing data 
         unsigned short *expSeqNum; //The expected seq num to see in an incomming ack
         unsigned short *macAckSeqNum; //The seqNum for to acknowlege that we have recieved

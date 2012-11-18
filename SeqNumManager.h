@@ -15,12 +15,6 @@ using std::tr1::unordered_map;
 
 class SeqNumManager {
     public:
-        /** 
-         * Default constructor, which I shouldn't need
-        SeqNumManager()
-            : max(0) {}; 
-        */
-
         /**
          * Constructor 
          */
@@ -45,12 +39,8 @@ class SeqNumManager {
         unordered_map<unsigned short, unsigned short> theMap; //Underlying data structure       
         unsigned short max; //Gets max sequence number
 };
-/* Should not need because it is now done implicitly 
-SeqNumManager::SeqNumManager(unsigned short maxSeqNum) {
-    max = maxSeqNum;
-}
-*/
 
+inline
 void
 SeqNumManager::increment(unsigned short mac) {
     short temp; //gets seqNum
@@ -70,7 +60,7 @@ SeqNumManager::increment(unsigned short mac) {
         theMap[mac] = 0;    //Create entry for new MAC addr
     }
 }
-
+inline
 short
 SeqNumManager::getSeqNum(unsigned short mac) {
     if (theMap.count(mac)) {

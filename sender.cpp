@@ -10,24 +10,6 @@ using namespace std;
 #include <unistd.h>
 using std::queue;
 
-/**
-Sender::Sender(RF* RFLayer, queue<Packet> * theQueue, unsigned short* sendFlag,
-                bool* receivedFlag, unsigned short ourMAC, 
-                unsigned short *expSeq, pthread_mutex_t *mutex, 
-                unsigned short *macAckSeq) {
-    //Initialize fields
-    theRF = RFLayer;
-    macAddr_Sender = ourMAC;
-    infoToSend = theQueue;
-    macAckSeqNum = macAckSeq;
-    expSeqNum = expSeq; 
-    ackReceived = receivedFlag;
-    ackToSend = sendFlag;
-    mutexSender = mutex;
-    seqTable = SeqNumManager(MAXSEQNUM);
-}
-*/
-
 void 
 Sender::MasterSend() {
     //FOR TESTING PURPOSES
