@@ -31,7 +31,7 @@ Listener::read_Packet ()
     {
         case 0:
             if (prints) wcerr << "Data packet received." << endl;
-            if (packetDest != MACaddrList)//compare the destination of this packet to our MAC address and to the broadcast address
+            if (packetDest != MACaddrList && packetDest != -1)//compare the destination of this packet to our MAC address and to the broadcast address
             {
                 status = 0;//this packet isn't for us
                 if (prints) wcerr << "Packet not addressed to current MAC address. :: " << MACaddrList << " :: " << packetDest << endl;
