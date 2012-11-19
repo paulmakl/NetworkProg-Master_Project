@@ -12,19 +12,19 @@ using std::queue;
 void 
 Sender::MasterSend() {
     //FOR TESTING PURPOSES
-    wcerr << infoToSend << endl;
+   // wcerr << infoToSend << endl;
     while (true) {
         //Lock mutex, block until you can
         pthread_mutex_lock(mutexSender);
 
         //Check for data to send
         if (infoToSend->empty()) {
-            wcerr << "QUEUE IS EMPTY" << endl;
+            //wcerr << "QUEUE IS EMPTY" << endl;
             pthread_mutex_unlock(mutexSender); //Unlock because the queue is not ready
             sleep(SLEEPTIME);
         }
         else {
-            wcerr << " pop should happen" << endl;
+            //wcerr << " pop should happen" << endl;
            
             //Get incomplete packet to send
             pachyderm = infoToSend->front();
@@ -65,13 +65,20 @@ Sender::buildFrame(short frm, bool resend,  short seqNum, int CS) {
 int 
 Sender::send(char* frame, int size) {
     //Listen to see if channel is open
+    //TODO Change to while loop
     if (!theRF->inUse()) { //The channel is clear
+        //TODO Wait IFS
+        //  Check if medium still idle
         if (theRF->transmit(frame, size) != size) {  //Makes the transmission 
             return 0; //Did not send all of frame or
            }
         else {
             return 1; //Frame transmitted properly 
         }
+        //Busy:
+        //Wait till transmition ends
+        //EXPONENTIAL BACKOFF 
+        //Send
     }
     else { //The channel is busy
         sleep(SLEEPTIME); //sleep
