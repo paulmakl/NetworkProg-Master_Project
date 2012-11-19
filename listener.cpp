@@ -117,8 +117,7 @@ Listener::UltraListen()
 int
 Listener::queue_data()
 {
-    Packet toDemiBrad;//create a packet
-    toDemiBrad.init_Packet(&buf[0], bytesReceived);//put the data in a packet and strip the headers off while it gets done
+    Packet toDemiBrad(&buf[0], bytesReceived);//create a packet
     /*
      * testing shiz to make sure the right data is being sent out
      toDemiBrad.init_Packet(&buf[0], bytesReceived);//construct the guts of the packet using the buffer and total byets recived
