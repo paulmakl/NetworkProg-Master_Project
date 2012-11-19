@@ -7,6 +7,7 @@
 #include <stdlib.h>
 #include <iostream>
 #include "Demibrad.h"
+#include <time>
 
 using namespace std;
 
@@ -20,9 +21,10 @@ int main(int argc, char const *argv[])
 	buf[0] = 'a';
 	buf[1] = 'b';
 	buf[2] = 'c';
-	dot11_send(101, &buf[0], bufSize);
+	
 	while(true){
-
+		dot11_send(101, &buf[0], bufSize);
+		//if(dot11_receive())
 	}
 }
 

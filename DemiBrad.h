@@ -61,3 +61,4 @@ class DemiBrad{
 
 int dot11_init(short MACadr, ostream* stremy);
 int dot11_send(short destAddr, char *buf, int bufSize);
+int dot11_recv(short *srcAddr, short *destAddr, char *buf, int bufSize);
