@@ -40,7 +40,7 @@ private:
     ostream *streamy; //the given output stream for data to the layer above
     volatile bool* ackReceivedL;// a pointer to a boolean that indicates whether or not a ACK has been recived
     static const int MAXPACKETSIZE = 2048; //size guarenteed to hold all properly formated packets
-    char buf[MAXPACKETSIZE];// buffer for the incoming packets
+    char buf[aMPDUMaximumLength];// buffer for the incoming packets
     queue<Packet> * daLoopLine;//a queue for the outgoing data
     volatile short* expectedSN;//the sequence number to check against incoming acks
     RF* daRF;//the reference to the RF layer
