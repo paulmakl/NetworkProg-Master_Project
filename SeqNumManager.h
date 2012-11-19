@@ -8,6 +8,8 @@
  * CSCI 325 University of Puget Sound
  */
 
+#pragma once
+
 #include <iostream>
 #include <tr1/unordered_map>
 using std::tr1::unordered_map;
@@ -60,6 +62,7 @@ SeqNumManager::increment(short mac) {
         theMap[mac] = 0;    //Create entry for new MAC addr
     }
 }
+
 inline
 short
 SeqNumManager::getSeqNum(short mac) {

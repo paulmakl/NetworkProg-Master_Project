@@ -29,8 +29,8 @@ class Sender {
          * param mutex Pointer to the mutex to lock the queue
          */
         Sender(RF* RFLayer, queue<Packet> * theQueue,
-                bool* receivedFlag, short ourMAC, 
-                short *expSeq, pthread_mutex_t * mutex) 
+                volatile bool* receivedFlag, short ourMAC, 
+                volatile short *expSeq, pthread_mutex_t * mutex) 
                     :   seqTable(MAXSEQNUM),  
                         theRF(RFLayer), macAddr_Sender(ourMAC),
                         infoToSend(theQueue), expSeqNum(expSeq), ackReceived(receivedFlag), 
@@ -44,57 +44,57 @@ class Sender {
     private:
     //Fields
         RF* theRF; //Pointer to the RF layer
-        short macAddr_Sender; //Our MAC address
         queue<Packet> *infoToSend; //A queue to check for outgoing data 
-        short *expSeqNum; //The expected seq num to see in an incomming ack
-        short *macAckSeqNum; //The seqNum for to acknowlege that we have recieved
-        bool* ackReceived; //Pointer to flag for received acks
+        volatile bool* ackReceived; //Pointer to flag for received acks
+        short macAddr_Sender; //Our MAC address
+        volatile short *expSeqNum; //The expected seq num to see in an incomming ack
+        volatile short *macAckSeqNum; //The seqNum for to acknowlege that we have recieved
+        pthread_mutex_t *mutexSender; //pointer to the lock for the queue
+        //Internal fields  
         Packet pachyderm; //The packet to send
         static const short MAXSEQNUM = 4095;
         static const int SLEEPTIME = 1;    //Wait time (second) to check again if
-                                                                            //the network is free 
+                                                            //the network is free 
         char* frame; //The byte array to be transmitted on RF
-        pthread_mutex_t *mutexSender; //pointer to the lock for the queue
         SeqNumManager seqTable; //Manages all seqNums for all MAC addr's
 
     //Methods
-        //TODO Do you actuall need these top three methods because you are just checking fields?
         /**
          * Checks the sender queue for data to be sent and checks the Ack
          * field for flags indicated acknowledgments needing to be sent
-         * @return 0 nothing to send
-         * @return 1 data to send
+         * return 0 nothing to send
+         * return 1 data to send
          */
         int  check_QueueToSend();
 
         /**
          * Checks for an acknowledgment received
-         * @return 0 No ack received
-         * @return Mac address of received ack  
+         * return 0 No ack received
+         * return Mac address of received ack  
          */
         //TODO How will you tell which message an ack is for using this system?
         short check_ReceivedAck();
 
         /**
          * Builds a packet object for sending
-         * @param frm the frame typ
-         * @param resend Indicates if this packet is part of  a retransmission
-         * @param seqNum This packets sequence number
-         * @param CS CRC
-         * @return 1 if packet was successfully built
+         * param frm the frame typ
+         * param resend Indicates if this packet is part of  a retransmission
+         * param seqNum This packets sequence number
+         * param CS CRC
+         * return 1 if packet was successfully built
          */
         int buildFrame(short frm, bool resend, short seqNum, int CS);
        
         /**
          * Sends a packet
-         * @param thePacket The packet to send
-         * @return 1 if the packet was sent correctly
+         * param thePacket The packet to send
+         * return 1 if the packet was sent correctly
          */
         int send(char* frame, int size);
 
         /**
          * Resends the current packet
-         * @return 1 if packet was successfully sent
+         * return 1 if packet was successfully sent
          */
         int resend();
 };
