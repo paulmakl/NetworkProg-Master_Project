@@ -28,13 +28,12 @@ class Sender {
          * param expSeq Pointer to the Seq num to be expected in an ack
          * param mutex Pointer to the mutex to lock the queue
          */
-        Sender(RF* RFLayer, queue<Packet> * theQueue,
-                volatile bool* receivedFlag, short ourMAC, 
-                volatile short *expSeq, pthread_mutex_t * mutex) 
-                    :   seqTable(MAXSEQNUM),  
-                        theRF(RFLayer), macAddr_Sender(ourMAC),
-                        infoToSend(theQueue), expSeqNum(expSeq), ackReceived(receivedFlag), 
-                        mutexSender(mutex) {}
+        Sender(RF* RFLayer, queue<Packet> *theQueue,
+                volatile bool *receivedFlag, short ourMAC, 
+                volatile short *expSeq, pthread_mutex_t *mutex) 
+                    :   theRF(RFLayer),  infoToSend(theQueue), ackReceived(receivedFlag), 
+                        macAddr_Sender(ourMAC), expSeqNum(expSeq), mutexSender(mutex), 
+                        seqTable(MAXSEQNUM) {}
         
         /**
          * Invokes the sender object to do all of its duties
