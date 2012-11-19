@@ -12,7 +12,7 @@ void *create_sender_thread(void *cnt){
 	theDemibrad.RFLayer_demibrad->attachThread();
 	//wcerr << "sender thread";
 
-	Sender sendy(theDemibrad.RFLayer_demibrad, &theDemibrad.send_Queue_demibrad, &theDemibrad.MACACK_demibrad, &theDemibrad.ack_Received_demibrad, theDemibrad.MACaddr_demibrad, &(theDemibrad.mutex_Demibrad_Sender));
+	Sender sendy(theDemibrad.RFLayer_demibrad, &theDemibrad.send_Queue_demibrad, &theDemibrad.ack_Received_demibrad, theDemibrad.MACaddr_demibrad, &(theDemibrad.mutex_Demibrad_Sender));
 	sendy.MasterSend();
 	wcerr << "This should not appear";
 	return (void *)0;
@@ -23,8 +23,7 @@ void *create_sender_thread(void *cnt){
 void *create_and_run_receiver_thread(void *cnt){
 	theDemibrad.RFLayer_demibrad->attachThread();
 	//wcerr << "receiver thread";
-	bool hello = true;
-	Listener listen(theDemibrad.RFLayer_demibrad, &theDemibrad.receive_Queue_demibrad, &theDemibrad.MACACK_demibrad, &theDemibrad.ack_Received_demibrad, 103, &theDemibrad.mutex_Demibrad_Receiver);
+	Listener listen(theDemibrad.RFLayer_demibrad, &theDemibrad.receive_Queue_demibrad, &theDemibrad.ack_Received_demibrad, 103, &theDemibrad.mutex_Demibrad_Receiver, &theDemibrad.expected_sequence_number);
 	listen.UltraListen();
 	wcerr << "This should not appear again";
 	return (void *)0;

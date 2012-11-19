@@ -26,7 +26,7 @@ public:
      * constructor for the listener class that sets up all our sexy varribles and
      * starts the thread listening for imcoming messages
      */
-    Listener(RF* RFLayer, queue<Packet>* incomingQueue, bool* receivedFlag, short myMAC, pthread_mutex_t * mutexListenr, short* exSN)
+    Listener(RF* RFLayer, queue<Packet>* incomingQueue, volatile bool* receivedFlag, short myMAC, pthread_mutex_t * mutexListenr, volatile short* exSN)
     : seqNumMang(MAXSEQNUM), MACaddrList(myMAC), ackReceivedL(receivedFlag), daLoopLine(incomingQueue), daRF(RFLayer), expectedSN(exSN), mutexListener(mutexListenr), prints(true) {}
     
     /*
@@ -36,7 +36,7 @@ public:
 
 private:
 
-    volatile short MACaddrList; //a pointer to our MAC address
+    short MACaddrList; //a pointer to our MAC address
     ostream *streamy; //the given output stream for data to the layer above
     volatile bool* ackReceivedL;// a pointer to a boolean that indicates whether or not a ACK has been recived
     static const int MAXPACKETSIZE = 2048; //size guarenteed to hold all properly formated packets
