@@ -4,19 +4,18 @@
  * the most lightfooted packets and determining their usefulness to us acting accordingly on information recived.
  * This means either alerting the sender the status of ACKs(ours or others), or saving data for our lordly demiBrad.
  * Weston Thornburg
+ * University of Puget Sound CS 325
+ * october 2012
  */
 
 
 
 #include <iostream>
-//#include "DemiBrad.h"
 #include "packet.h"
-#include "CircularFifo.h"
 #include "RF.h"
 #include <queue>
 #include <pthread.h>
-//#ifndef __RF_H_INCLUDED__   // if x.h hasn't been included yet...
-//#define __RF_H_INCLUDED__
+#include "SeqNumManager.h"
 using namespace std;
 
 class Listener
@@ -27,7 +26,8 @@ public:
      * constructor for the listener class that sets up all our sexy varribles and
      * starts the thread listening for imcoming messages
      */
-    Listener(RF* RFLayer, queue<Packet>* incomingQueue, unsigned short* sendFlag, bool* receivedFlag, unsigned short myMAC, pthread_mutex_t * mutexListenr);
+    Listener(RF* RFLayer, queue<Packet>* incomingQueue, bool* receivedFlag, short myMAC, pthread_mutex_t * mutexListenr, short* exSN)
+    : seqNumMang(MAXSEQNUM), MACaddrList(myMAC), ackReceivedL(receivedFlag), daLoopLine(incomingQueue), daRF(RFLayer), expectedSN(exSN), mutexListener(mutexListenr), prints(true) {}
     
     /*
      * the heart of the listener watches activity on the RF layer and blocks until a packet is recived
@@ -36,24 +36,19 @@ public:
 
 private:
 
-
-    unsigned short MACaddrList; //a pointer to our MAC address ************
+    volatile short MACaddrList; //a pointer to our MAC address
     ostream *streamy; //the given output stream for data to the layer above
-    unsigned short* MACACKList;//a pointer to the MAC address of the most recent sender of data that has not been sent an ACK yet 
-    // or assuming that none need to be sent a special case of zero should be used to indicate this
-    bool* ackReceivedL;// a pointer to a boolean that indicates whether or not a ACK has been recived
+    volatile bool* ackReceivedL;// a pointer to a boolean that indicates whether or not a ACK has been recived
     static const int MAXPACKETSIZE = 2048; //size guarenteed to hold all properly formated packets
-    static const int ADDRESSRANGE = 1800;//max number of different possible mac addresses
     char buf[MAXPACKETSIZE];// buffer for the incoming packets
-    char SNRec[ADDRESSRANGE];//an array that could hold differnet sequence numbers for every mac address
     queue<Packet> * daLoopLine;//a queue for the outgoing data
-    
+    volatile short* expectedSN;//the sequence number to check against incoming acks
     RF* daRF;//the reference to the RF layer
     int bytesReceived;// bytes from the last packet
-
-
-    
-    
+    bool prints;//bool for turning prints on or off
+    SeqNumManager seqNumMang;//a hashmap with added funtionality for dealing with sequence numbers
+    pthread_mutex_t* mutexListener;//a mutex for locking the queue
+    static const short MAXSEQNUM = 4095;//the largest possible sequence number that can be used
 
     /*
      * looks at a packet to check for three things from every packet that comes across the the RF layer
@@ -69,6 +64,16 @@ private:
       * then is put into our incoming_Queue\
       */
       int queue_data();
+
+      /*
+       * a method for hiding away those nasty bitwise operaters for getting a squence number outta sight outta my way 
+       */
+        short extractSequenceNumber();
+
+        /*
+         * a method for hinging the bitwise terrible of getting a source address out of a packet
+         */
+         short extractSourceAddress();
 };
 //#endif
 
