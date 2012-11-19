@@ -23,7 +23,7 @@ int frame_size; // this is the size of the frame. It is always 10 more that byte
 
 
 // Basic constructor. CS is the value for CRC this will eventually be taken out
-void Packet::initpacket(unsigned short dest, char* dta, int size){
+Packet::Packet(unsigned short dest, char* dta, int size){
 	frametype = 3; // test value
 	resend = 5; // test value
 	sequence_number = 30; // test value
@@ -39,7 +39,7 @@ void Packet::initpacket(unsigned short dest, char* dta, int size){
 }
 
 //Weston's Additions: overwritten "constructor" to unpack data from listener going to demi brad
-void Packet::init_Packet(char *pac, int byts)
+Packet::Packet(char *pac, int byts)
 {
     int size = byts-10;//total size of incoming data minus 10 bytes of header and CRC
     bytes_to_send = size;
