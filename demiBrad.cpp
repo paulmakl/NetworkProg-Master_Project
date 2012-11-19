@@ -12,7 +12,7 @@ void *create_sender_thread(void *cnt){
 	theDemibrad.RFLayer_demibrad->attachThread();
 	//wcerr << "sender thread";
 
-	Sender sendy(theDemibrad.RFLayer_demibrad, &theDemibrad.receive_Queue_demibrad, &theDemibrad.ack_Received_demibrad, 103, &theDemibrad.expected_sequence_number, &theDemibrad.mutex_Demibrad_Receiver);
+	Sender sendy(theDemibrad.RFLayer_demibrad, &theDemibrad.send_Queue_demibrad, &theDemibrad.ack_Received_demibrad, 103, &theDemibrad.expected_sequence_number, &theDemibrad.mutex_Demibrad_Receiver);
 	sendy.MasterSend();
 	wcerr << "This should not appear";
 	return (void *)0;

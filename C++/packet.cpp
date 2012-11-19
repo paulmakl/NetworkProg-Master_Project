@@ -5,58 +5,40 @@
 #include "packet.h"
 using namespace std;
 
-//TODO make ACK init
-//     CONSTRUCTOR SHOULD ONLY TAKE A DESTINATION ADDRESS
-// look at IEEE to see what an acknowledgement looks like
-
-// DO NOT CHANGE THESE TYPES. IT WILL MAKE EVERYTHING BREAK.
-short frametype; // can either be 1-4 based on the type of frame.
-bool resend; // if true, this packet is a resend packet.
-unsigned short sequence_number; // the sequence number for the packet.
-unsigned short destination; // the destination mac address for everything
-unsigned short sender; // the sender mac address
-char* data; // a pointer to an char array. It cointains the data that the user wants to send
-unsigned int CRC; // currently, you can pass in the CRC, this will eventually be taken out but until CRC is implemented it will remain in. 
-int bytes_to_send; // this is the size of the data char array.
-int frame_size; // this is the size of the frame. It is always 10 more that bytes_to_send.
-char physical_data_array[2038];
-
 // Basic constructor. CS is the value for CRC this will eventually be taken out
-void Packet::initpacket(unsigned short dest, char* dta, int size){
+Packet::Packet(short dest, char* dta, int size){
 	frametype = 3; // test value
 	resend = 5; // test value
 	sequence_number = 30; // test value
 	destination = dest;
 	sender = 1001; // test value
-	data = dta;
 	CRC = 46869594; // test value
 	bytes_to_send = size;
 	frame_size = size + 10;
 	resend = false; // test value
-    pointer_data_to_physical(); //Make the physical copy
-    //buildByteArray(); //Build the frame
+    pointer_data_to_physical(dta); //Make the physical copy
 }
 
 //Weston's Additions: overwritten "constructor" to unpack data from listener going to demi brad
-void Packet::init_Packet(char *pac, int byts)
+Packet::Packet(char *pac, int byts)
 {
     int size = byts-10;//total size of incoming data minus 10 bytes of header and CRC
     bytes_to_send = size;
     char dataIn[size];//a new char array for just the incoming data
-    unsigned short dataSource = pac[4] + 0;//extract the source address
-    dataSource << 8;
+    short dataSource = pac[4] + 0;//extract the source address
+    dataSource = dataSource << 8;
     dataSource = dataSource + pac[5];
     sender = dataSource;
     for (int i = 6; i < byts-4; ++i)//strip the headers and put just the data in our packet
     {
         dataIn[i-6] = pac[i];//the offset of six is the front header being skipped in our buf and the four less is the CRC
     }
-    char * king_of_france = &dataIn[0];
-    data = king_of_france;
-    pointer_data_to_physical(); //Make the physical copy
+    char* pointerToData = &dataIn[0];
+    pointer_data_to_physical(pointerToData); //Make the physical copy
 }
 
-void Packet::pointer_data_to_physical(){
+// takes a pointer to an array of data and copies it into the phyical data array in the packet class
+void Packet::pointer_data_to_physical(char* data){
 	int i = 0;
 	while(i < bytes_to_send){
 		physical_data_array[i] = data[i];
@@ -73,7 +55,7 @@ int Packet::buildByteArray(char *buffer){
 	//four bytes. and then puts those bytes in the
 	// last four slots of the packet.
 	int i = 0; // create a counter variable
-	unsigned int temp_int = 0; // make a temporary integer.
+	int temp_int = 0; // make a temporary integer.
 	while(i < 4){
 		temp_int = CRC << 24 - 8*i; // shift the ith byte of the integer all the way over to the left.
 		temp_int = temp_int >> 24; // shift that byte back to its original position.
@@ -83,7 +65,7 @@ int Packet::buildByteArray(char *buffer){
 
 	//Now we need to put the destination and sender addresses in their
 	//proper positions
-	unsigned short temp_short = 0; // create a temporary short variable.
+	short temp_short = 0; // create a temporary short variable.
 	temp_short = sender << 8; // shift the first byte of sender the the leftmost position of the short
 	temp_short = temp_short >> 8;// shift the previously mentioned byte back to its original position.
 								 // this removes all the unnesessary zeros.
@@ -107,7 +89,7 @@ int Packet::buildByteArray(char *buffer){
 	// when I stored destination address and sender address, I broke a short (2 bytes) up into two 1 byte
 	// segments that could easily be put into the buffer. I take a similar approach here. I merge the three
 	// variables into a short and then split it into two bytes to be put into the buffer.
-	unsigned short temp_short_two = 0; // I needed a second temporary variable.
+	short temp_short_two = 0; // I needed a second temporary variable.
 	temp_short = 0; // i zeroed out the first temporary variable, just to be safe.
 	temp_short = frametype << 13; // the frame type is stored in a short, so I shift it over 13 bits so that only the
 								  // last three bits will be in the leftmost position of the number
@@ -134,9 +116,8 @@ int Packet::buildByteArray(char *buffer){
 	// after the header. we go through the data in 'data' and 
 	// put it in the buffer.
 	while(i < bytes_to_send){
-		buffer[i+6] = data[i];
+		buffer[i+6] = physical_data_array[i];
 		i++;
 	}
-	//time for a nap...
 }
 

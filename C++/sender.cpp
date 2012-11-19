@@ -4,44 +4,38 @@
  * class: CSCI 325 University of Puget Sound
  */
 
-using namespace std;
 #include <iostream>
 #include "sender.h"
-//#include "DemiBrad.h"
 #include <unistd.h>
+using std::queue;
 
-Sender::Sender(RF* RFLayer, CircularFifo<Packet*,10>* theQueue, unsigned short* sendFlag,
-                bool* receivedFlag, unsigned short ourMAC) {
-    //Initialize fields
-    theRF = RFLayer;
-    macAddr_Sender = ourMAC;
-    infoToSend = theQueue;
-    ackReceived = receivedFlag;
-    ackToSend = sendFlag;
-    seqNum = 0; //Initialize sequnece number to 0
-}
-
-void Sender::MasterSend() {
+void 
+Sender::MasterSend() {
     //FOR TESTING PURPOSES
+    wcerr << infoToSend << endl;
     while (true) {
-        //Check for Ack to send
-        if (ackToSend != 0) {
-        //TODO Implement listen for Ack's to send
-        }
+        //Lock mutex, block until you can
+        pthread_mutex_lock(mutexSender);
 
         //Check for data to send
-        if (infoToSend->isEmpty() == true) {
-            //TODO Sleep
+        if (infoToSend->empty()) {
+            wcerr << "QUEUE IS EMPTY" << endl;
+            pthread_mutex_unlock(mutexSender); //Unlock because the queue is not ready
+            sleep(SLEEPTIME);
         }
         else {
+            wcerr << " pop should happen" << endl;
+           
             //Get incomplete packet to send
-            Packet* temp;
-            infoToSend->pop(temp); 
-            pachyderm = *temp; //Dereference temp to save a local copy of it
+            pachyderm = infoToSend->front();
+            infoToSend->pop(); 
+            pthread_mutex_unlock(mutexSender); //Unlock bc we are done with queue 
             
             //buildFrame(frameType, false,seqNum, CRC);
-            buildFrame(1, false, seqNum, 1111); //FOR TESTING 
-            
+            buildFrame(1, false, 0, 1111); //FOR TESTING 
+
+            //TODO add in seq numbering
+
             //Build the frame (char[]) to be send
             char theFrame[pachyderm.frame_size];
             char* pointerToTheFrame = &theFrame[0];
@@ -50,10 +44,9 @@ void Sender::MasterSend() {
             //Transmit
             send(pointerToTheFrame, pachyderm.frame_size);
 
-            //start Timer to check for timeouts
-            delete temp; //Free memory because this is c++
-            delete pointerToTheFrame;
-            //TODO Memory leak: theFrame is not dealt with
+            //TODO start Timer to check for timeouts
+
+             //Free memory because this is c++
         }
 
         //TODO Handle case of timeout and resend
@@ -61,7 +54,7 @@ void Sender::MasterSend() {
 }
 
 int
-Sender::buildFrame(short frm, bool resend, unsigned short seqNum, int CS) {
+Sender::buildFrame(short frm, bool resend,  short seqNum, int CS) {
     pachyderm.frametype = frm;
     pachyderm.resend = resend;
     pachyderm.sequence_number = seqNum;
@@ -89,17 +82,6 @@ int
 Sender::resend() {
    return 0;//nuild Packet with a 1 for resend
 }
-
-void
-Sender::incrementSeqNum() {
-   if (seqNum < MAXSEQNUM) {
-       seqNum++;
-   }
-   else {
-       seqNum = 0;
-   }
-}
-
 
 
 
