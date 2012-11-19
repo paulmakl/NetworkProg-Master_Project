@@ -99,6 +99,11 @@ Listener::UltraListen()
         {
             if (seqNum == *expectedSN)
             {
+                Packet paulLovesPBR( extractSourceAddress(), extractSequenceNumber() );
+                char theFrame[paulLovesPBR.frame_size];
+                char* pointerToTheFrame = &theFrame[0];
+                paulLovesPBR.buildByteArray(pointerToTheFrame);
+                theRF->transmit( pointerToTheFrame, paulLovesPBR.frame_size )
                 bool temp = true;
                 ackReceivedL = &temp;
             }
