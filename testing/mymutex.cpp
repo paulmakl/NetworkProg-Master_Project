@@ -8,7 +8,8 @@
 using namespace std;
 
 #define NUMTHREADS 3
-pthread_mutex_t mutex = PTHREAD_MUTEX_INITIALIZER;
+pthread_mutex_t mutex; //= PTHREAD_MUTEX_INITIALIZER;
+pthread_mutexattr_t attr;
 queue<int*> sharedData;
 
 
@@ -20,6 +21,8 @@ void *thready(void *parm){
 
 int main(int argc, char const *argv[])
 {
+	pthread_mutexattr_init(&attr);
+	pthread_mutex_init(&mutex, &attr);
 	pthread_t thread[NUMTHREADS];
 	int rc=0;
 	int i;

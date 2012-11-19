@@ -1,29 +1,18 @@
 #include "DemiBrad.h"
 
 using namespace std;
-DemiBrad x;
-short MACaddr_demibrad; // users mac address
-ostream* streamy_demibrad; // provided ostream
-bool ack_Received_demibrad; // flag for acknowledgment received
-unsigned short MACACK_demibrad; // the address that is associated with the next Acknowledgement. Is zero if none need to be sent
-//unsigned short send_flag_demibrad; // flat that lets the sender know when to send
-RF* RFLayer_demibrad; // the RF layer associated with Demibrad
-queue<Packet> send_Queue_demibrad; // the queue of packets to send
-queue<Packet> receive_Queue_demibrad; // the queu of packets received from the receiver class
-unsigned short MACACK_sequence_number;
-unsigned short MACACK_expected_sequence_number;
-pthread_mutex_t mutex_Demibrad_Receiver = PTHREAD_MUTEX_INITIALIZER;
-pthread_mutex_t mutex_Demibrad_Sender = PTHREAD_MUTEX_INITIALIZER;
+DemiBrad theDemibrad;
+
+// NONMEMBER FUNCTIONS
 
 /*
  * creates a sender thread
  */
 void *create_sender_thread(void *cnt){
-	RFLayer_demibrad->attachThread();
+	theDemibrad.RFLayer_demibrad->attachThread();
 	//wcerr << "sender thread";
 
-	Sender sendy(RFLayer_demibrad, &send_Queue_demibrad, &MACACK_demibrad, &ack_Received_demibrad, MACaddr_demibrad, &mutex_Demibrad_Sender);
-	wcerr << &send_Queue_demibrad << endl;
+	Sender sendy(theDemibrad.RFLayer_demibrad, &theDemibrad.send_Queue_demibrad, &theDemibrad.MACACK_demibrad, &theDemibrad.ack_Received_demibrad, theDemibrad.MACaddr_demibrad, &(theDemibrad.mutex_Demibrad_Sender));
 	sendy.MasterSend();
 	wcerr << "This should not appear";
 	return (void *)0;
@@ -32,22 +21,22 @@ void *create_sender_thread(void *cnt){
   * create receiver thread
   */
 void *create_and_run_receiver_thread(void *cnt){
-	RFLayer_demibrad->attachThread();
+	theDemibrad.RFLayer_demibrad->attachThread();
 	//wcerr << "receiver thread";
 	bool hello = true;
-	Listener listen(RFLayer_demibrad, &receive_Queue_demibrad, &MACACK_demibrad, &ack_Received_demibrad, 103, &mutex_Demibrad_Receiver);
+	Listener listen(theDemibrad.RFLayer_demibrad, &theDemibrad.receive_Queue_demibrad, &theDemibrad.MACACK_demibrad, &theDemibrad.ack_Received_demibrad, 103, &theDemibrad.mutex_Demibrad_Receiver);
 	listen.UltraListen();
 	wcerr << "This should not appear again";
 	return (void *)0;
 }
 
- /*
-  * initialize the demibrad class
-  */
-int dot11_init(short MACadr, ostream* stremy){
+DemiBrad::DemiBrad(short MACadr, ostream* stremy){
 	MACaddr_demibrad = MACadr;
 	streamy_demibrad = stremy;
 	RFLayer_demibrad = new RF();
+	pthread_mutexattr_init(&attr);
+	pthread_mutex_init(&mutex_Demibrad_Sender, &attr);
+	pthread_mutex_init(&mutex_Demibrad_Receiver, &attr);
 	// create the threads
 	pthread_t ids[3];
     pthread_attr_t attr;
@@ -59,29 +48,61 @@ int dot11_init(short MACadr, ostream* stremy){
     // create the sender and receiver threads
     pthread_create(&(ids[0]), &attr, create_sender_thread, &(counts[0]));
     pthread_create(&(ids[1]), &attr, create_and_run_receiver_thread, &(counts[1]));
-    return 1;
+}
+
+int dot11_init(short MACadr, ostream* stremy){
+	DemiBrad temp(MACadr, stremy);
+	theDemibrad = temp;
+	return 1;
+}
+
+
+int dot11_recv(short *srcAddr, short *destAddr, char *buf, int bufSize){
+	return theDemibrad.dot11_recv_DemiBrad(srcAddr, destAddr, buf, bufSize);
+}
+
+int dot11_command(int cmd, int val){
+	return theDemibrad.dot11_command_DemiBrad(cmd,val);
 }
  /*
   * unimplemented
   */
-int DemiBrad::dot11_command(int cmd, int val){
+int status(){
+	return theDemibrad.status_DemiBrad();
+}
+
+ /*
+  * send data
+  */
+int dot11_send(short destAddr, char *buf, int bufSize){
+	return theDemibrad.dot11_send_DemiBrad(destAddr, buf, bufSize);
+}
+//MEMBER FUNCTIONS
+
+ /*
+  * unimplemented
+  */
+int DemiBrad::dot11_command_DemiBrad(int cmd, int val){
 	return 1;
 }
  /*
   * unimplemented
   */
-int DemiBrad::status(){
+int DemiBrad::status_DemiBrad(){
 	return 0;
 }
 /*
  * receive data
  */
-int DemiBrad::dot11_recv(short *srcAddr, short *destAddr, char *buf, int bufSize){
+int DemiBrad::dot11_recv_DemiBrad(short *srcAddr, short *destAddr, char *buf, int bufSize){
 	Packet temp = receive_Queue_demibrad.front(); // temporary packet
 	receive_Queue_demibrad.pop(); // pop of the first pointer to a packet
+	char tempBuf[bufSize];
+	char * tempBufP = &tempBuf[0];
+	temp.buildByteArray(tempBufP);
 	int i = 0;
 	while(i < bufSize){ // put the data in the buffer into the buffer that is beoing returned
-		buf[i] = temp.physical_data_array[i];
+		buf[i] = tempBuf[i + bufSize];
 		i++;
 	}
 	return bufSize;
@@ -89,10 +110,9 @@ int DemiBrad::dot11_recv(short *srcAddr, short *destAddr, char *buf, int bufSize
  /*
   * send data
   */
-int DemiBrad::dot11_send(short destAddr, char *buf, int bufSize){
-	Packet temp; // make a temporary packet
+int DemiBrad::dot11_send_DemiBrad(short destAddr, char *buf, int bufSize){
+	Packet temp(destAddr,buf,bufSize); // make a temporary packet
 	//memory_buffer_demibrad[memory_buffer_number_count_demibrad] = temp; //put the temporary packet in the memory buffer
-	temp.initpacket(destAddr,buf,bufSize); // initialize the packet with the information to be sent
 	send_Queue_demibrad.push(temp);
 	return 1;
 }

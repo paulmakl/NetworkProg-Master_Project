@@ -13,22 +13,13 @@ using namespace std;
 int main(int argc, char const *argv[])
 {
 	ostream* stream;
-	DemiBrad jesus;
-	jesus.dot11_init(103, stream);
+	//DemiBrad jesus;
+	dot11_init(103, stream);
 	int bufSize = 3;
 	char buf[bufSize];
 	buf[0] = 'a';
 	buf[1] = 'b';
 	buf[2] = 'c';
-	jesus.dot11_send(769, &buf[0], bufSize);
-	jesus.dot11_send(769, &buf[0], bufSize);
-	jesus.dot11_send(769, &buf[0], bufSize);
-	jesus.dot11_send(769, &buf[0], bufSize);
-	jesus.dot11_send(769, &buf[0], bufSize);
-	jesus.dot11_send(769, &buf[0], bufSize);
-	jesus.dot11_send(769, &buf[0], bufSize);
-	jesus.dot11_send(769, &buf[0], bufSize);
-	jesus.dot11_send(769, &buf[0], bufSize);
 	while(true){
 
 	}
