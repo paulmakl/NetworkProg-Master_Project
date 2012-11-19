@@ -13,6 +13,8 @@ class Packet {
 	Packet(short dest, char* dta, int size);
 	// Constructor for Receiver
     Packet(char *pac, int byts);
+    // Creates a packet for an acknowledgement
+    Packet(short destaddr, short seqnum);
     // Creates a resend packet
 	int make_resend();
 	// builds a packet into a byte array

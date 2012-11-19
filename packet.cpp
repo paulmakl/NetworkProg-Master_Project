@@ -36,6 +36,16 @@ Packet::Packet(char *pac, int byts)
     char* pointerToData = &dataIn[0];
     pointer_data_to_physical(pointerToData); //Make the physical copy
 }
+// Packet for acknowledgement
+Packet::Packet(short destaddr, short seqnum){
+	sequence_number = seqnum;
+	destination = destaddr;
+	bytes_to_send = 0;
+	frame_size = 10;
+	frametype = 1;
+	resend = false;
+	CRC = 92929;
+}
 
 // takes a pointer to an array of data and copies it into the phyical data array in the packet class
 void Packet::pointer_data_to_physical(char* data){
