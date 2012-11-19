@@ -8,7 +8,8 @@ using namespace std;
 class Packet {
 	public:
 	// Initializer list
-	Packet(): frametype(0), resend(false), sequence_number(0), sender(0), CRC(0), bytes_to_send(0), frame_size(0) {};
+	Packet(): frametype(0), resend(false), sequence_number(0), sender(0), CRC(0), 
+	resTransAttempts(0), bytes_to_send(0), frame_size(0), {};
 	// Constructor for sender
 	Packet(short dest, char* dta, int size);
 	// Constructor for Receiver
@@ -42,6 +43,7 @@ class Packet {
 	// the physical data to be put in the packet
 	char physical_data_array[MAXDATASIZE];
 	// specifies the size of the frame, which will always bet 10 greater that the number of bytes to be sent
+	int resTransAttempts;
     int frame_size; 
 	private:
 };

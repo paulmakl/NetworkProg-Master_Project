@@ -40,8 +40,8 @@ Sender::MasterSend() {
             infoToSend->pop(); 
             pthread_mutex_unlock(mutexSender); //Unlock bc we are done with queue 
             
-            //buildFrame(frameType, false,seqNum, CRC);
-            buildFrame(1, false, 0, 1111); //FOR TESTING 
+            //buildFrame(0, true, seqTable(pachyderm.destination), 1111)
+            buildFrame(1, false, 0, 1111); //FOR TESTING, uncomment above line for actual
 
             //TODO add in seq numbering
 
@@ -51,9 +51,15 @@ Sender::MasterSend() {
             pachyderm.buildByteArray(pointerToTheFrame); //Fill theFrame
             
             //Transmit
-            send(pointerToTheFrame, pachyderm.frame_size);
+            send(pointerToTheFrame, pachyderm.frame_size, false, aCWmin);
            //TODO start Timer to check for timeouts
-
+            //If(NoAckRecieved) {
+            //      int flag = 0;
+            //      While (!flag) {
+            //          flag = resend()
+            //      }
+        }
+        }
              //Free memory because this is c++
         }
 
@@ -71,70 +77,65 @@ Sender::buildFrame(short frm, bool resend,  short seqNum, int CS) {
 }
 
 int 
-Sender::send(char* frame, int size) {
-    //Listen to see if channel is open
-    //TODO Change to while loop
-
-    //Wait for current channel to be idle
-    if (!theRF->inUse()) {
-        waitIFS
-        if (!theRF->inUse()) {  //Perfect transmittion
-           if (theRF->transmit(frame, size) != size) {  //Makes the transmission 
-                return 0; //Did not send all of frame or
+Sender::send(char* frame, int size, bool reSend, int cWparam) {
+    if (!reSend) {  //This is not a retransmittion 
+        //Wait for current channel to be idle
+        if (!theRF->inUse()) {
+            waitIFS
+            if (!theRF->inUse()) {  //Perfect transmittion
+               if (theRF->transmit(frame, size) != size) {  //Makes the transmission 
+                    return 0; //Did not send all of frame or something failed internally
+                } else {
+                    return 1; //Frame transmitted properly 
+                }
+            }
+        } 
+           //Channel was busy
+            bool idleFlag = false;
+            //Wait for channel to open
+            while (!idleFlag) { 
+                while (theRF->inUse()) {    //They are sending
+                    usleep(1000); //Sleep 1 milSec
+                }
+                waitIFS
+                //Check is channel is idle
+                if (!theRF->inUse()) {
+                    idleFlag = true;    //Break
+                }
+            }
+    } //Possibility for this to be a resend
+    //Exponential backoff!
+    int cWindow = cWparam;
+    int waitTime = rand() % pow(2, cWindow)//Random number in range [0,2^aCWmin)
+    while (true) {
+        while (waitTime>0 && !theRF->inUse()) {     //We havent waited waitTime and 
+                                                                            //No one else is transmitting
+            uSleep(1000);   //Sleep 1 milSec
+            waitTime--;
+        }   //StopClock
+        if (waitTime>0) {   //We havent finished waiting, but someone had transmitted
+                while (theRF->inUse()) {    //They are transmitting
+                    usleep(1000);   //Sleep 1 milSec
+                }
+                waitIFS
+        } else {
+            if (theRF->transmit(frame, size) != size) {  //Makes the transmission 
+                return 0; //Did not send all of frame or something failed internally
             } else {
                 return 1; //Frame transmitted properly 
             }
         }
-    } else {    //Channel was busy
-        //Wait for channel to open
-        bool idleFlag = false;
-        while (!idleFlag) {
-            while (theRF->inUse()) {
-                sleep(SLEEPTIME); //TODO Lower SLEEPTIME
-            }
-            waitIFS
-            //Check is channel is idle
-            if (!theRF->inUse()) {
-                idleFlag = true;    //Break
-            }
-        }
-        //Exponential backoff!
-        int cWindow = aCWmin;
-        while (cWindow <= aCWmax) {
-            int waitTime // = 2^ and shit of that sort 
-
-            //Checking if someone has sent while we are waiting
-            if (theRF->getIdleTime() < ) {
-
-            }
-        }
-
-    }
-
-
-    //Channel still idle?
-    if (!theRF->inUse()) { //The channel is clear
-        //TODO Wait IFS
-        //  Check if medium still idle
-        if (theRF->transmit(frame, size) != size) {  //Makes the transmission 
-            return 0; //Did not send all of frame or
-           }
-        else {
-            return 1; //Frame transmitted properly 
-        }
-        //Busy:
-        //Wait till transmition ends
-        //EXPONENTIAL BACKOFF 
-        //Send
-    }
-    else { //The channel is busy
-        sleep(SLEEPTIME); //sleep
-    }
+    }   //End Exponential Backoff
 }
 
 int 
-Sender::resend() {
-   return 0;//nuild Packet with a 1 for resend
+Sender::resend(int wait) {
+    buildFrame(0, true, seqTable(pachyderm.destination), 1111);
+    char theFrame[pachyderm.frame_size];
+    char* pointerToTheFrame = &theFrame[0];
+    pachyderm.buildByteArray(pointerToTheFrame); //Fill theFrame
+    //USE PACKET.RETRANSATTEMPS
+    return send(pointerToTheFrame, pachyderm.frame_size, true, wait+1); 
 }
 
 
