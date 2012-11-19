@@ -11,17 +11,25 @@ using namespace std;
 
 int main(int argc, char const *argv[])
 {
-	int data_size = 3;
+	int data_size = 1;
 	char dta[data_size];
-	dta[0] = 'd';
-	dta[1] = 'b';
-	dta[2] = 'c';
+	dta[0] = 'H';
+	dta[1] = 'E';
+	dta[2] = 'L';
+	dta[0] = 'L';
+	dta[1] = 'O';
+	dta[2] = ' ';
+	dta[0] = 'W';
+	dta[1] = 'O';
+	dta[2] = 'R';
+	dta[0] = 'L';
+	dta[1] = 'D';
 	Packet john(101, &dta[0], data_size);
 	char Byte_Array[data_size+10];
 	int q = john.buildByteArray(&Byte_Array[0]);
 	int i = 0;
 	while(i < (data_size+10)){
-		cout << Byte_Array[i] + 0 << " :: ";
+		cout << Byte_Array[i]<< " :: ";
 		i++;
 	}
 	cout << "\n";
