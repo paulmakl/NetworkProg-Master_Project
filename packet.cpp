@@ -5,23 +5,6 @@
 #include "packet.h"
 using namespace std;
 
-//TODO make ACK init
-//     CONSTRUCTOR SHOULD ONLY TAKE A DESTINATION ADDRESS
-// look at IEEE to see what an acknowledgement looks like
-
-// DO NOT CHANGE THESE TYPES. IT WILL MAKE EVERYTHING BREAK.
-short frametype; // can either be 1-4 based on the type of frame.
-bool resend; // if true, this packet is a resend packet.
-short sequence_number; // the sequence number for the packet.
-short destination; // the destination mac address for everything
-short sender; // the sender mac address
-//char* data; // a pointer to an char array. It cointains the data that the user wants to send
-int CRC; // currently, you can pass in the CRC, this will eventually be taken out but until CRC is implemented it will remain in. 
-int bytes_to_send; // this is the size of the data char array.
-int frame_size; // this is the size of the frame. It is always 10 more that bytes_to_send.
-//char physical_data_array[MAXDATASIZE];
-
-
 // Basic constructor. CS is the value for CRC this will eventually be taken out
 Packet::Packet(short dest, char* dta, int size){
 	frametype = 3; // test value
@@ -29,13 +12,11 @@ Packet::Packet(short dest, char* dta, int size){
 	sequence_number = 30; // test value
 	destination = dest;
 	sender = 1001; // test value
-	//data = dta;
 	CRC = 46869594; // test value
 	bytes_to_send = size;
 	frame_size = size + 10;
 	resend = false; // test value
     pointer_data_to_physical(dta); //Make the physical copy
-    //buildByteArray(); //Build the frame
 }
 
 //Weston's Additions: overwritten "constructor" to unpack data from listener going to demi brad
@@ -56,6 +37,7 @@ Packet::Packet(char *pac, int byts)
     pointer_data_to_physical(pointerToData); //Make the physical copy
 }
 
+// takes a pointer to an array of data and copies it into the phyical data array in the packet class
 void Packet::pointer_data_to_physical(char* data){
 	int i = 0;
 	while(i < bytes_to_send){
@@ -137,6 +119,5 @@ int Packet::buildByteArray(char *buffer){
 		buffer[i+6] = physical_data_array[i];
 		i++;
 	}
-	//time for a nap...
 }
 
