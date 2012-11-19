@@ -98,12 +98,12 @@ int DemiBrad::dot11_recv_DemiBrad(short *srcAddr, short *destAddr, char *buf, in
 		Packet temp = receive_Queue_demibrad.front(); // temporary packet
 		receive_Queue_demibrad.pop(); // pop of the first pointer to a packet
 		char tempBuf[bufSize];
-		int = temp.bytes_to_send;
+		int size = temp.bytes_to_send;
 		char * tempBufP = &tempBuf[0];
 		temp.buildByteArray(tempBufP);
 		int i = 0;
-		while(i < bufSize){ // put the data in the buffer into the buffer that is beoing returned
-			buf[i] = tempBuf[i + bufSize];
+		while(i < size){ // put the data in the buffer into the buffer that is beoing returned
+			buf[i] = tempBuf[i + 6];
 			i++;
 		}
 		return bufSize;

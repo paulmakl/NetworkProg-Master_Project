@@ -7,7 +7,7 @@
 #include <stdlib.h>
 #include <iostream>
 #include "Demibrad.h"
-#include <time>
+#include <time.h>
 
 using namespace std;
 
@@ -15,16 +15,20 @@ int main(int argc, char const *argv[])
 {
 	ostream* stream;
 	//DemiBrad jesus;
-	dot11_init(103, stream);
+	short dest = 101;
+	short myMAC = 103;
+	dot11_init(myMAC, stream);
+	wcerr << "Creating a buffer to send out"
 	int bufSize = 3;
 	char buf[bufSize];
 	buf[0] = 'a';
 	buf[1] = 'b';
 	buf[2] = 'c';
-	
+	wcerr << "Testing..." << endl;
 	while(true){
-		dot11_send(101, &buf[0], bufSize);
-		//if(dot11_receive())
+		wcerr << "Sending "
+		dot11_send(dest, &buf[0], bufSize);
+		
 	}
 }
 
