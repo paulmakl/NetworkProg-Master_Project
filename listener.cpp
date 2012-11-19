@@ -31,7 +31,7 @@ Listener::read_Packet ()
     {
         case 0:
             if (prints) wcerr << "Data packet received." << endl;
-            if (packetDest != MACaddrList)//compare the destination of this packet to our MAC address and to the broadcast address
+            if (packetDest != MACaddrList && packetDest != -1)//compare the destination of this packet to our MAC address and to the broadcast address
             {
                 status = 0;//this packet isn't for us
                 if (prints) wcerr << "Packet not addressed to current MAC address. :: " << MACaddrList << " :: " << packetDest << endl;
@@ -87,6 +87,12 @@ Listener::UltraListen()
         {
             if ( seqNumMang.getSeqNum(dataSource) + 1 == seqNum )
             {
+                Packet paulLovesPBR( extractSourceAddress(), extractSequenceNumber() );
+                char theFrame[paulLovesPBR.frame_size];
+                //char* pointerToTheFrame = &theFrame[0];
+                paulLovesPBR.buildByteArray(&theFrame[0]);
+                if (prints) wcerr << "***************Paul loathes PBR :: " << paulLovesPBR.frame_size << endl;
+                daRF->transmit( &theFrame[0], paulLovesPBR.frame_size );
                 seqNumMang.increment(dataSource);
                 queue_data();//put data in the queue
             }
@@ -99,11 +105,7 @@ Listener::UltraListen()
         {
             if (seqNum == *expectedSN)
             {
-                Packet paulLovesPBR( extractSourceAddress(), extractSequenceNumber() );
-                char theFrame[paulLovesPBR.frame_size];
-                char* pointerToTheFrame = &theFrame[0];
-                paulLovesPBR.buildByteArray(pointerToTheFrame);
-                theRF->transmit( pointerToTheFrame, paulLovesPBR.frame_size )
+                
                 bool temp = true;
                 ackReceivedL = &temp;
             }

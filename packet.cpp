@@ -12,7 +12,7 @@ Packet::Packet(short dest, char* dta, int size){
 	sequence_number = 30; // test value
 	destination = dest;
 	sender = 1001; // test value
-	CRC = 46869594; // test value
+	CRC = -1; // test value
 	bytes_to_send = size;
 	frame_size = size + 10;
 	resend = false; // test value
@@ -36,6 +36,7 @@ Packet::Packet(char *pac, int byts)
     }
     char* pointerToData = &dataIn[0];
     pointer_data_to_physical(pointerToData); //Make the physical copy
+    CRC = -1;
 }
 // Packet for acknowledgement
 Packet::Packet(short destaddr, short seqnum){
@@ -45,7 +46,7 @@ Packet::Packet(short destaddr, short seqnum){
 	frame_size = 10;
 	frametype = 1;
 	resend = false;
-	CRC = 92929;
+	CRC = -1;
 }
 
 // takes a pointer to an array of data and copies it into the phyical data array in the packet class
