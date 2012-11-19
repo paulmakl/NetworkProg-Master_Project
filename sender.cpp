@@ -4,7 +4,6 @@
  * class: CSCI 325 University of Puget Sound
  */
 
-using namespace std;
 #include <iostream>
 #include "sender.h"
 #include <unistd.h>
@@ -15,11 +14,6 @@ Sender::MasterSend() {
     //FOR TESTING PURPOSES
     wcerr << infoToSend << endl;
     while (true) {
-        //Check for Ack to send
-        if (ackToSend != 0) {
-        //TODO Implement listen for Ack's to send
-        }
-        
         //Lock mutex, block until you can
         pthread_mutex_lock(mutexSender);
 
@@ -38,7 +32,7 @@ Sender::MasterSend() {
             pthread_mutex_unlock(mutexSender); //Unlock bc we are done with queue 
             
             //buildFrame(frameType, false,seqNum, CRC);
-            buildFrame(1, false, seqNum, 1111); //FOR TESTING 
+            buildFrame(1, false, 0, 1111); //FOR TESTING 
 
             //TODO add in seq numbering
 
@@ -53,8 +47,6 @@ Sender::MasterSend() {
             //TODO start Timer to check for timeouts
 
              //Free memory because this is c++
-            delete pointerToTheFrame;
-            delete [] theFrame;
         }
 
         //TODO Handle case of timeout and resend
@@ -62,7 +54,7 @@ Sender::MasterSend() {
 }
 
 int
-Sender::buildFrame(short frm, bool resend, unsigned short seqNum, int CS) {
+Sender::buildFrame(short frm, bool resend,  short seqNum, int CS) {
     pachyderm.frametype = frm;
     pachyderm.resend = resend;
     pachyderm.sequence_number = seqNum;
