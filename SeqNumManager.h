@@ -18,7 +18,8 @@ class SeqNumManager {
         /**
          * Constructor 
          */
-        SeqNumManager(unsigned short maxSeqNum); 
+        SeqNumManager(unsigned short maxSeqNum) 
+            : max(maxSeqNum) {}; 
 
         /**
          * Increments the sequence number for a given MAC address or 
@@ -39,10 +40,7 @@ class SeqNumManager {
         unsigned short max; //Gets max sequence number
 };
 
-SeqNumManager::SeqNumManager(unsigned short maxSeqNum) {
-    max = maxSeqNum;
-}
-
+inline
 void
 SeqNumManager::increment(unsigned short mac) {
     short temp; //gets seqNum
@@ -62,7 +60,7 @@ SeqNumManager::increment(unsigned short mac) {
         theMap[mac] = 0;    //Create entry for new MAC addr
     }
 }
-
+inline
 short
 SeqNumManager::getSeqNum(unsigned short mac) {
     if (theMap.count(mac)) {

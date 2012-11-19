@@ -7,25 +7,11 @@
 using namespace std;
 #include <iostream>
 #include "sender.h"
-//#include "DemiBrad.h"
 #include <unistd.h>
+using std::queue;
 
-queue<Packet> * infoToSend;
-pthread_mutex_t * mutexSender;
-
-Sender::Sender(RF* RFLayer, queue<Packet> * theQueue, unsigned short* sendFlag, bool* receivedFlag, unsigned short ourMAC, pthread_mutex_t * mutexSendr)
-{
-    //Initialize fields
-    theRF = RFLayer;
-    macAddr_Sender = ourMAC;
-    infoToSend = theQueue;
-    ackReceived = receivedFlag;
-    ackToSend = sendFlag;
-    mutexSender = mutexSendr;
-    seqNum = 0; //Initialize sequnece number to 0
-}
-
-void Sender::MasterSend() {
+void 
+Sender::MasterSend() {
     //FOR TESTING PURPOSES
     wcerr << infoToSend << endl;
     while (true) {
@@ -33,23 +19,29 @@ void Sender::MasterSend() {
         if (ackToSend != 0) {
         //TODO Implement listen for Ack's to send
         }
+        
+        //Lock mutex, block until you can
+        pthread_mutex_lock(mutexSender);
 
         //Check for data to send
         if (infoToSend->empty()) {
-            //TODO Sleep
-            wcerr << "QUEUE IS EMPTY" << endl;
+            //wcerr << "QUEUE IS EMPTY" << endl;
+            pthread_mutex_unlock(mutexSender); //Unlock because the queue is not ready
             sleep(SLEEPTIME);
         }
         else {
-            wcerr << " pop should happen" << endl;
+            //wcerr << " pop should happen" << endl;
+           
             //Get incomplete packet to send
             pachyderm = infoToSend->front();
             infoToSend->pop(); 
-             //Dereference temp to save a local copy of it
+            pthread_mutex_unlock(mutexSender); //Unlock bc we are done with queue 
             
             //buildFrame(frameType, false,seqNum, CRC);
             buildFrame(1, false, seqNum, 1111); //FOR TESTING 
-            
+
+            //TODO add in seq numbering
+
             //Build the frame (char[]) to be send
             char theFrame[pachyderm.frame_size];
             char* pointerToTheFrame = &theFrame[0];
@@ -58,10 +50,11 @@ void Sender::MasterSend() {
             //Transmit
             send(pointerToTheFrame, pachyderm.frame_size);
 
-            //start Timer to check for timeouts
-            //delete temp; //Free memory because this is c++
+            //TODO start Timer to check for timeouts
+
+             //Free memory because this is c++
             delete pointerToTheFrame;
-            //TODO Memory leak: theFrame is not dealt with
+            delete [] theFrame;
         }
 
         //TODO Handle case of timeout and resend
@@ -97,17 +90,6 @@ int
 Sender::resend() {
    return 0;//nuild Packet with a 1 for resend
 }
-
-void
-Sender::incrementSeqNum() {
-   if (seqNum < MAXSEQNUM) {
-       seqNum++;
-   }
-   else {
-       seqNum = 0;
-   }
-}
-
 
 
 

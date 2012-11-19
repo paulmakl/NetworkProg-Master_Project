@@ -1,8 +1,7 @@
 #include "DemiBrad.h"
 
-
 using namespace std;
-
+DemiBrad x;
 short MACaddr_demibrad; // users mac address
 ostream* streamy_demibrad; // provided ostream
 bool ack_Received_demibrad; // flag for acknowledgment received
@@ -11,7 +10,10 @@ unsigned short MACACK_demibrad; // the address that is associated with the next 
 RF* RFLayer_demibrad; // the RF layer associated with Demibrad
 queue<Packet> send_Queue_demibrad; // the queue of packets to send
 queue<Packet> receive_Queue_demibrad; // the queu of packets received from the receiver class
-pthread_mutex_t mutex_Demibrad = PTHREAD_MUTEX_INITIALIZER;
+unsigned short MACACK_sequence_number;
+unsigned short MACACK_expected_sequence_number;
+pthread_mutex_t mutex_Demibrad_Receiver = PTHREAD_MUTEX_INITIALIZER;
+pthread_mutex_t mutex_Demibrad_Sender = PTHREAD_MUTEX_INITIALIZER;
 
 /*
  * creates a sender thread
@@ -20,7 +22,7 @@ void *create_sender_thread(void *cnt){
 	RFLayer_demibrad->attachThread();
 	//wcerr << "sender thread";
 
-	Sender sendy(RFLayer_demibrad, &send_Queue_demibrad, &MACACK_demibrad, &ack_Received_demibrad, MACaddr_demibrad, &mutex_Demibrad);
+	Sender sendy(RFLayer_demibrad, &send_Queue_demibrad, &MACACK_demibrad, &ack_Received_demibrad, MACaddr_demibrad, &mutex_Demibrad_Sender);
 	wcerr << &send_Queue_demibrad << endl;
 	sendy.MasterSend();
 	wcerr << "This should not appear";
@@ -33,7 +35,7 @@ void *create_and_run_receiver_thread(void *cnt){
 	RFLayer_demibrad->attachThread();
 	//wcerr << "receiver thread";
 	bool hello = true;
-	Listener listen(RFLayer_demibrad, &receive_Queue_demibrad, &MACACK_demibrad, &ack_Received_demibrad, 103, &mutex_Demibrad);
+	Listener listen(RFLayer_demibrad, &receive_Queue_demibrad, &MACACK_demibrad, &ack_Received_demibrad, 103, &mutex_Demibrad_Receiver);
 	listen.UltraListen();
 	wcerr << "This should not appear again";
 	return (void *)0;
@@ -42,7 +44,7 @@ void *create_and_run_receiver_thread(void *cnt){
  /*
   * initialize the demibrad class
   */
-int DemiBrad::dot11_init(short MACadr, ostream* stremy){
+int dot11_init(short MACadr, ostream* stremy){
 	MACaddr_demibrad = MACadr;
 	streamy_demibrad = stremy;
 	RFLayer_demibrad = new RF();

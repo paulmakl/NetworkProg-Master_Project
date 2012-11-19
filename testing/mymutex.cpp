@@ -4,6 +4,7 @@
 #include <unistd.h>
 #include <queue>
 #include <iostream>
+#include "threadClass.h"
 using namespace std;
 
 #define NUMTHREADS 3
@@ -12,24 +13,8 @@ queue<int*> sharedData;
 
 
 void *thready(void *parm){
-	pthread_mutex_lock(&mutex);
-	wcerr << pthread_self() << " IN THE HOUSE!!!!!!" << endl;
-	int * temp_buff[NUMTHREADS];
-	int i = 0;
-	while(!sharedData.empty()){
-		wcerr << *(sharedData.front()) + 1 << " :: " << endl;
-		*(sharedData.front()) = *(sharedData.front()) + 1;
-		temp_buff[i] = sharedData.front();
-		sharedData.pop();
-		i++;
-	}
-	i = 0;
-	while(i < 4){
-		sharedData.push(temp_buff[i]);
-		i++;
-	}
-	wcerr << pthread_self() << " PEACE OUT" << endl;
-	pthread_mutex_unlock(&mutex);
+	threadClass pompus(&sharedData, &mutex);
+	pompus.threadCall();
 	return NULL;
 }
 
