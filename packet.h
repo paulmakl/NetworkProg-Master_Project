@@ -1,36 +1,46 @@
 #include <iostream>
 #include <stdlib.h>
+#pragma once
 #ifndef packet_H
 #define packet_H
 using namespace std;
 
 class Packet {
 	public:
-	//Methods
-      //  void initpacket(unsigned short dest, char* dta, int size);
-		Packet(): frametype(0), resend(false), sequence_number(0), sender(0), CRC(0), bytes_to_send(0), frame_size(0) {};
-		Packet(short dest, char* dta, int size);
-        void initpacket(short dest, char* dta, int size);//(short frametype, bool resend, unsigned short sequence_number, unsigned short destination, unsigned short sender, char* data, int CRC, int bytes_to_send);
-		//Packet(short frm, bool resen, unsigned short sn, unsigned short dest, unsigned short sendr, char *dta, int CS);
-        Packet(char *pac, int byts);//: frametype(0), resend(false), sequence_number(0), sender(0), CRC(0), bytes_to_send(0), frame_size(0), destination(0) {};
-		int make_resend(); // turns the resend bool to true
-		int buildByteArray(char *buffer); // builds a byte array of the packet attached. 
-		int get_crc();// TEMPORARY
-		void pointer_data_to_physical(char* data);
+	// Initializer list
+	Packet(): frametype(0), resend(false), sequence_number(0), sender(0), CRC(0), bytes_to_send(0), frame_size(0) {};
+	// Constructor for sender
+	Packet(short dest, char* dta, int size);
+	// Constructor for Receiver
+    Packet(char *pac, int byts);
+    // Creates a resend packet
+	int make_resend();
+	// builds a packet into a byte array
+	int buildByteArray(char *buffer);
+	// takes the data out of a physical array and coppies it into the packet class
+	void pointer_data_to_physical(char* data);
 
-    //Fields
-        static const short MAXDATASIZE = 2038;  //The max amount of bytes
-                                                //that can be held in the 
-                                                //data field of a packet
-	    short frametype;
-        bool resend;
-		short sequence_number;
-		short destination;
-		short sender;
-		int CRC;
-		int bytes_to_send;
-		char physical_data_array[MAXDATASIZE];
-        int frame_size; 
+	// Fields
+    static const short MAXDATASIZE = 2038;  //The max amount of bytes
+                                            //that can be held in the 
+                                            //data field of a packet
+    // The type of frame being sent (between 1 and 4)
+    short frametype;
+    // checked off if this packet is a resend
+    bool resend;
+    // the sequence number
+	short sequence_number;
+	// destination addres
+	short destination;
+	// the address of the sender
+	short sender;
+	int CRC;
+	// the amount of data to be sent
+	int bytes_to_send;
+	// the physical data to be put in the packet
+	char physical_data_array[MAXDATASIZE];
+	// specifies the size of the frame, which will always bet 10 greater that the number of bytes to be sent
+    int frame_size; 
 	private:
 };
 
