@@ -66,6 +66,7 @@ int
 Sender::send(char* frame, int size) {
     //Listen to see if channel is open
     //TODO Change to while loop
+    
     if (!theRF->inUse()) { //The channel is clear
         //TODO Wait IFS
         //  Check if medium still idle

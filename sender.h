@@ -14,6 +14,24 @@
 #include <queue>
 #include "SeqNumManager.h"
  
+ // The SIFS inter-frame spacing time, in milliseconds 
+#define aSIFSTime    100
+
+// The slot time, in milliseconds 
+#define aSlotTime    200
+
+// The minimum size of the collision window 
+#define aCWmin       3
+
+// The maximum size of the collision window 
+#define aCWmax       31
+
+// The maximum nubmer of retransmission attempts 
+#define dot11RetryLimit    5
+
+// The maximum number of bytes allowed in an RF packet 
+#define aMPDUMaximumLength    2048
+ 
  using std::queue; 
 
 class Sender {
