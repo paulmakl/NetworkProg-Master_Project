@@ -94,20 +94,31 @@ int DemiBrad::status_DemiBrad(){
  * receive data
  */
 int DemiBrad::dot11_recv_DemiBrad(short *srcAddr, short *destAddr, char *buf, int bufSize){
+	pthread_mutex_lock(&mutex_Demibrad_Receiver);
 	if(!receive_Queue_demibrad.empty()){
 		Packet temp = receive_Queue_demibrad.front(); // temporary packet
 		receive_Queue_demibrad.pop(); // pop of the first pointer to a packet
 		char tempBuf[bufSize];
 		int size = temp.bytes_to_send;
-		char * tempBufP = &tempBuf[0];
-		temp.buildByteArray(tempBufP);
+		wcerr << "************ size:" << size << endl;
+		//char * tempBufP = &tempBuf[0];
+		wcerr << "GOT THIS FAR ARARARARARARA" << endl;
+		temp.buildByteArray(&tempBuf[0]);
 		int i = 0;
-		while(i < size){ // put the data in the buffer into the buffer that is beoing returned
+
+		while(i < size){ // put the data in the buffer into the buffer that is being returned
 			buf[i] = tempBuf[i + 6];
 			i++;
 		}
-		return bufSize;
+		i = 0;
+		while(i < size){ // put the data in the buffer into the buffer that is being returned
+			wcerr << buf[i] << " :: ";
+			i++;
+		}
+		pthread_mutex_unlock(&mutex_Demibrad_Receiver);
+		return temp.bytes_to_send;
 	}else{
+		pthread_mutex_unlock(&mutex_Demibrad_Receiver);
 		return -1;
 	}
 }

@@ -11,9 +11,9 @@ using namespace std;
 
 int main(int argc, char const *argv[])
 {
-	int data_size = 1;
-	char dta[data_size];
-	dta[0] = 'H';
+	int data_size = 11;
+	char dta[] = "Hello World";
+	/*dta[0] = 'H';
 	dta[1] = 'E';
 	dta[2] = 'L';
 	dta[0] = 'L';
@@ -23,7 +23,7 @@ int main(int argc, char const *argv[])
 	dta[1] = 'O';
 	dta[2] = 'R';
 	dta[0] = 'L';
-	dta[1] = 'D';
+	dta[1] = 'D';*/
 	Packet john(101, &dta[0], data_size);
 	char Byte_Array[data_size+10];
 	int q = john.buildByteArray(&Byte_Array[0]);

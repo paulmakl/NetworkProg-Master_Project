@@ -24,6 +24,7 @@ Packet::Packet(char *pac, int byts)
 {
     int size = byts-10;//total size of incoming data minus 10 bytes of header and CRC
     bytes_to_send = size;
+    wcerr << "*******************************************" << bytes_to_send << endl;
     char dataIn[size];//a new char array for just the incoming data
     short dataSource = pac[4] + 0;//extract the source address
     dataSource = dataSource << 8;
