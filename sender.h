@@ -31,7 +31,7 @@
 
 // The maximum number of bytes allowed in an RF packet 
 #define aMPDUMaximumLength    2048
- 
+
  using std::queue; 
 
 class Sender {
@@ -75,14 +75,6 @@ class Sender {
         SeqNumManager seqTable; //Manages all seqNums for all MAC addr's
 
     //Methods
-        /**
-         * Checks the sender queue for data to be sent and checks the Ack
-         * field for flags indicated acknowledgments needing to be sent
-         * return 0 nothing to send
-         * return 1 data to send
-         */
-        int  check_QueueToSend();
-
         /**
          * Checks for an acknowledgment received
          * return 0 No ack received

@@ -4,10 +4,19 @@
  * class: CSCI 325 University of Puget Sound
  */
 
-#include <iostream>
+//files included
+#include <iostream> //For cout & endl
 #include "sender.h"
-#include <unistd.h>
+#include <unistd.h> //For sleep()
+#include <stdlib.h> //For rand()
+#include <math.h> //for pwr
+
+//Wait IFS (SIFS + 2*slotTime)
+#define waitIFS sleep(EaSIFSTIME + 2*aSlotTime);
+
+//Items used
 using std::queue;
+
 
 void 
 Sender::MasterSend() {
@@ -43,8 +52,7 @@ Sender::MasterSend() {
             
             //Transmit
             send(pointerToTheFrame, pachyderm.frame_size);
-
-            //TODO start Timer to check for timeouts
+           //TODO start Timer to check for timeouts
 
              //Free memory because this is c++
         }
@@ -66,7 +74,45 @@ int
 Sender::send(char* frame, int size) {
     //Listen to see if channel is open
     //TODO Change to while loop
-    
+
+    //Wait for current channel to be idle
+    if (!theRF->inUse()) {
+        waitIFS
+        if (!theRF->inUse()) {  //Perfect transmittion
+           if (theRF->transmit(frame, size) != size) {  //Makes the transmission 
+                return 0; //Did not send all of frame or
+            } else {
+                return 1; //Frame transmitted properly 
+            }
+        }
+    } else {    //Channel was busy
+        //Wait for channel to open
+        bool idleFlag = false;
+        while (!idleFlag) {
+            while (theRF->inUse()) {
+                sleep(SLEEPTIME); //TODO Lower SLEEPTIME
+            }
+            waitIFS
+            //Check is channel is idle
+            if (!theRF->inUse()) {
+                idleFlag = true;    //Break
+            }
+        }
+        //Exponential backoff!
+        int cWindow = aCWmin;
+        while (cWindow <= aCWmax) {
+            int waitTime // = 2^ and shit of that sort 
+
+            //Checking if someone has sent while we are waiting
+            if (theRF->getIdleTime() < ) {
+
+            }
+        }
+
+    }
+
+
+    //Channel still idle?
     if (!theRF->inUse()) { //The channel is clear
         //TODO Wait IFS
         //  Check if medium still idle
