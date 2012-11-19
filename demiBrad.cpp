@@ -12,7 +12,7 @@ void *create_sender_thread(void *cnt){
 	theDemibrad.RFLayer_demibrad->attachThread();
 	//wcerr << "sender thread";
 
-	Sender sendy(theDemibrad.RFLayer_demibrad, &theDemibrad.send_Queue_demibrad, &theDemibrad.ack_Received_demibrad, 103, &theDemibrad.expected_sequence_number, &theDemibrad.mutex_Demibrad_Receiver);
+	Sender sendy(theDemibrad.RFLayer_demibrad, &theDemibrad.send_Queue_demibrad, &theDemibrad.ack_Received_demibrad, theDemibrad.MACaddr_demibrad, &theDemibrad.expected_sequence_number, &theDemibrad.mutex_Demibrad_Sender);
 	sendy.MasterSend();
 	wcerr << "This should not appear";
 	return (void *)0;
@@ -23,7 +23,7 @@ void *create_sender_thread(void *cnt){
 void *create_and_run_receiver_thread(void *cnt){
 	theDemibrad.RFLayer_demibrad->attachThread();
 	//wcerr << "receiver thread";
-	Listener listen(theDemibrad.RFLayer_demibrad, &theDemibrad.receive_Queue_demibrad, &theDemibrad.ack_Received_demibrad, 103, &theDemibrad.mutex_Demibrad_Receiver, &theDemibrad.expected_sequence_number);
+	Listener listen(theDemibrad.RFLayer_demibrad, &theDemibrad.receive_Queue_demibrad, &theDemibrad.ack_Received_demibrad, theDemibrad.MACaddr_demibrad, &theDemibrad.mutex_Demibrad_Receiver, &theDemibrad.expected_sequence_number);
 	listen.UltraListen();
 	wcerr << "This should not appear again";
 	return (void *)0;
@@ -57,7 +57,7 @@ int dot11_init(short MACadr, ostream* stremy){
 
 
 int dot11_recv(short *srcAddr, short *destAddr, char *buf, int bufSize){
-	return theDemibrad.dot11_recv_DemiBrad(srcAddr, destAddr, buf, bufSize);
+	return theDemibrad.dot11_recv_DemiBrad(srcAddr, destAddr, buf, bufSize); //BRAD LOOK HERE: jump to line 96
 }
 
 int dot11_command(int cmd, int val){
@@ -92,32 +92,31 @@ int DemiBrad::status_DemiBrad(){
 }
 /*
  * receive data
+ * BRAD LOOK HERE: This is the function that receives data! 
  */
 int DemiBrad::dot11_recv_DemiBrad(short *srcAddr, short *destAddr, char *buf, int bufSize){
-	pthread_mutex_lock(&mutex_Demibrad_Receiver);
-	if(!receive_Queue_demibrad.empty()){
-		Packet temp = receive_Queue_demibrad.front(); // temporary packet
-		receive_Queue_demibrad.pop(); // pop of the first pointer to a packet
-		char tempBuf[bufSize];
-		int size = temp.bytes_to_send;
+	pthread_mutex_lock(&mutex_Demibrad_Receiver); // Lock the receiver's mutex so the receiver cannot access data while we do.
+	if(!receive_Queue_demibrad.empty()){// check if the queue containing packets addressed to us is empty
+		//if not
+		Packet temp = receive_Queue_demibrad.front(); // make a temporary packet
+		receive_Queue_demibrad.pop(); // pop of the front to a packet
+		
+		int size = temp.frame_size;
 		wcerr << "************ size:" << size << endl;
 		//char * tempBufP = &tempBuf[0];
-		wcerr << "GOT THIS FAR ARARARARARARA" << endl;
-		temp.buildByteArray(&tempBuf[0]);
+		wcerr << "Entering troubled function ..." << endl;
+		wcerr << "Exiting troubled function ..." << endl; // BRAD LOOK HERE
 		int i = 0;
-
-		while(i < size){ // put the data in the buffer into the buffer that is being returned
-			buf[i] = tempBuf[i + 6];
-			i++;
-		}
-		i = 0;
-		while(i < size){ // put the data in the buffer into the buffer that is being returned
+		//char tempBuf[temp.frame_size]; // BRAD LOOK HERE: I have created a temporary buffer
+		while(i < temp.bytes_to_send){ // put the data in the buffer into the buffer that is being returned
+			buf[i] = temp.physical_data_array[i];
 			wcerr << buf[i] << " :: ";
 			i++;
 		}
 		pthread_mutex_unlock(&mutex_Demibrad_Receiver);
 		return temp.bytes_to_send;
 	}else{
+		//if it is empty, unlock the mutex and return -1
 		pthread_mutex_unlock(&mutex_Demibrad_Receiver);
 		return -1;
 	}

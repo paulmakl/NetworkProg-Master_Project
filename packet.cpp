@@ -65,15 +65,17 @@ int Packet::buildByteArray(char *buffer){
 	//These next few lines of code breaks the CRC into
 	//four bytes. and then puts those bytes in the
 	// last four slots of the packet.
+	wcerr << "Checkpoint" << endl;
 	int i = 0; // create a counter variable
 	int temp_int = 0; // make a temporary integer.
 	while(i < 4){
 		temp_int = CRC << 24 - 8*i; // shift the ith byte of the integer all the way over to the left.
 		temp_int = temp_int >> 24; // shift that byte back to its original position.
 		buffer[frame_size-1-i] = temp_int; // add that byte to the appropriate section of the buffer.
+		wcerr << buffer[frame_size-1-i]+0 << "::";
 		i++;
 	}
-
+	wcerr << "Checkpoint" << endl;
 	//Now we need to put the destination and sender addresses in their
 	//proper positions
 	short temp_short = 0; // create a temporary short variable.
@@ -126,9 +128,12 @@ int Packet::buildByteArray(char *buffer){
 	// we want to put it in the buffer, but we want to put the data
 	// after the header. we go through the data in 'data' and 
 	// put it in the buffer.
+	wcerr << "Checkpoint" << endl;
 	while(i < bytes_to_send){
 		buffer[i+6] = physical_data_array[i];
+		wcerr << " ::" << i << physical_data_array[i];
 		i++;
 	}
+	wcerr << "FIN" << endl;
 }
 

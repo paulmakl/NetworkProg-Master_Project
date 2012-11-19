@@ -1,6 +1,6 @@
 /* 
  *
- * THIS IS AN EXAMPLE OF USING PACKETS
+ * this is a test to see if our code works because we can't get the gui working :(
  * - Paul
  */
 
@@ -14,9 +14,8 @@ using namespace std;
 int main(int argc, char const *argv[])
 {
 	ostream* stream;
-	//DemiBrad jesus;
-	short dest = 103;
-	short myMAC = 101;
+	short dest = 628;
+	short myMAC = 524;
 	dot11_init(myMAC, stream);
 	wcerr << "Creating a buffer" << endl;
 	int bufSize = 3;
@@ -26,15 +25,16 @@ int main(int argc, char const *argv[])
 	buf[2] = 'c';
 	wcerr << "Testing..." << endl;
 	while(true){
-		/*wcerr << "Sending 'abc'..." << endl;
-		dot11_send(dest, &buf[0], bufSize);
-		wcerr << "Message sent!" << endl;*/
+		//wcerr << "Sending 'abc'..." << endl;
+		//dot11_send(dest, &buf[0], bufSize);
+		//wcerr << "Message sent!" << endl;
 		wcerr << "Creating temporary Variables ..." << endl;
 		short srcAddr,destAddr = -1;
-		char buf[2048];
+		char buf_new[2048];
 		wcerr << "Created Variables!" << endl;
 		wcerr << "Checking incoming data queue..." << endl;
-		int incDataResult = dot11_recv(&srcAddr, &destAddr, &buf[0], 2048);
+		int incDataResult = dot11_recv(&srcAddr, &destAddr, &buf_new[0], 2038); // BRAD LOOK HERE: This is the layer above calling our dot11_recv function.
+																				// it continues in demiBrad.cpp on line 59
 		if (incDataResult == -1)
 		{
 			wcerr << "No Data in queue" << endl;
@@ -42,7 +42,7 @@ int main(int argc, char const *argv[])
 			wcerr << "Data in queue detected! Printing..." << endl;
 			int i = 0;
 			while(i < incDataResult){
-				wcerr << buf[i] << " :: ";
+				wcerr << buf_new[i] << " :: ";
 				i++;
 			}
 			wcerr << "Printing done!" << endl;
