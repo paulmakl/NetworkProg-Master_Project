@@ -79,17 +79,13 @@ Listener::UltraListen()
             if (prints) wcerr << bytesReceived << " !Full Packet Received! woo! ";
         }
         PRR = read_Packet();
-        short dataSource = buf[4];//extract the source address
-        dataSource = dataSource << 8;
-        dataSource = dataSource + buf[5] + 0;
-        short SN = buf[0];//extract the sequence number 
-        SN = SN << 8;
-        SN = SN + buf[1] + 0;
-        SN = SN << 4;//shift other data off the sequence number
-        SN = SN >> 4;
+        short dataSource;
+        dataSource = extractSourceAddress();
+        short seqNum;
+        seqNum = extractSequenceNumber();
         if (PRR == 1)//if the packet is relevent to us and is data queue it up
         {
-            if ( seqNumMang.getSeqNum(dataSource) + 1 == SN )
+            if ( seqNumMang.getSeqNum(dataSource) + 1 == seqNum )
             {
                 seqNumMang.increment(dataSource);
                 queue_data();//put data in the queue
@@ -101,7 +97,7 @@ Listener::UltraListen()
         }
         if (PRR == 2)//if the packet is relevent and is an ACK adjust ack recived flag
         {
-            if (SN == expectedSN)
+            if (seqNum == *expectedSN)
             {
                 bool temp = true;
                 ackReceivedL = &temp;
@@ -147,6 +143,26 @@ Listener::queue_data()
         dataIn[i-6] = buf[i];//the offset of six is the front header being skipped in our buf and the four less is the CRC
     }
     */ 
+}
+
+short
+Listener::extractSequenceNumber()
+{
+    short SN = buf[0];//extract the sequence number 
+    SN = SN << 8;
+    SN = SN + buf[1] + 0;
+    SN = SN << 4;//shift other data off the sequence number
+    SN = SN >> 4;
+    return SN; 
+}
+
+short
+Listener::extractSourceAddress()
+{
+    short DS = buf[4];//extract the source address
+    DS = DS << 8;
+    DS = DS + buf[5] + 0;
+    return DS;
 }
 
 

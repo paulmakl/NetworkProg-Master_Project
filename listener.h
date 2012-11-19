@@ -27,7 +27,7 @@ public:
      * starts the thread listening for imcoming messages
      */
     Listener(RF* RFLayer, queue<Packet>* incomingQueue, bool* receivedFlag, short myMAC, pthread_mutex_t * mutexListenr, short* exSN)
-    : MACaddrList(myMAC), ackReceivedL(receivedFlag), daLoopLine(incomingQueue), daRF(RFLayer), expectedSN(exSN), mutexListener(mutexListenr), prints(true), ackReceivedL(false) {}
+    : seqNumMang(MAXSEQNUM), MACaddrList(myMAC), ackReceivedL(receivedFlag), daLoopLine(incomingQueue), daRF(RFLayer), expectedSN(exSN), mutexListener(mutexListenr), prints(true) {}
     
     /*
      * the heart of the listener watches activity on the RF layer and blocks until a packet is recived
@@ -36,13 +36,13 @@ public:
 
 private:
 
-    short MACaddrList; //a pointer to our MAC address
+    volatile short MACaddrList; //a pointer to our MAC address
     ostream *streamy; //the given output stream for data to the layer above
-    bool* ackReceivedL;// a pointer to a boolean that indicates whether or not a ACK has been recived
+    volatile bool* ackReceivedL;// a pointer to a boolean that indicates whether or not a ACK has been recived
     static const int MAXPACKETSIZE = 2048; //size guarenteed to hold all properly formated packets
     char buf[MAXPACKETSIZE];// buffer for the incoming packets
     queue<Packet> * daLoopLine;//a queue for the outgoing data
-    short* expectedSN;//the sequence number to check against incoming acks
+    volatile short* expectedSN;//the sequence number to check against incoming acks
     RF* daRF;//the reference to the RF layer
     int bytesReceived;// bytes from the last packet
     bool prints;//bool for turning prints on or off
@@ -64,6 +64,16 @@ private:
       * then is put into our incoming_Queue\
       */
       int queue_data();
+
+      /*
+       * a method for hiding away those nasty bitwise operaters for getting a squence number outta sight outta my way 
+       */
+        short extractSequenceNumber();
+
+        /*
+         * a method for hinging the bitwise terrible of getting a source address out of a packet
+         */
+         short extractSourceAddress();
 };
 //#endif
 
