@@ -13,10 +13,9 @@
 #include "RF.h"
 #include <queue>
 #include "SeqNumManager.h"
+ 
  using std::queue; 
 
-//#ifndef __RF_H_INCLUDED__   // if x.h hasn't been included yet...
-//#define __RF_H_INCLUDED__
 class Sender {
     public:
         /**
@@ -97,4 +96,3 @@ class Sender {
          */
         int resend();
 };
-//#endif

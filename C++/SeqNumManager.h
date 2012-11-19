@@ -12,6 +12,7 @@
 
 #include <iostream>
 #include <tr1/unordered_map>
+
 using std::tr1::unordered_map;
 
 
@@ -67,7 +68,7 @@ inline
 short
 SeqNumManager::getSeqNum(short mac) {
     if (theMap.count(mac)) {
-        return theMap[mac];  //Return the sequNum
+        return theMap[mac];  //Return the seqNum
     }
     else {
         return -1;  //Address did not exist
