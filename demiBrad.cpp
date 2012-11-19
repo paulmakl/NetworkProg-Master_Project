@@ -23,7 +23,6 @@ void *create_sender_thread(void *cnt){
 void *create_and_run_receiver_thread(void *cnt){
 	theDemibrad.RFLayer_demibrad->attachThread();
 	//wcerr << "receiver thread";
-	bool hello = true;
 	Listener listen(theDemibrad.RFLayer_demibrad, &theDemibrad.receive_Queue_demibrad, &theDemibrad.ack_Received_demibrad, 103, &theDemibrad.mutex_Demibrad_Receiver, &theDemibrad.expected_sequence_number);
 	listen.UltraListen();
 	wcerr << "This should not appear again";
