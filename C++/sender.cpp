@@ -19,12 +19,12 @@ Sender::MasterSend() {
 
         //Check for data to send
         if (infoToSend->empty()) {
-            wcerr << "QUEUE IS EMPTY" << endl;
+            //wcerr << "QUEUE IS EMPTY" << endl;
             pthread_mutex_unlock(mutexSender); //Unlock because the queue is not ready
             sleep(SLEEPTIME);
         }
         else {
-            wcerr << " pop should happen" << endl;
+            //wcerr << " pop should happen" << endl;
            
             //Get incomplete packet to send
             pachyderm = infoToSend->front();
