@@ -9,7 +9,7 @@ class Packet {
 	public:
 	// Initializer list
 	Packet(): frametype(0), resend(false), sequence_number(0), sender(0), CRC(0), 
-	resTransAttempts(0), bytes_to_send(0), frame_size(0), {};
+	resTransAttempts(0), bytes_to_send(0), frame_size(0) {};
 	// Constructor for sender
 	Packet(short dest, char* dta, int size);
 	// Constructor for Receiver

@@ -92,6 +92,7 @@ Listener::UltraListen()
                 //char* pointerToTheFrame = &theFrame[0];
                 paulLovesPBR.buildByteArray(&theFrame[0]);
                 if (prints) wcerr << "***************Paul loathes PBR :: " << paulLovesPBR.frame_size << endl;
+                usleep(aSIFSTime * 1000);
                 daRF->transmit( &theFrame[0], paulLovesPBR.frame_size );
                 seqNumMang.increment(dataSource);
                 queue_data();//put data in the queue
