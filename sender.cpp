@@ -53,18 +53,16 @@ Sender::MasterSend() {
             //Transmit
             send(pointerToTheFrame, pachyderm.frame_size, false, aCWmin);
            //TODO start Timer to check for timeouts
-            //If(NoAckRecieved) {
-            //      int flag = 0;
-            //      While (!flag) {
-            //          flag = resend()
-            //      }
+            //CAN ONLY RESEND 5 TIMES AND CONTENTION WINDOWN CAN ONLY GET UP TO 31
+            //while(NoAckRecieved && notAtEndofTimer) {
+            //          usleep(1000);
+            //    }
+            //     if (noAckRecieved) {
+            //          retransmit
+            //       }
         }
-        }
-             //Free memory because this is c++
-        }
-
-        //TODO Handle case of timeout and resend
     }
+             //Free memory because this is c++
 }
 
 int
@@ -129,13 +127,13 @@ Sender::send(char* frame, int size, bool reSend, int cWparam) {
 }
 
 int 
-Sender::resend(int wait) {
+Sender::resend() {
     buildFrame(0, true, seqTable(pachyderm.destination), 1111);
     char theFrame[pachyderm.frame_size];
     char* pointerToTheFrame = &theFrame[0];
     pachyderm.buildByteArray(pointerToTheFrame); //Fill theFrame
-    //USE PACKET.RETRANSATTEMPS
-    return send(pointerToTheFrame, pachyderm.frame_size, true, wait+1); 
+    pachyderm.reTransAttemps++;     //Increment the times we have tried to resend
+    return send(pointerToTheFrame, pachyderm.frame_size, true, aCWmin + pachyderm.reTransAttemps); 
 }
 
 
