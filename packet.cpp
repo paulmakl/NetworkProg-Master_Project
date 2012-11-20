@@ -7,9 +7,9 @@ using namespace std;
 
 // Basic constructor. CS is the value for CRC this will eventually be taken out
 Packet::Packet(short dest, char* dta, int size){
-	frametype = 3; // test value
-	resend = 5; // test value
-	sequence_number = 30; // test value
+	frametype = 0; // test value
+	resend = 0; // test value
+	sequence_number = 0; // test value
 	destination = dest;
 	sender = 1001; // test value
 	CRC = -1; // test value
@@ -24,7 +24,7 @@ Packet::Packet(char *pac, int byts)
 {
     int size = byts-10;//total size of incoming data minus 10 bytes of header and CRC
     bytes_to_send = size;
-    wcerr << "*******************************************" << bytes_to_send << endl;
+    //wcerr << "*******************************************" << bytes_to_send << endl;
     char dataIn[size];//a new char array for just the incoming data
     short dataSource = pac[4] + 0;//extract the source address
     dataSource = dataSource << 8;
@@ -66,7 +66,8 @@ int Packet::buildByteArray(char *buffer){
 	//These next few lines of code breaks the CRC into
 	//four bytes. and then puts those bytes in the
 	// last four slots of the packet.
-	wcerr << "Checkpoint" << endl;
+	//wcerr << "Checkpoint" << endl;
+	//THIS IS COMMENTED OUT SO THAT WE CAN IMPLEMENT A HACK. ADD LATER
 	int i = 0; // create a counter variable
 	int temp_int = 0; // make a temporary integer.
 	while(i < 4){
@@ -76,7 +77,14 @@ int Packet::buildByteArray(char *buffer){
 		wcerr << buffer[frame_size-1-i]+0 << "::";
 		i++;
 	}
-	wcerr << "Checkpoint" << endl;
+	// THIS IS THE END OF THE PART THAT WAS COMMENTED OUT BECAUSE WE IMPLEMENTED A HACK. ADD LATER
+	//THIS IS A HACK AND SHOULD BE DELETED SOON!!!!!!
+	//buffer[frame_size-4] = -1;
+	//buffer[frame_size-3] = -1;
+	//buffer[frame_size-2] = -1;
+	//buffer[frame_size-1] = -1;
+	//THIS IS THE END OF THE HACK PART!!!!!!!please kill me
+	//wcerr << "Checkpoint" << endl;
 	//Now we need to put the destination and sender addresses in their
 	//proper positions
 	short temp_short = 0; // create a temporary short variable.
@@ -129,12 +137,12 @@ int Packet::buildByteArray(char *buffer){
 	// we want to put it in the buffer, but we want to put the data
 	// after the header. we go through the data in 'data' and 
 	// put it in the buffer.
-	wcerr << "Checkpoint" << endl;
-	while(i < bytes_to_send){
-		buffer[i+6] = physical_data_array[i];
-		wcerr << " ::" << i << physical_data_array[i];
-		i++;
-	}
-	wcerr << "FIN" << endl;
+	//wcerr << "Checkpoint" << endl;
+	//while(i < bytes_to_send){
+	//	buffer[i+6] = physical_data_array[i];
+	//	wcerr << " ::" << i << physical_data_array[i];
+	//	i++;
+	//}
+	//wcerr << "FIN" << endl;
 }
 

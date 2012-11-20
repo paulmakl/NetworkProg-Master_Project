@@ -83,6 +83,8 @@ class Sender {
         //TODO How will you tell which message an ack is for using this system?
         short check_ReceivedAck();
 
+        //FROM PAUL:: custom power function to deal with ints.
+        int intPow(int base, int power);
         /**
          * Builds a packet object for sending
          * param frm the frame typ
@@ -98,7 +100,8 @@ class Sender {
          * param thePacket The packet to send
          * return 1 if the packet was sent correctly
          */
-        int send(char* frame, int size);
+        // FROM PAUL: forgot to put the new parameters in the .h file
+        int send(char* frame, int size, bool reSend, int cWparam);
 
         /**
          * Resends the current packet

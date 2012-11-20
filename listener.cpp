@@ -125,6 +125,7 @@ Listener::UltraListen()
 int
 Listener::queue_data()
 {
+    wcerr << "putting data in queue ****" << endl;
     Packet toDemiBrad(&buf[0], bytesReceived);//create a packet
     /*
      * testing shiz to make sure the right data is being sent out

@@ -26,20 +26,21 @@ int main(int argc, char const *argv[])
 	wcerr << "Testing..." << endl;
 	while(true){
 		//wcerr << "Sending 'abc'..." << endl;
-		//dot11_send(dest, &buf[0], bufSize);
+		dot11_send(dest, &buf[0], bufSize);
 		//wcerr << "Message sent!" << endl;
 		//wcerr << "Creating temporary Variables ..." << endl;
 		short srcAddr,destAddr = -1;
 		char buf_new[2048];
 		//wcerr << "Created Variables!" << endl;
-		wcerr << "Checking incoming data queue..." << endl;
+		//wcerr << "Checking incoming data queue..." << endl;
 		int incDataResult = dot11_recv(&srcAddr, &destAddr, &buf_new[0], 2038); // BRAD LOOK HERE: This is the layer above calling our dot11_recv function.
 																				// it continues in demiBrad.cpp on line 59
+
 		if (incDataResult == -1)
 		{
-			wcerr << "No Data in queue" << endl;
+			//wcerr << "No Data in queue" << endl;
 		}else{
-			wcerr << "Data in queue detected! Printing..." << endl;
+			wcerr << endl << "Data in queue detected! Printing..." << endl;
 			int i = 0;
 			while(i < incDataResult){
 				wcerr << buf_new[i] << " :: ";
@@ -48,6 +49,7 @@ int main(int argc, char const *argv[])
 			//wcerr << "Printing done!" << endl;
 		}
 		wcerr << "Sleeping." << endl << "---------------------" << endl << endl;
+
 		sleep(3);
 	}
 }

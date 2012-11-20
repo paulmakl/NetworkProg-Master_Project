@@ -12,7 +12,7 @@ using namespace std;
 int main(int argc, char const *argv[])
 {
 	int data_size = 11;
-	char dta[] = "Hello World";
+	char dta[] = "abcdefghijk";
 	/*dta[0] = 'H';
 	dta[1] = 'E';
 	dta[2] = 'L';
@@ -26,10 +26,10 @@ int main(int argc, char const *argv[])
 	dta[1] = 'D';*/
 	Packet john(101, &dta[0], data_size);
 	char Byte_Array[data_size+10];
-	int q = john.buildByteArray(&Byte_Array[0]);
+	john.buildByteArray(&Byte_Array[0]);
 	int i = 0;
-	while(i < (data_size+10)){
-		cout << Byte_Array[i]<< " :: ";
+	while(i < data_size){
+		cout << Byte_Array[i] + 0 << " :: ";
 		i++;
 	}
 	cout << "\n";

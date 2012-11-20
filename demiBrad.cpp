@@ -114,6 +114,7 @@ int DemiBrad::dot11_recv_DemiBrad(short *srcAddr, short *destAddr, char *buf, in
 			i++;
 		}
 		pthread_mutex_unlock(&mutex_Demibrad_Receiver);
+		wcerr << endl << "Bytes Sent :: " << temp.bytes_to_send << endl;
 		return temp.bytes_to_send;
 	}else{
 		//if it is empty, unlock the mutex and return -1
