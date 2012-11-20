@@ -59,8 +59,6 @@ Sender::MasterSend() {
             buildFrame(0, true, seqTable.getSeqNum(pachyderm.destination), 1111); // FROM PAUL: turned this on and fixed the function call
             //buildFrame(1, false, 0, 1111); //FOR TESTING, uncomment above line for actual
 
-            //TODO add in seq numbering
-
             //Build the frame (char[]) to be send
             char theFrame[pachyderm.frame_size];
             char* pointerToTheFrame = &theFrame[0];

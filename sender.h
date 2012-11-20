@@ -50,7 +50,7 @@ class Sender {
                 volatile short *expSeq, pthread_mutex_t *mutex) 
                     :   theRF(RFLayer),  infoToSend(theQueue), ackReceived(receivedFlag), 
                         macAddr_Sender(ourMAC), expSeqNum(expSeq), mutexSender(mutex), 
-                        seqTable(MAXSEQNUM) {}
+                        seqTable(MAXSEQNUM) {} 
         
         /**
          * Invokes the sender object to do all of its duties
@@ -76,6 +76,13 @@ class Sender {
 
     //Methods
         /**
+        * Temporary method for computing an exponent
+        * param base the base to raise
+        * power to raise the base to
+        */
+        int intPow(int base, int power);
+                 
+        /**
          * Checks for an acknowledgment received
          * return 0 No ack received
          * return Mac address of received ack  
@@ -83,8 +90,6 @@ class Sender {
         //TODO How will you tell which message an ack is for using this system?
         short check_ReceivedAck();
 
-        //FROM PAUL:: custom power function to deal with ints.
-        int intPow(int base, int power);
         /**
          * Builds a packet object for sending
          * param frm the frame typ
@@ -100,8 +105,7 @@ class Sender {
          * param thePacket The packet to send
          * return 1 if the packet was sent correctly
          */
-        // FROM PAUL: forgot to put the new parameters in the .h file
-        int send(char* frame, int size, bool reSend, int cWparam);
+        int send(char* frame, int size);
 
         /**
          * Resends the current packet
