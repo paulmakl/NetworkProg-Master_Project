@@ -8,14 +8,13 @@ using namespace std;
 // Basic constructor. CS is the value for CRC this will eventually be taken out
 Packet::Packet(short dest, char* dta, int size){
 	frametype = 0; // test value
-	resend = 0; // test value
+	resend = false; // test value
 	sequence_number = 0; // test value
 	destination = dest;
 	sender = 1001; // test value
 	CRC = -1; // test value
 	bytes_to_send = size;
 	frame_size = size + 10;
-	resend = false; // test value
     pointer_data_to_physical(dta); //Make the physical copy
 }
 
@@ -69,25 +68,25 @@ int Packet::buildByteArray(char *buffer){
 	//wcerr << "Checkpoint" << endl;
 	//THIS IS COMMENTED OUT SO THAT WE CAN IMPLEMENT A HACK. ADD LATER
 	int i = 0; // create a counter variable
-	int temp_int = 0; // make a temporary integer.
+	/*int temp_int = 0; // make a temporary integer.
 	while(i < 4){
 		temp_int = CRC << 24 - 8*i; // shift the ith byte of the integer all the way over to the left.
 		temp_int = temp_int >> 24; // shift that byte back to its original position.
 		buffer[frame_size-1-i] = temp_int; // add that byte to the appropriate section of the buffer.
-		wcerr << buffer[frame_size-1-i]+0 << "::";
+		//wcerr << buffer[frame_size-1-i]+0 << "::";
 		i++;
-	}
+	}*/
 	// THIS IS THE END OF THE PART THAT WAS COMMENTED OUT BECAUSE WE IMPLEMENTED A HACK. ADD LATER
 	//THIS IS A HACK AND SHOULD BE DELETED SOON!!!!!!
-	//buffer[frame_size-4] = -1;
-	//buffer[frame_size-3] = -1;
-	//buffer[frame_size-2] = -1;
-	//buffer[frame_size-1] = -1;
+	buffer[frame_size-4] = -1;
+	buffer[frame_size-3] = -1;
+	buffer[frame_size-2] = -1;
+	buffer[frame_size-1] = -1;
 	//THIS IS THE END OF THE HACK PART!!!!!!!please kill me
 	//wcerr << "Checkpoint" << endl;
 	//Now we need to put the destination and sender addresses in their
 	//proper positions
-	short temp_short = 0; // create a temporary short variable.
+	unsigned short temp_short = 0; // create a temporary short variable.
 	temp_short = sender << 8; // shift the first byte of sender the the leftmost position of the short
 	temp_short = temp_short >> 8;// shift the previously mentioned byte back to its original position.
 								 // this removes all the unnesessary zeros.
@@ -111,22 +110,32 @@ int Packet::buildByteArray(char *buffer){
 	// when I stored destination address and sender address, I broke a short (2 bytes) up into two 1 byte
 	// segments that could easily be put into the buffer. I take a similar approach here. I merge the three
 	// variables into a short and then split it into two bytes to be put into the buffer.
-	short temp_short_two = 0; // I needed a second temporary variable.
+	unsigned short temp_short_two = 0; // I needed a second temporary variable.
 	temp_short = 0; // i zeroed out the first temporary variable, just to be safe.
 	temp_short = frametype << 13; // the frame type is stored in a short, so I shift it over 13 bits so that only the
 								  // last three bits will be in the leftmost position of the number
-	if (resend == true) // if resend is true, then we need to flip the 13th bit. Otherwise we leave it at 0.
+	
+	if (resend) // if resend is true, then we need to flip the 13th bit. Otherwise we leave it at 0.
 	{
+		
 		temp_short = temp_short + 4096; // 4096 is the number where only the 13th bit is flipped. 
 	}
+
 	//sequence number is stored in a short. We only want the first 12 bits. So we remove the last 4
 	//with bitshift operations.
-	temp_short_two = sequence_number << 4;
-	temp_short_two = temp_short_two >> 4;
+	if (sequence_number > 4095 || sequence_number < 0)
+	{
+		temp_short_two = 4095;
+	}else{
+		temp_short_two = sequence_number << 4;
+		temp_short_two = temp_short_two >> 4;
+	}
 	temp_short = temp_short + temp_short_two; // temp_short now holds the short that we need to break up.
+	
 	// Now we break up the short into two packets. 
 	temp_short_two = temp_short << 8;
 	temp_short_two = temp_short_two >> 8;
+	wcerr << temp_short_two << endl;
 	buffer[1] = temp_short_two;
 	temp_short_two = temp_short >> 8;
 	buffer[0] = temp_short_two;
@@ -138,11 +147,11 @@ int Packet::buildByteArray(char *buffer){
 	// after the header. we go through the data in 'data' and 
 	// put it in the buffer.
 	//wcerr << "Checkpoint" << endl;
-	//while(i < bytes_to_send){
-	//	buffer[i+6] = physical_data_array[i];
-	//	wcerr << " ::" << i << physical_data_array[i];
-	//	i++;
-	//}
+	while(i < bytes_to_send){
+		buffer[i+6] = physical_data_array[i];
+		//wcerr << " ::" << i << physical_data_array[i];
+		i++;
+	}
 	//wcerr << "FIN" << endl;
 }
 
