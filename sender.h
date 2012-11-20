@@ -105,7 +105,7 @@ class Sender {
          * param thePacket The packet to send
          * return 1 if the packet was sent correctly
          */
-        int send(char* frame, int size);
+        int send(char* frame, int size, bool reSend, int cWparam);
 
         /**
          * Resends the current packet

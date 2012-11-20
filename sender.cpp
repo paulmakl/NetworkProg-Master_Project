@@ -16,7 +16,7 @@
 //Wait IFS (SIFS + 2*slotTime)
 // FROM PAUL: the constant aSIFSTime was EaSIFSTIME. I think it was
 // a mistake but I changed it to the name you had in your h file.
-#define waitIFS usleep(aSIFSTime + 2*aSlotTime);
+#define waitIFS usleep((aSIFSTime + 2*aSlotTime)*1000);
 
 //Items used
 using std::queue;
@@ -46,7 +46,7 @@ Sender::MasterSend() {
         if (infoToSend->empty()) {
             //wcerr << "QUEUE IS EMPTY" << endl;
             pthread_mutex_unlock(mutexSender); //Unlock because the queue is not ready
-            sleep(SLEEPTIME);
+            usleep(1000);
         }
         else {
             //wcerr << " pop should happen" << endl;
@@ -56,18 +56,19 @@ Sender::MasterSend() {
             infoToSend->pop(); 
             pthread_mutex_unlock(mutexSender); //Unlock bc we are done with queue 
             wcerr << "Got stuff off the queue" << endl;
-            buildFrame(0, true, seqTable.getSeqNum(pachyderm.destination), 1111); // FROM PAUL: turned this on and fixed the function call
+            seqTable.increment(pachyderm.destination);
+            buildFrame(0, false, seqTable.getSeqNum(pachyderm.destination), 1111); // FROM PAUL: turned this on and fixed the function call
             //buildFrame(1, false, 0, 1111); //FOR TESTING, uncomment above line for actual
 
             //Build the frame (char[]) to be send
             char theFrame[pachyderm.frame_size];
-            char* pointerToTheFrame = &theFrame[0];
-            pachyderm.buildByteArray(pointerToTheFrame); //Fill theFrame
+            //char* pointerToTheFrame = &theFrame[0];
+            pachyderm.buildByteArray(&theFrame[0]); //Fill theFrame
             
             //Transmit
             //FROM PAUL: need to check the result of send. So I store it in a temp variable.
             wcerr << "sending data" << endl;
-            int doesItSend = send(pointerToTheFrame, pachyderm.frame_size, false, aCWmin);
+            int doesItSend = send(&theFrame[0], pachyderm.frame_size, false, aCWmin);
             wcerr << "data sent!" << endl;
            //TODO start Timer to check for timeouts
             //CAN ONLY RESEND 5 TIMES AND CONTENTION WINDOWN CAN ONLY GET UP TO 31

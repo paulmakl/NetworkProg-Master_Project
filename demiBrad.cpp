@@ -128,8 +128,10 @@ int DemiBrad::dot11_recv_DemiBrad(short *srcAddr, short *destAddr, char *buf, in
 int DemiBrad::dot11_send_DemiBrad(short destAddr, char *buf, int bufSize){
 	Packet temp(destAddr,buf,bufSize); // make a temporary packet
 	//memory_buffer_demibrad[memory_buffer_number_count_demibrad] = temp; //put the temporary packet in the memory buffer
+	pthread_mutex_lock(&mutex_Demibrad_Sender);
 	send_Queue_demibrad.push(temp);
-	return 1;
+	pthread_mutex_unlock(&mutex_Demibrad_Sender);
+	return bufSize;
 }
 
 
