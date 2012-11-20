@@ -24,11 +24,11 @@ int main(int argc, char const *argv[])
 	dta[2] = 'R';
 	dta[0] = 'L';
 	dta[1] = 'D';*/
-	Packet john(101, &dta[0], data_size);
+	Packet john(628, &dta[0], data_size);
 	char Byte_Array[data_size+10];
 	john.buildByteArray(&Byte_Array[0]);
 	int i = 0;
-	while(i < data_size){
+	while(i < data_size+10){
 		cout << Byte_Array[i] + 0 << " :: ";
 		i++;
 	}
