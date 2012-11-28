@@ -102,7 +102,7 @@ int DemiBrad::dot11_recv_DemiBrad(short *srcAddr, short *destAddr, char *buf, in
 		receive_Queue_demibrad.pop(); // pop of the front to a packet
 		
 		int size = temp.frame_size;
-		wcerr << "************ size:" << size << endl;
+		wcerr << "************ destination Address:" << size << endl;
 		//char * tempBufP = &tempBuf[0];
 		wcerr << "Entering troubled function ..." << endl;
 		wcerr << "Exiting troubled function ..." << endl; // BRAD LOOK HERE
@@ -113,6 +113,8 @@ int DemiBrad::dot11_recv_DemiBrad(short *srcAddr, short *destAddr, char *buf, in
 			wcerr << buf[i] << " :: ";
 			i++;
 		}
+		*destAddr = temp.destination;
+		*srcAddr = temp.sender;
 		pthread_mutex_unlock(&mutex_Demibrad_Receiver);
 		wcerr << endl << "Bytes Sent :: " << temp.bytes_to_send << endl;
 		return temp.bytes_to_send;

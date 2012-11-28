@@ -55,7 +55,7 @@ Sender::MasterSend() {
             pachyderm = infoToSend->front();
             infoToSend->pop(); 
             pthread_mutex_unlock(mutexSender); //Unlock bc we are done with queue 
-            wcerr << "Got stuff off the queue" << endl;
+            //wcerr << "Got stuff off the queue" << endl;
             seqTable.increment(pachyderm.destination);
             buildFrame(0, false, seqTable.getSeqNum(pachyderm.destination), 1111); // FROM PAUL: turned this on and fixed the function call
             //buildFrame(1, false, 0, 1111); //FOR TESTING, uncomment above line for actual
@@ -67,9 +67,9 @@ Sender::MasterSend() {
             
             //Transmit
             //FROM PAUL: need to check the result of send. So I store it in a temp variable.
-            wcerr << "sending data" << endl;
+            //wcerr << "sending data" << endl;
             int doesItSend = send(&theFrame[0], pachyderm.frame_size, false, aCWmin);
-            wcerr << "data sent!" << endl;
+            //wcerr << "data sent!" << endl;
            //TODO start Timer to check for timeouts
             //CAN ONLY RESEND 5 TIMES AND CONTENTION WINDOWN CAN ONLY GET UP TO 31
             //while(NoAckRecieved && notAtEndofTimer) {
@@ -126,18 +126,18 @@ int
 Sender::send(char* frame, int size, bool reSend, int cWparam) {
     if (!reSend) {  //This is not a retransmittion 
         //Wait for current channel to be idle
-        wcerr << "This is not a retransmission" << endl;
+        //wcerr << "This is not a retransmission" << endl;
         if (!theRF->inUse()) {
-            wcerr << "The RF layer is not in use." << endl;
+            //wcerr << "The RF layer is not in use." << endl;
             waitIFS
-            wcerr << "Waiting IFS" << endl;
+            //wcerr << "Waiting IFS" << endl;
             if (!theRF->inUse()) {  //Perfect transmittion
-                wcerr << "The RF layer is still not in use yay!" << endl;
+                //wcerr << "The RF layer is still not in use yay!" << endl;
                if (theRF->transmit(frame, size) != size) {  //Makes the transmission
-                wcerr << "Did not send correctly" << endl;
+                //wcerr << "Did not send correctly" << endl;
                     return 0; //Did not send all of frame or something failed internally
                 } else {
-                    wcerr << "sent correctly" << endl;
+                    //wcerr << "sent correctly" << endl;
                     return 1; //Frame transmitted properly 
                 }
             }

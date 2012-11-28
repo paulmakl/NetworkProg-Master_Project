@@ -133,7 +133,6 @@ RF::RF()
      * Almost done!  Now we need to create a Java Thread around our RF object, and
      * invoke the thread's start method.
      *
-     */
      
     jclass thread = env->FindClass("java/lang/Thread");
     if (thread == 0) {
@@ -153,7 +152,7 @@ RF::RF()
     
     // Call its start method
     env->CallVoidMethod(theThread, start);   
-
+*/
 }
 
 
