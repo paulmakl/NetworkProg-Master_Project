@@ -21,7 +21,7 @@ using namespace std;
 class DemiBrad{
 
 	public:
-		DemiBrad():MACaddr_demibrad(0), ack_Received_demibrad(false), MACACK_demibrad(0), expected_sequence_number(0) {};
+		DemiBrad():MACaddr_demibrad(0), ack_Received_demibrad(false), MACACK_demibrad(0), expected_sequence_number(0), fudge_factor_Demibrad(0) {};
 		DemiBrad(short MACaddr, ostream *streamy);
 		int dot11_command_DemiBrad(int cmd, int val);
 		int status_DemiBrad();
@@ -41,9 +41,14 @@ class DemiBrad{
 		queue<Packet> send_Queue_demibrad; // the queue of packets to send
 		queue<Packet> receive_Queue_demibrad; // the queu of packets received from the receiver class
 		volatile short expected_sequence_number;
+		
 		pthread_mutex_t mutex_Demibrad_Receiver;// = PTHREAD_MUTEX_INITIALIZER;
 		pthread_mutex_t mutex_Demibrad_Sender;// = PTHREAD_MUTEX_INITIALIZER;
+		pthread_mutex_t mutex_Demibrad_ostream;
+		pthread_mutex_t mutex_Demibrad_fudge_factor;
+		volatile long long fudge_factor_Demibrad;
 		pthread_mutexattr_t attr;
+
 	//private:
 
 		/*short MACaddr_demibrad; // users mac address

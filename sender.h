@@ -73,6 +73,9 @@ class Sender {
                                                             //the network is free 
         char* frame; //The byte array to be transmitted on RF
         SeqNumManager seqTable; //Manages all seqNums for all MAC addr's
+        pthread_mutex_t *mutexSenderOstream;
+        pthread_mutex_t *mutexDemibradFudgeFactor;
+        volatile long long *fudgeFactorDemibrad;
 
     //Methods
         /**

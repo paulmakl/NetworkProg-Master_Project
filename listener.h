@@ -49,6 +49,9 @@ private:
     SeqNumManager seqNumMang;//a hashmap with added funtionality for dealing with sequence numbers
     pthread_mutex_t* mutexListener;//a mutex for locking the queue
     static const short MAXSEQNUM = 4095;//the largest possible sequence number that can be used
+    pthread_mutex_t *mutex_Demibrad_ostream;
+    pthread_mutex_t *mutex_Demibrad_fudge_factor;
+    volatile long long *fudge_factor_Demibrad;
 
     /*
      * looks at a packet to check for three things from every packet that comes across the the RF layer

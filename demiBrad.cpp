@@ -31,11 +31,15 @@ void *create_and_run_receiver_thread(void *cnt){
 
 DemiBrad::DemiBrad(short MACadr, ostream* stremy){
 	MACaddr_demibrad = MACadr;
+
 	streamy_demibrad = stremy;
 	RFLayer_demibrad = new RF();
+	mutex_Demibrad_fudge_factor = 0;
 	pthread_mutexattr_init(&attr);
 	pthread_mutex_init(&mutex_Demibrad_Sender, &attr);
 	pthread_mutex_init(&mutex_Demibrad_Receiver, &attr);
+	pthread_mutex_init(&mutex_Demibrad_ostream, &attr);
+	pthread_mutex_init(&mutex_Demibrad_fudge_factor);
 	// create the threads
 	pthread_t ids[3];
     pthread_attr_t attr;
@@ -128,6 +132,9 @@ int DemiBrad::dot11_recv_DemiBrad(short *srcAddr, short *destAddr, char *buf, in
   * send data
   */
 int DemiBrad::dot11_send_DemiBrad(short destAddr, char *buf, int bufSize){
+	//char test[] = "RAWR MY NAME IS PAUL RAWR RAWR\n";
+	//char * pointer = &test[0];
+	//theDemibrad.*streamy_demibrad.write(pointer, 31);
 	Packet temp(destAddr,buf,bufSize); // make a temporary packet
 	//memory_buffer_demibrad[memory_buffer_number_count_demibrad] = temp; //put the temporary packet in the memory buffer
 	pthread_mutex_lock(&mutex_Demibrad_Sender);
