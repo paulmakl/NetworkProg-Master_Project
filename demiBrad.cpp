@@ -50,6 +50,8 @@ DemiBrad::DemiBrad(short MACadr, ostream* stremy){
 }
 
 int dot11_init(short MACadr, ostream* stremy){
+    char x;
+    cin >> x;
 	DemiBrad temp(MACadr, stremy);
 	theDemibrad = temp;
 	return 1;
