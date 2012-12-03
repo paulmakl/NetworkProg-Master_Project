@@ -106,7 +106,6 @@ Listener::UltraListen()
         {
             if (seqNum == *expectedSN)
             {
-                
                 bool temp = true;
                 ackReceivedL = &temp;
             }
@@ -117,7 +116,7 @@ Listener::UltraListen()
         }
         if (PRR == 3)//if a beacon comes in
         {
-             queue_data();// put the data in the queue
+            long long newTimeStamp = extractTimeStamp();
         }
     }
 }
@@ -125,7 +124,7 @@ Listener::UltraListen()
 int
 Listener::queue_data()
 {
-    wcerr << "putting data in queue ****" << endl;
+    if (prints) wcerr << "putting data in queue ****" << endl;
     Packet toDemiBrad(&buf[0], bytesReceived);//create a packet
     /*
      * testing shiz to make sure the right data is being sent out
@@ -173,6 +172,24 @@ Listener::extractSourceAddress()
     return DS;
 }
 
+long long
+Listener::extractTimeStamp()
+{
+    int size = bytesReceived-10;//total size of incoming data minus 10 bytes of header and CRC
+    char timeStamp[size];//a new char array for just the incoming data
+    for (int i = 6; i < bytesReceived-4; ++i)//strip the headers and put just the data in our tuple
+    {
+        timeStamp[i-6] = buf[i];//the offset of six is the front header being skipped in our buf and the four less is the CRC
+    }
+    long long tmStmp = 0;
+    for (int i = 0; i < size-1; ++i)//build the long long that will hold the time stamp
+    {
+        tmStmp = tmStmp + timeStamp[i];
+        tmStmp = tmStmp << 8;
+    }
+    tmStmp = tmStmp + timeStamp[size-1];//the last byte needs to happens out side the loop to prevent over shifting  the data
+    return tmStmp;
+}
 
 
 
