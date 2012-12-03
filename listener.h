@@ -49,9 +49,9 @@ private:
     SeqNumManager seqNumMang;//a hashmap with added funtionality for dealing with sequence numbers
     pthread_mutex_t* mutexListener;//a mutex for locking the queue
     static const short MAXSEQNUM = 4095;//the largest possible sequence number that can be used
-    pthread_mutex_t *mutex_Demibrad_ostream;
-    pthread_mutex_t *mutex_Demibrad_fudge_factor;
-    volatile long long *fudge_factor_Demibrad;
+    pthread_mutex_t *mutexDemibradOstream;//a mutex for the output stream
+    pthread_mutex_t *mutexDemibradFudgeFactor;//a mutex for the fudge factor on our time stamp
+    volatile long long *fudgeFactorDemibrad = 0;// the fudge factor for the time stamp we get from the RF layer
 
     /*
      * looks at a packet to check for three things from every packet that comes across the the RF layer
@@ -59,24 +59,30 @@ private:
      * second it looks to see if the packet is addressed to our MAC address if not it disregards it
      * finally if the packet is for us it determines if it is an ACK or incoming data responding accordingly
      */
-     int read_Packet();
+    int read_Packet();
 
-     /*
-      * if an incoming packet is for us and has data for us then this method packs the relevent information,
-      * the sender's MAC, an array of characters of the data, and the size of said array into a tupal that
-      * then is put into our incoming_Queue\
-      */
-      int queue_data();
+    /*
+     * if an incoming packet is for us and has data for us then this method packs the relevent information,
+     * the sender's MAC, an array of characters of the data, and the size of said array into a tupal that
+     * then is put into our incoming_Queue\
+     */
+    int queue_data();
 
-      /*
-       * a method for hiding away those nasty bitwise operaters for getting a squence number outta sight outta my way 
-       */
-        short extractSequenceNumber();
+    /*
+     * a method for hiding away those nasty bitwise operaters for getting a squence number outta sight outta my way 
+     */
+    short extractSequenceNumber();
 
-        /*
-         * a method for hinging the bitwise terrible of getting a source address out of a packet
-         */
-         short extractSourceAddress();
+    /*
+     * a method for hinging the bitwise terrible of getting a source address out of a packet
+     */
+    short extractSourceAddress();
+
+    /*
+     * a another method for hiding the terrible bitshifting madness of these lifes and times when extracting a beacon's time stamp
+     */
+    long long extractTimeStamp();
+
 };
 //#endif
 

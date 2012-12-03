@@ -91,7 +91,7 @@ Listener::UltraListen()
                 char theFrame[paulLovesPBR.frame_size];
                 //char* pointerToTheFrame = &theFrame[0];
                 paulLovesPBR.buildByteArray(&theFrame[0]);
-                if (prints) wcerr << "***************Paul loathes PBR :: " << paulLovesPBR.frame_size << endl;
+                if (prints) wcerr << "Paul loves PBR :: " << paulLovesPBR.frame_size << endl;
                 usleep(aSIFSTime * 1000);
                 daRF->transmit( &theFrame[0], paulLovesPBR.frame_size );
                 seqNumMang.increment(dataSource);
@@ -116,7 +116,14 @@ Listener::UltraListen()
         }
         if (PRR == 3)//if a beacon comes in
         {
-            long long newTimeStamp = extractTimeStamp();
+            long long newTimeStamp = extractTimeStamp();//get their timpe stamp from them
+            long long ourTmSmp = daRF->clock() + fudgeFactorDemibrad;//figure out what time we think it is
+            long long diff = newTimeStamp - ourTmSmp;// compute the difference 
+            if (diff > 0)//if their clock is running faster than ours go to their time
+            {
+                fudgeFactorDemibrad = &diff;// update the fudge factor 
+                //TODO figure our our program times for sending and reciving
+            }
         }
     }
 }
@@ -187,7 +194,7 @@ Listener::extractTimeStamp()
         tmStmp = tmStmp + timeStamp[i];
         tmStmp = tmStmp << 8;
     }
-    tmStmp = tmStmp + timeStamp[size-1];//the last byte needs to happens out side the loop to prevent over shifting  the data
+    tmStmp = tmStmp + timeStamp[size-1];//the last byte needs to happens outside the loop to prevent over shifting  the data
     return tmStmp;
 }
 
