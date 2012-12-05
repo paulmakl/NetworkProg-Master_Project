@@ -26,6 +26,8 @@ class Packet {
 	void build_CRC(char *data, int data_length);
 	// shifts an entire array of characters over by 1 character
 	void shift_char_array(char *data, int size);
+	// this is super complicated i will explain it when its done
+	void xor_crc(char *data, int CRC_TT, int sizenum);
 	// Fields
     static const short MAXDATASIZE = 2038;  //The max amount of bytes
                                             //that can be held in the 

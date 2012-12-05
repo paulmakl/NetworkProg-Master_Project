@@ -179,3 +179,26 @@ void Packet::shift_char_array(char *data, int size){
  	data[size-1] = data[size-1] << 1;
 }
 
+void Packet::xor_crc(char *data, int CRC_TT, int sizenum){
+	unsigned int acc = 0;
+		//int acc = 0;
+	int i = 0;
+	while(i < sizenum){
+		unsigned char temp_char = data[i];
+		unsigned int temp = temp_char;
+		//cout << temp << endl;
+		temp = temp << (3-i)*8;
+		//cout << temp << endl;
+		acc = acc + temp;
+		//cout << acc << endl;
+		//cout << endl;
+		i++;
+	}
+	unsigned int CRC_int = CRC_TT;
+	unsigned int CRC_shifted = CRC_int >> 1;
+	CRC_shifted = CRC_shifted + 2147483648;
+	cout << CRC_shifted << endl;
+	unsigned int XORed = 0;
+	
+}
+
