@@ -35,7 +35,7 @@ Packet::Packet(char *pac, int byts)
     }
     char* pointerToData = &dataIn[0];
     pointer_data_to_physical(pointerToData); //Make the physical copy
-    CRC = -1;
+    CRC = 0;
 }
 // Packet for acknowledgement
 Packet::Packet(short destaddr, short seqnum){
@@ -45,7 +45,7 @@ Packet::Packet(short destaddr, short seqnum){
 	frame_size = 10;
 	frametype = 1;
 	resend = false;
-	CRC = -1;
+	CRC = 0;
 }
 
 // takes a pointer to an array of data and copies it into the phyical data array in the packet class
@@ -153,5 +153,21 @@ int Packet::buildByteArray(char *buffer){
 		i++;
 	}
 	//wcerr << "FIN" << endl;
+}
+
+void Packet::build_CRC(char *data, int size){
+
+
+}
+
+void Packet::shift_char_array(char *data, int size){
+	int i = 1;
+	while(i < (size-2)){
+		unsigned char previous = data[i-1];
+		previous = previous >> 7;
+		
+		data[i] = 'a';
+ 	}
+
 }
 
