@@ -161,13 +161,21 @@ void Packet::build_CRC(char *data, int size){
 }
 
 void Packet::shift_char_array(char *data, int size){
-	int i = 1;
-	while(i < (size-2)){
-		unsigned char previous = data[i-1];
-		previous = previous >> 7;
-		
-		data[i] = 'a';
+	int i = 0;
+	while(i < (size-1)){
+		unsigned char next = data[i+1];
+		unsigned char current = data[i];
+		next = next >> 7;
+		if(next == 1){
+			current = current << 1;
+			current = current + 1;
+			data[i] = current;
+		}else{
+			current = current << 1;
+			data[i] = current;
+		}
+		i++;
  	}
-
+ 	data[size-1] = data[size-1] << 1;
 }
 
