@@ -14,9 +14,9 @@ public int computeCRC(char* message, int len) {
 
 	temp = message; 	//Get bit pattern
 	while (i < len - 32) {	//while we are not at the end of the message
-		if (temp[i] & 1) { 	//if the char we are at is a 1
-
-		}
+	       if (temp[i] & 1) { 	//if the char we are at is a 1
+                                        
+                                }
 	}
 
 

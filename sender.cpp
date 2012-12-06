@@ -11,7 +11,7 @@
 #include <stdlib.h> //For rand()
 //FROM PAUL: This was removed since we now have
 // our own power function
-// #include <math.h> //for pwr
+#include <math.h> //for pwr
 
 //Wait IFS (SIFS + 2*slotTime)
 // FROM PAUL: the constant aSIFSTime was EaSIFSTIME. I think it was
@@ -21,7 +21,7 @@
 //Items used
 using std::queue;
 
-
+/*
 //FROM PAUL: impolementing the intPow function
 // it simply does powers for ints. The native c++ 
 // pow function does not like ints, it uses doubles and floats.
@@ -33,6 +33,7 @@ int Sender::intPow(int base, int power){
     }
     return acc;
 }
+*/
 
 void 
 Sender::MasterSend() {
@@ -56,13 +57,13 @@ Sender::MasterSend() {
             infoToSend->pop(); 
             pthread_mutex_unlock(mutexSender); //Unlock bc we are done with queue 
             //wcerr << "Got stuff off the queue" << endl;
-            seqTable.increment(pachyderm.destination);
-            buildFrame(0, false, seqTable.getSeqNum(pachyderm.destination), 1111); // FROM PAUL: turned this on and fixed the function call
-            //buildFrame(1, false, 0, 1111); //FOR TESTING, uncomment above line for actual
+            seqTable.increment(pachyderm.destination);  //Increment the sequence number 
 
-            //Build the frame (char[]) to be send
+            //Construct the frame to transmit
+            buildFrame(0, false, seqTable.getSeqNum(pachyderm.destination), 1111); 
+
+            //Build the byte[] to be send
             char theFrame[pachyderm.frame_size];
-            //char* pointerToTheFrame = &theFrame[0];
             pachyderm.buildByteArray(&theFrame[0]); //Fill theFrame
             
             //Transmit
@@ -156,15 +157,17 @@ Sender::send(char* frame, int size, bool reSend, int cWparam) {
                 }
             }
     } //Possibility for this to be a resend
-    //Exponential backoff!
+    //Exponential backoff:
     int cWindow = cWparam;
-    int waitTime = rand() % intPow(2, cWindow);//Random number in range [0,2^aCWmin) FROM PAUL: forgot a ;
+    int waitTime = rand() % (int)pow((float)2, (float)cWindow);  //Random number in range 
+                                                                                                //[0,2^aCWmin) 
+
     while (true) {
         while (waitTime>0 && !theRF->inUse()) {     //We havent waited waitTime and 
                                                                             //No one else is transmitting
-            usleep(1000);   //Sleep 1 milSec FROM PAUL: the s in usleep was capitalized, I fixed it.
+            usleep(1000);   //Sleep 1 milSec
             waitTime--;
-        }   //StopClock
+        }   //StopClock:
         if (waitTime>0) {   //We havent finished waiting, but someone had transmitted
                 while (theRF->inUse()) {    //They are transmitting
                     usleep(1000);   //Sleep 1 milSec
@@ -182,15 +185,14 @@ Sender::send(char* frame, int size, bool reSend, int cWparam) {
 
 int 
 Sender::resend() {
-    short tempy = 7;
-    //FROM PAUL: The third argument to build frame was originally seqTable(pachyderm.destination)
-    // I think you meant to call the getSeqNum function from your seqNumManager
     buildFrame(0, true, seqTable.getSeqNum(pachyderm.destination), 1111);
     char theFrame[pachyderm.frame_size];
     char* pointerToTheFrame = &theFrame[0];
     pachyderm.buildByteArray(pointerToTheFrame); //Fill theFrame
-    pachyderm.resTransAttempts++;     //Increment the times we have tried to resend FROM PAUL: resTransAttempts, not reTransAttempts
-    return send(pointerToTheFrame, pachyderm.frame_size, true, aCWmin + pachyderm.resTransAttempts); 
+    pachyderm.resTransAttempts++;     //Increment the times we have tried to resend 
+
+    return send(pointerToTheFrame, pachyderm.frame_size, true, 
+                        aCWmin + pachyderm.resTransAttempts); 
 }
 
 
