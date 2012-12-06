@@ -35,7 +35,7 @@ Packet::Packet(char *pac, int byts)
     }
     char* pointerToData = &dataIn[0];
     pointer_data_to_physical(pointerToData); //Make the physical copy
-    CRC = -1;
+    CRC = 0;
 }
 // Packet for acknowledgement
 Packet::Packet(short destaddr, short seqnum){
@@ -45,7 +45,7 @@ Packet::Packet(short destaddr, short seqnum){
 	frame_size = 10;
 	frametype = 1;
 	resend = false;
-	CRC = -1;
+	CRC = 0;
 }
 
 // takes a pointer to an array of data and copies it into the phyical data array in the packet class
@@ -153,5 +153,52 @@ int Packet::buildByteArray(char *buffer){
 		i++;
 	}
 	//wcerr << "FIN" << endl;
+}
+
+void Packet::build_CRC(char *data, int size){
+
+
+}
+
+void Packet::shift_char_array(char *data, int size){
+	int i = 0;
+	while(i < (size-1)){
+		unsigned char next = data[i+1];
+		unsigned char current = data[i];
+		next = next >> 7;
+		if(next == 1){
+			current = current << 1;
+			current = current + 1;
+			data[i] = current;
+		}else{
+			current = current << 1;
+			data[i] = current;
+		}
+		i++;
+ 	}
+ 	data[size-1] = data[size-1] << 1;
+}
+
+void Packet::xor_crc(char *data, int CRC_TT, int sizenum){
+	unsigned int acc = 0;
+		//int acc = 0;
+	int i = 0;
+	while(i < sizenum){
+		unsigned char temp_char = data[i];
+		unsigned int temp = temp_char;
+		//cout << temp << endl;
+		temp = temp << (3-i)*8;
+		//cout << temp << endl;
+		acc = acc + temp;
+		//cout << acc << endl;
+		//cout << endl;
+		i++;
+	}
+	unsigned int CRC_int = CRC_TT;
+	unsigned int CRC_shifted = CRC_int >> 1;
+	CRC_shifted = CRC_shifted + 2147483648;
+	cout << CRC_shifted << endl;
+	unsigned int XORed = 0;
+	
 }
 
