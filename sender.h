@@ -58,8 +58,6 @@ class Sender {
                     pthread_mutex_t *mtxDemibradFdgFctr, 
                     volatile long long *fdgFctrDemibrad,
                     ostream *output,
-                    volatile int *cmdval,
-                    volatile int *status,
                     pthread_mutex_t *mutexStatus) 
                     :   theRF(RFLayer),  
                         infoToSend(theQueue), 
@@ -68,12 +66,11 @@ class Sender {
                         expSeqNum(expSeq), 
                         mutexSender(mutex), 
                         statCode(statusCode),
-                        cmd(cmdCode),
+                        cmdVals(cmdCode),
                         statMutex(statusMutex),
                         mutexFudgeFactor(mtxDemibradFdgFctr),
                         fudgeFactor(fdgFctrDemibrad),
                         seqTable(MAXSEQNUM),
-                        cmdVals(cmdval),
                         statusCode(status),
                         mutexStatCode(mutexStatus)  {} 
         
@@ -92,14 +89,12 @@ class Sender {
         volatile short *expSeqNum; //The expected seq num to see in an incomming ack
         pthread_mutex_t *mutexSender; //pointer to the lock for the queue
         volatile int *statCode; //Pointer to the  current status code
-        volatile int *cmd;  //Pointer to commands we are issued
+        volatile int *cmdVals;  //Pointer to 1st item in cam value array 
         pthread_mutex_t *statMutex; //Pointer to the mutex protecting statuses 
         pthread_mutex_t *mutexSenderOstream;    //Lock for the ostream
         pthread_mutex_t *mutexFudgeFactor;  //lock for accessing the fudge factor
         volatile long long *fudgeFactor;    //pointer to the fudge factor to align our clock 
                                                               //with the RF layer clock
-        volatile int *cmdVals;   //Pointer to first item in the cmd value array
-        volatile int *statusCode;   //pointer to the most recent 
         pthread_mutex_t *mutexStatCode; //Mutex for the status code pointer
 
         //Internal fields  
