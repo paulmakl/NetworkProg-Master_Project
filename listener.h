@@ -26,8 +26,8 @@ public:
      * constructor for the listener class that sets up all our sexy varribles and
      * starts the thread listening for imcoming messages
      */
-    Listener(RF* RFLayer, queue<Packet>* incomingQueue, volatile bool* receivedFlag, short myMAC, pthread_mutex_t * mutexListenr, volatile short* exSN, pthread_mutex_t *statusMutex, pthread_mutex_t *mutexListenerOstreamInput, pthread_mutex_t *mutexDemibradFudgeFactorInput, volatile long long *fudgeFactorDemibrad)
-    : seqNumMang(MAXSEQNUM), MACaddrList(myMAC), ackReceivedL(receivedFlag), daLoopLine(incomingQueue), daRF(RFLayer), expectedSN(exSN), mutexListener(mutexListenr), prints(true), fugFacMutex(mutexDemibradFudgeFactorInput), ostreamMutex(mutexListenerOstreamInput), fudgeFactor(fudgeFactorDemibrad) {}
+    Listener(RF* RFLayer, queue<Packet>* incomingQueue, volatile bool* receivedFlag, short myMAC, pthread_mutex_t * mutexListenr, volatile short* exSN, pthread_mutex_t *statusCodeMutex, pthread_mutex_t *mutexListenerOstreamInput, pthread_mutex_t *mutexDemibradFudgeFactorInput, volatile long long *fudgeFactorDemibrad, int *cmds [4], int *statusCode)
+    : seqNumMang(MAXSEQNUM), MACaddrList(myMAC), ackReceivedL(receivedFlag), daLoopLine(incomingQueue), daRF(RFLayer), expectedSN(exSN), mutexListener(mutexListenr), prints(true), fugFacMutex(mutexDemibradFudgeFactorInput), ostreamMutex(mutexListenerOstreamInput), fudgeFactor(fudgeFactorDemibrad), commands(cmds), status(statusCode), statusMutex(statusCodeMutex) {}
     
     /*
      * the heart of the listener watches activity on the RF layer and blocks until a packet is recived
@@ -46,14 +46,15 @@ private:
     RF* daRF;//the reference to the RF layer
     int bytesReceived;// bytes from the last packet
     bool prints;//bool for turning prints on or off
-    bool writes;//bool for diagnostic output to the ostream
     SeqNumManager seqNumMang;//a hashmap with added funtionality for dealing with sequence numbers
     pthread_mutex_t* mutexListener;//a mutex for locking the queue
     static const short MAXSEQNUM = 4095;//the largest possible sequence number that can be used
     pthread_mutex_t *ostreamMutex;//a mutex for the output stream
     pthread_mutex_t *fugFacMutex;//a mutex for the fudge factor on our time stamp
     volatile long long *fudgeFactor = 0;// the fudge factor for the time stamp we get from the RF layer
-    int commands[4];
+    pthread_mutex_t *statusCode;
+    int *commands[4];// an array of command code values where the index repersents the command to be altered and the returned value is the command level
+    int *status;//an int that hold the most recent error code returned
 
     /*
      * looks at a packet to check for three things from every packet that comes across the the RF layer
