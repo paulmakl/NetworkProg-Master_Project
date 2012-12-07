@@ -14,9 +14,7 @@
 #include <math.h> //for pwr
 
 //Wait IFS (SIFS + 2*slotTime)
-// FROM PAUL: the constant aSIFSTime was EaSIFSTIME. I think it was
-// a mistake but I changed it to the name you had in your h file.
-#define waitIFS usleep((aSIFSTime + 2*aSlotTime)*1000);
+#define waitIFS usleep((aSIFSTime + 2*aSlotTime)*SLEEPTIME);
 
 //Items used
 using std::queue;
@@ -47,7 +45,7 @@ Sender::MasterSend() {
         if (infoToSend->empty()) {
             //wcerr << "QUEUE IS EMPTY" << endl;
             pthread_mutex_unlock(mutexSender); //Unlock because the queue is not ready
-            usleep(1000);
+            usleep(SLEEPTIME);
         }
         else {
             //wcerr << " pop should happen" << endl;
@@ -74,7 +72,7 @@ Sender::MasterSend() {
            //TODO start Timer to check for timeouts
             //CAN ONLY RESEND 5 TIMES AND CONTENTION WINDOWN CAN ONLY GET UP TO 31
             //while(NoAckRecieved && notAtEndofTimer) {
-            //          usleep(1000);
+            //          usleep(SLEEPTIME);
             //    }
             //     if (noAckRecieved) {
             //          retransmit
@@ -87,9 +85,9 @@ Sender::MasterSend() {
              //Free memory because this is c++
 }
 
-void
-Sender::endTimer() {
-        
+//void
+//Sender::endTimer() {
+
 }
 
 int
@@ -103,6 +101,11 @@ Sender::buildFrame(short frm, bool resend,  short seqNum, int CS) {
 
 int 
 Sender::send(char* frame, int size, bool reSend, int cWparam) {
+    //Adjust fudge factor
+    pthread_mutex_lock(mutexFudgeFactor);   //lock the mutex
+    long long fudFact = *fudgeFactor;   //update fudge factor
+    pthread_mutex_unlock(mutexFudgeFactor); //unlock mutex
+
     if (!reSend) {  //This is not a retransmittion 
         //Wait for current channel to be idle
         //wcerr << "This is not a retransmission" << endl;
@@ -112,6 +115,10 @@ Sender::send(char* frame, int size, bool reSend, int cWparam) {
             //wcerr << "Waiting IFS" << endl;
             if (!theRF->inUse()) {  //Perfect transmittion
                 //wcerr << "The RF layer is still not in use yay!" << endl;
+                //Align the send with a 50 milsec interval
+                while ((theRF->clock() + fudFact) % 50) {
+                        usleep(SLEEPTIME);  //Sleep 1 milsec  
+                }
                if (theRF->transmit(frame, size) != size) {  //Makes the transmission
                 //wcerr << "Did not send correctly" << endl;
                     return 0; //Did not send all of frame or something failed internally
@@ -123,19 +130,21 @@ Sender::send(char* frame, int size, bool reSend, int cWparam) {
                 }
             }
         } 
-           //Channel was busy
-            bool idleFlag = false;
-            //Wait for channel to open
-            while (!idleFlag) { 
-                while (theRF->inUse()) {    //They are sending
-                    usleep(1000); //Sleep 1 milSec
-                }
-                waitIFS
-                //Check is channel is idle
-                if (!theRF->inUse()) {
-                    idleFlag = true;    //Break
-                }
+       //Channel was busy
+        bool idleFlag = false;
+        //Wait for channel to open
+        while (!idleFlag) { 
+            while ((theRF->clock() + fudFact) % 50 || theRF->inUse() ) {    //They are sending
+                                                                                                                //And aligns with 50 
+                                                                                                                //milsec mark
+                usleep(SLEEPTIME); //Sleep 1 milSec
             }
+            waitIFS
+            //Check is channel is idle
+            if (!theRF->inUse()) {
+                idleFlag = true;    //Break
+            }
+        }
     } //Possibility for this to be a resend
     //Exponential backoff:
     int cWindow = cWparam;
@@ -145,12 +154,12 @@ Sender::send(char* frame, int size, bool reSend, int cWparam) {
     while (true) {
         while (waitTime>0 && !theRF->inUse()) {     //We havent waited waitTime and 
                                                                             //No one else is transmitting
-            usleep(1000);   //Sleep 1 milSec
+            usleep(SLEEPTIME);   //Sleep 1 milSec
             waitTime--;
         }   //StopClock:
         if (waitTime>0) {   //We havent finished waiting, but someone had transmitted
                 while (theRF->inUse()) {    //They are transmitting
-                    usleep(1000);   //Sleep 1 milSec
+                    usleep(SLEEPTIME);   //Sleep 1 milSec
                 }
                 waitIFS
         } else {
@@ -167,11 +176,11 @@ int
 Sender::resend() {
     buildFrame(0, true, seqTable.getSeqNum(pachyderm.destination), 1111);
     char theFrame[pachyderm.frame_size];
-    char* pointerToTheFrame = &theFrame[0];
-    pachyderm.buildByteArray(pointerToTheFrame); //Fill theFrame
+    //char* pointerToTheFrame = &theFrame[0];
+    pachyderm.buildByteArray(&theFrame[0]); //Fill theFrame
     pachyderm.resTransAttempts++;     //Increment the times we have tried to resend 
 
-    return send(pointerToTheFrame, pachyderm.frame_size, true, 
+    return send(&theFrame[0], pachyderm.frame_size, true, 
                         aCWmin + pachyderm.resTransAttempts); 
 }
 

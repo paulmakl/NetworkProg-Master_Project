@@ -56,7 +56,8 @@ class Sender {
                     pthread_mutex_t *statusMutex, 
                     pthread_mutex_t *mutexSenderOstreamInput, 
                     pthread_mutex_t *mtxDemibradFdgFctr, 
-                    volatile long long *fdgFctrDemibrad) 
+                    volatile long long *fdgFctrDemibrad,
+                    ostream *output) 
                     :   theRF(RFLayer),  
                         infoToSend(theQueue), 
                         ackReceived(receivedFlag), 
@@ -66,8 +67,8 @@ class Sender {
                         statCode(statusCode),
                         cmd(cmdCode),
                         statMutex(statusMutex),
-                        mutexDemibradFudgeFactor(mtxDemibradFdgFctr),
-                        fudgeFactorDemibrad(fdgFctrDemibrad)
+                        mutexFudgeFactor(mtxDemibradFdgFctr),
+                        fudgeFactor(fdgFctrDemibrad),
                         seqTable(MAXSEQNUM)  {} 
         
         /**
@@ -88,14 +89,14 @@ class Sender {
         volatile int *cmd;  //Pointer to commands we are issued
         pthread_mutex_t *statMutex; //Pointer to the mutex protecting statuses 
         pthread_mutex_t *mutexSenderOstream;
-        pthread_mutex_t *mutexDemibradFudgeFactor;
-        volatile long long *fudgeFactorDemibrad;
+        pthread_mutex_t *mutexFudgeFactor;
+        volatile long long *fudgeFactor;
 
         //Internal fields  
         Packet pachyderm; //The packet to send
         static const short MAXSEQNUM = 4095;
-        static const int SLEEPTIME = 1;    //Wait time (second) to check again if
-                                                            //the network is free 
+        static const int SLEEPTIME = 1000;    //Wait time (milsec) to check again if
+                                                                    //the network is free 
         char* frame; //The byte array to be transmitted on RF
         SeqNumManager seqTable; //Manages all seqNums for all MAC addr's
 
