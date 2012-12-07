@@ -80,38 +80,16 @@ Sender::MasterSend() {
             //          retransmit
             //       }
             // FROM PAUL: If the frame sent properly, then we want to check for a timeout.
-            if (doesItSend != -1)
-            {
-                // FROM PAUL: If data was sent, then we check for a timeout.
-                // we want to wait SIFS (100 milliseconds)
-                int currentCW = aCWmin; // stores the current window size
-                // FROM PAUL: loop to handle exponential backoff
-                // if we actually send a packet, then the very next ack we get
-                // should be for our previously transmitted message.
-                while(ackReceived && pachyderm.resTransAttempts < 5){
-                    usleep(aSIFSTime); // FROM PAUL: wait SIFS
-                    if (ackReceived) // FROM PAUL: if we get an ack, then everything is GREAT!
-                                     // and we break.
-                    {
-                        break;
-                    }else{
-                        // FROM PAUL: if we don't get an ack, then we doulbe the size of the window
-                        // only if it is smaller than the maximum window size. Otherwise, 
-                        // we set it to the maximum window size.
-                        currentCW = currentCW*2;
-                        pachyderm.resTransAttempts = pachyderm.resTransAttempts + 1;
-                        if(currentCW >= aCWmax){
-                            currentCW = aCWmax;
-                        }
-                        // FROM PAUL: we then try to resend. 
-                        resend();
-                    }
-                }
-            }
+
 
         }
     }
              //Free memory because this is c++
+}
+
+void
+Sender::endTimer() {
+
 }
 
 int
@@ -137,9 +115,11 @@ Sender::send(char* frame, int size, bool reSend, int cWparam) {
                if (theRF->transmit(frame, size) != size) {  //Makes the transmission
                 //wcerr << "Did not send correctly" << endl;
                     return 0; //Did not send all of frame or something failed internally
+                    //TODO Add status output
                 } else {
                     //wcerr << "sent correctly" << endl;
                     return 1; //Frame transmitted properly 
+                    //TODO Add status output
                 }
             }
         } 
