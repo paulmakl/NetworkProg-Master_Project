@@ -11,8 +11,19 @@ DemiBrad theDemibrad;
 void *create_sender_thread(void *cnt){
 	theDemibrad.RFLayer_demibrad->attachThread();
 	//wcerr << "sender thread";
-
-	Sender sendy(theDemibrad.RFLayer_demibrad, &theDemibrad.send_Queue_demibrad, &theDemibrad.ack_Received_demibrad, theDemibrad.MACaddr_demibrad, &theDemibrad.expected_sequence_number, &theDemibrad.mutex_Demibrad_Sender);
+	Sender sendy(theDemibrad.RFLayer_demibrad, 
+		&theDemibrad.send_Queue_demibrad, 
+		&theDemibrad.ack_Received_demibrad, 
+		theDemibrad.MACaddr_demibrad, 
+		&theDemibrad.expected_sequence_number, 
+		&theDemibrad.mutex_Demibrad_Sender, 
+		&theDemibrad.statusCode, 
+		&theDemibrad.cmdCode[0], 
+		&theDemibrad.statusMutex, 
+		&theDemibrad.mutex_Demibrad_ostream, 
+		&theDemibrad.mtxDemibradFdgFctr, 
+		&theDemibrad.fdgFctrDemibrad, 
+		theDemibrad.streamy_demibrad);
 	sendy.MasterSend();
 	wcerr << "This should not appear";
 	return (void *)0;
@@ -23,7 +34,18 @@ void *create_sender_thread(void *cnt){
 void *create_and_run_receiver_thread(void *cnt){
 	theDemibrad.RFLayer_demibrad->attachThread();
 	//wcerr << "receiver thread";
-	Listener listen(theDemibrad.RFLayer_demibrad, &theDemibrad.receive_Queue_demibrad, &theDemibrad.ack_Received_demibrad, theDemibrad.MACaddr_demibrad, &theDemibrad.mutex_Demibrad_Receiver, &theDemibrad.expected_sequence_number);
+	Listener listen(theDemibrad.RFLayer_demibrad, 
+		&theDemibrad.receive_Queue_demibrad, 
+		&theDemibrad.ack_Received_demibrad, 
+		theDemibrad.MACaddr_demibrad, 
+		&theDemibrad.mutex_Demibrad_Receiver, 
+		&theDemibrad.expected_sequence_number, 
+		&theDemibrad.statusMutex, 
+		&theDemibrad.mutex_Demibrad_ostream, 
+		&theDemibrad.mutex_Demibrad_fudge_factor, 
+		&theDemibrad.fudge_factor_Demibrad, 
+		&theDemibrad.cmdCode[0], 
+		&theDemibrad.status);
 	listen.UltraListen();
 	wcerr << "This should not appear again";
 	return (void *)0;
@@ -34,21 +56,32 @@ DemiBrad::DemiBrad(short MACadr, ostream* stremy){
 
 	streamy_demibrad = stremy;
 	RFLayer_demibrad = new RF();
-	mutex_Demibrad_fudge_factor = 0;
+	fudge_factor_Demibrad = 0;
 	pthread_mutexattr_init(&attr);
 	pthread_mutex_init(&mutex_Demibrad_Sender, &attr);
 	pthread_mutex_init(&mutex_Demibrad_Receiver, &attr);
 	pthread_mutex_init(&mutex_Demibrad_ostream, &attr);
-	pthread_mutex_init(&mutex_Demibrad_fudge_factor);
+	pthread_mutex_init(&mutex_Demibrad_fudge_factor, &attr);
 	// create the threads
 	pthread_t ids[3];
-    pthread_attr_t attr;
-    pthread_attr_init(&attr);
-    pthread_attr_setscope(&attr, PTHREAD_SCOPE_SYSTEM);  
+
+      
     pthread_setconcurrency(3);
     int counts[3];
     RFLayer_demibrad->attachThread();
     // create the sender and receiver threads
+	statusCode = 0; 
+    cmdCode[0] = 0;
+    cmdCode[1] = 0;
+    cmdCode[2] = 0;
+    cmdCode[3] = 30;
+    pthread_mutex_init(&statusMutex, &attr);
+    pthread_mutex_init(&mutex_Demibrad_ostream, &attr);
+    pthread_mutex_init(&mtxDemibradFdgFctr, &attr);
+    fdgFctrDemibrad = 5; // CHANGE THIS
+    pthread_attr_t attr;
+    pthread_attr_init(&attr);
+    pthread_attr_setscope(&attr, PTHREAD_SCOPE_SYSTEM);
     pthread_create(&(ids[0]), &attr, create_sender_thread, &(counts[0]));
     pthread_create(&(ids[1]), &attr, create_and_run_receiver_thread, &(counts[1]));
 }

@@ -86,10 +86,10 @@ Listener::UltraListen()
             if (prints) wcerr << bytesReceived << " !Full Packet Received! woo! ";
             //if (commands[0] == 1) streamy << " !Full Packet Received! woo! ";
         }
-        if (buf.size < 10)
-        {
+        //if (buf->size() < 10)
+        //{
             //status = 2 
-        }
+        //}
         PRR = read_Packet();
         short dataSource;
         dataSource = extractSourceAddress();
@@ -131,11 +131,11 @@ Listener::UltraListen()
         if (PRR == 3)//if a beacon comes in
         {
             long long newTimeStamp = extractTimeStamp();//get their timpe stamp from them
-            long long ourTmSmp = daRF->clock() + fudgeFactorDemibrad;//figure out what time we think it is
+            volatile long long ourTmSmp = daRF->clock() + *fudgeFactor;//figure out what time we think it is
             long long diff = newTimeStamp - ourTmSmp;// compute the difference 
             if (diff > 0)//if their clock is running faster than ours go to their time
             {
-                fudgeFactorDemibrad = &diff;// update the fudge factor 
+                fudgeFactor = &diff;// update the fudge factor 
                 //TODO figure our our program times for sending and reciving
             }
         }
@@ -145,7 +145,8 @@ Listener::UltraListen()
 int
 Listener::queue_data()
 {
-    if (daLoopLine.size > 4)
+    //int queueSize = *daLoopLine.size();
+    if ( daLoopLine->size() > 4)
     {
         //status = 10; // report that the queue for incoming data is full
         if (prints) wcerr << "Queue too full to recive incoming Packets" << endl;

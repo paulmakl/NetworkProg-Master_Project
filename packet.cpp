@@ -155,12 +155,12 @@ int Packet::buildByteArray(char *buffer){
 	//wcerr << "FIN" << endl;
 }
 
-void Packet::build_CRC(char *data, int size){
+//void Packet::build_CRC(char *data, int size){
 
 
-}
+//}
 
-void Packet::shift_char_array(char *data, int size){
+/*void Packet::shift_char_array(char *data, int size){
 	int i = 0;
 	while(i < (size-1)){
 		unsigned char next = data[i+1];
@@ -199,6 +199,84 @@ void Packet::xor_crc(char *data, int CRC_TT, int sizenum){
 	CRC_shifted = CRC_shifted + 2147483648;
 	cout << CRC_shifted << endl;
 	unsigned int XORed = 0;
-	
 }
+
+
+// takes a pointer to an array of data and copies it into the phyical data array in the packet class
+/*static void pointer_data_to_physical_universal(char* data, char *put_data_here, int size){
+	int i = 0;
+	while(i < size){
+		put_data_here[i] = data[i];
+		i++;
+	}
+}*/
+
+/*char Packet::get_nth_bit(char dta, int n){
+	unsigned char nbit = dta;
+	nbit = nbit << (8-n);
+	nbit = nbit >> 7;
+	return nbit;
+}
+
+char Packet::get_nth_bit(int dta, int n){
+	unsigned int nint = dta;
+	nint = nint << (32-n);
+	nint = nint >> 31;
+	unsigned char nbit = nint;
+	return nbit;
+}
+
+void Packet::flip_nth_bit(char *dta, int n){
+	unsigned char flipper = 1;
+	flipper = flipper << (n-1);
+	*dta = *dta ^ flipper;
+}*/
+
+/*void Packet::calc_CRC(char *dta, int size, int CRCTT){
+	char temp_physical_array[size+4];
+	pointer_data_to_physical_universal(dta,&temp_physical_array[0],size);
+	int CRC_bit_counter = 0;
+	int master_bit_index = 0;
+	for (int i = 0; i < size; ++i)
+	{
+		for (int j = 0; j < 8; ++j)
+		{
+			if(get_nth_bit(temp_physical_array[i], j) == 0 && CRC_bit_counter == 0)
+			{
+				master_bit_index++;
+			}else{
+				if(CRC_bit_counter > 33)
+				{
+					CRC_bit_counter = 0;
+					
+				}
+				char temp_bit_from_array = get_nth_bit(temp_physical_array[i], j);
+				char temp_bit_from_CRC = get_nth_bit(CRCTT, CRC_bit_counter);
+				char result_xor = temp_bit_from_array ^ temp_bit_from_CRC;
+				if (result_xor == 1 && )
+				{
+					flip_nth_bit(&temp_physical_array[i], j);
+					CRC_bit_counter++;
+				}else{
+					CRC_bit_counter++;
+				}
+				master_bit_index++;
+			}
+		}
+	}
+	/*
+	Create physical array/
+	Copy data into physical array/
+	For every byte of data, Q...
+		For every bit of Q, N..
+			N XOR I CRC bit
+			increment I
+			if i > 33
+				i = 0
+		...
+	...
+	set the last four bytes of dta to the CRC
+	
+}*/
+
 
