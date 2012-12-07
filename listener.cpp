@@ -34,7 +34,7 @@ Listener::read_Packet ()
             if (packetDest != MACaddrList && packetDest != -1)//compare the destination of this packet to our MAC address and to the broadcast address
             {
                 status = 0;//this packet isn't for us
-                if (prints) wcerr << "Packet not addressed to current MAC address. :: " << MACaddrList << " :: " << packetDest << endl;
+                if (prints) wcerr << "Packet not addressed to current MAC address. Our Mac address: " << MACaddrList << ".  Destination of incoming packet: " << packetDest << endl;
                 return status;
             }
             status = 1;
@@ -45,7 +45,7 @@ Listener::read_Packet ()
             if (packetDest != MACaddrList)//compare the destination of this packet to our MAC address and to the broadcast address
             {
                 status = 0;//this packet isn't for us
-                if (prints) wcerr << "Packet not addressed to current MAC address. :: " << MACaddrList << " :: " << packetDest << endl;
+                if (prints) wcerr << "Packet not addressed to current MAC address. Our Mac address: " << MACaddrList << ".  Destination of incoming packet: " << packetDest << endl;
                 return status;
             }
             status = 2;
@@ -77,6 +77,10 @@ Listener::UltraListen()
         }
         else{
             if (prints) wcerr << bytesReceived << " !Full Packet Received! woo! ";
+        }
+        if (buf.size < 10)
+        {
+            //status = 2 
         }
         PRR = read_Packet();
         short dataSource;
@@ -131,32 +135,40 @@ Listener::UltraListen()
 int
 Listener::queue_data()
 {
-    if (prints) wcerr << "putting data in queue ****" << endl;
-    Packet toDemiBrad(&buf[0], bytesReceived);//create a packet
-    /*
-     * testing shiz to make sure the right data is being sent out
-     toDemiBrad.init_Packet(&buf[0], bytesReceived);//construct the guts of the packet using the buffer and total byets recived
-    int i = 5;
-    while(i < bytesReceived - 4){
-        wcerr << buf[i] << " :: ";
-        i++;
-    }
-    wcerr << "\n";*/
-    pthread_mutex_lock(mutexListener);//lock the queue off
-    daLoopLine->push(toDemiBrad);//send the pointer to the packet up to demibrad
-    pthread_mutex_unlock(mutexListener); //unlock the queue so demibrad can have shot at it
-    /*  
-     * this is the code that has moved over to packet now 
-    int size = bytesReceived-10;//total size of incoming data minus 10 bytes of header and CRC
-    char dataIn[size];//a new char array for just the incoming data
-    short dataSource = buf[4];//extract the source address
-    dataSource << 8;
-    dataSource = dataSource + buf[5];
-    for (int i = 6; i < bytesReceived-4; ++i)//strip the headers and put just the data in our tuple
+    if (daLoopLine.size > 4)
     {
-        dataIn[i-6] = buf[i];//the offset of six is the front header being skipped in our buf and the four less is the CRC
+        //status = 10; // report that the queue for incoming data is full
+        if (prints) wcerr << "Queue too full to recive incoming Packets" << endl;
     }
-    */ 
+    else
+    {
+        if (prints) wcerr << "putting data in queue" << endl;
+        Packet toDemiBrad(&buf[0], bytesReceived);//create a packet
+        /*
+         * testing shiz to make sure the right data is being sent out
+         toDemiBrad.init_Packet(&buf[0], bytesReceived);//construct the guts of the packet using the buffer and total byets recived
+        int i = 5;
+        while(i < bytesReceived - 4){
+            wcerr << buf[i] << " :: ";
+            i++;
+        }
+        wcerr << "\n";*/
+        pthread_mutex_lock(mutexListener);//lock the queue off
+        daLoopLine->push(toDemiBrad);//send the pointer to the packet up to demibrad
+        pthread_mutex_unlock(mutexListener); //unlock the queue so demibrad can have shot at it
+        /*  
+         * this is the code that has moved over to packet now 
+        int size = bytesReceived-10;//total size of incoming data minus 10 bytes of header and CRC
+        char dataIn[size];//a new char array for just the incoming data
+        short dataSource = buf[4];//extract the source address
+        dataSource << 8;
+        dataSource = dataSource + buf[5];
+        for (int i = 6; i < bytesReceived-4; ++i)//strip the headers and put just the data in our tuple
+        {
+            dataIn[i-6] = buf[i];//the offset of six is the front header being skipped in our buf and the four less is the CRC
+        }
+        */ 
+    }   
 }
 
 short
