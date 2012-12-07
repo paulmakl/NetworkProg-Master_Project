@@ -112,6 +112,12 @@ Sender::buildBeacon (char* frame, const long long fudgeFctr) {
 
 }
 
+unsigned char
+Sender::pullByte(long long *number, int index) {
+    unsigned long long temp = (unsinged long long) *number;  
+    unsigned long long ii = 0x1111;
+}
+
 int 
 Sender::send(char* frame, int size, bool reSend, int cWparam) {
     //Adjust fudge factor

@@ -122,6 +122,14 @@ class Sender {
         void buildBeacon(char* frame, const long long fudgeFctr);
 
         /**
+        * Pulls out a particular bytes from a long long
+        * param number the long long to pull a byte out of
+        * param index the byte to pull out of number
+        * return The byte pulled out 
+        */
+        unsigned char pullByte(unsigned long long number, int index);
+
+        /**
          * Builds a packet object for sending
          * param frm the frame typ
          * param resend Indicates if this packet is part of  a retransmission
