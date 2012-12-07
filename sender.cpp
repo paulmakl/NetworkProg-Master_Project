@@ -108,14 +108,36 @@ Sender::buildFrame(short frm, bool resend,  short seqNum, int CS) {
 }
 
 void
-Sender::buildBeacon (char* frame, const long long fudgeFctr) {
+Sender::buildBeacon (long long timeParam, const long long beaconTime) {
+    int jj = 0; //index into the data array
 
+    //Fill parts of packet we know
+    pachyderm.frametype = 2;    //Of type beacon
+    pachyderm.resend = 0;   //Not a resend
+    pachyderm.sequence_number = 0;  //No sequence number meaning
+    pachyderm.destination = -1; //Sent to broadcast channel
+    pachyderm.CRC = 0xff;   //CRC of -1
+    pachyderm.bytes_to_send = 8;    //8 bytes of data
+    pachyderm.frame_size = 18;  //18 total bytes to transmit
+
+    //Get time
+    long long timeTemp = timeParam + beaconTime;    //Our clock time plus how long 
+                                                                                    //it takes to build and send a beacon
+
+    //Fill the data array 
+    for (int ii=sizeof(timeParam) - 1; ii>=0; ii--) {
+        pachyderm.physical_data_array[jj] = pullByte(timeTemp, ii);
+        jj++;
+    }
 }
 
 unsigned char
-Sender::pullByte(long long *number, int index) {
-    unsigned long long temp = (unsinged long long) *number;  
-    unsigned long long ii = 0x1111;
+Sender::pullByte(long long number, int index) {
+    unsigned long long temp = (unsigned long long) number;  
+    unsigned long long ii = 0xff << 8 * index;    //create a bitmask for byte at pos index
+    unsigned char kk = (temp & ii) >> 8 * index;    //use the bitmask and shift back
+
+    return kk;
 }
 
 int 

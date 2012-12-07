@@ -57,8 +57,7 @@ class Sender {
                     pthread_mutex_t *mutexSenderOstreamInput, 
                     pthread_mutex_t *mtxDemibradFdgFctr, 
                     volatile long long *fdgFctrDemibrad,
-                    ostream *output,
-                    pthread_mutex_t *mutexStatus) 
+                    ostream *output)
                     :   theRF(RFLayer),  
                         infoToSend(theQueue), 
                         ackReceived(receivedFlag), 
@@ -67,12 +66,11 @@ class Sender {
                         mutexSender(mutex), 
                         statCode(statusCode),
                         cmdVals(cmdCode),
-                        statMutex(statusMutex),
+                        mutexStatus(statusMutex),
+                        mutexSenderOstream(mutexSenderOstreamInput),
                         mutexFudgeFactor(mtxDemibradFdgFctr),
                         fudgeFactor(fdgFctrDemibrad),
-                        seqTable(MAXSEQNUM),
-                        statusCode(status),
-                        mutexStatCode(mutexStatus)  {} 
+                        seqTable(MAXSEQNUM) {}
         
         /**
          * Invokes the sender object to do all of its duties
@@ -90,13 +88,11 @@ class Sender {
         pthread_mutex_t *mutexSender; //pointer to the lock for the queue
         volatile int *statCode; //Pointer to the  current status code
         volatile int *cmdVals;  //Pointer to 1st item in cmd value array
-        pthread_mutex_t *statMutex; //Pointer to the mutex protecting statuses 
+        pthread_mutex_t *mutexStatus; //Pointer to the mutex protecting statuses 
         pthread_mutex_t *mutexSenderOstream;    //Lock for the ostream
         pthread_mutex_t *mutexFudgeFactor;  //lock for accessing the fudge factor
         volatile long long *fudgeFactor;    //pointer to the fudge factor to align our clock 
                                                               //with the RF layer clock
-        pthread_mutex_t *mutexStatCode; //Mutex for the status code pointer
-
         //Internal fields  
         Packet pachyderm; //The packet to send
         static const short MAXSEQNUM = 4095;
@@ -116,10 +112,10 @@ class Sender {
 
         /**
         * Builds a beacon frame
-        * param fudgeFctr The amoutn of time it takes to build a beacon and transmit it
-        * param frame pointer to the byte array to fill
+        * param timeParam The RF time plus our fudge factor for adjustment
+        * param beaconTime The time it takes to build a beacon
         */
-        void buildBeacon(char* frame, const long long fudgeFctr);
+        void buildBeacon(long long timeParam, const long long beaconTime);
 
         /**
         * Pulls out a particular bytes from a long long
@@ -127,7 +123,7 @@ class Sender {
         * param index the byte to pull out of number
         * return The byte pulled out 
         */
-        unsigned char pullByte(unsigned long long number, int index);
+        unsigned char pullByte(long long number, int index);
 
         /**
          * Builds a packet object for sending
