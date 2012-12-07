@@ -47,7 +47,7 @@ class Sender {
          */
         Sender(RF* RFLayer, queue<Packet> *theQueue,
                 volatile bool *receivedFlag, short ourMAC, 
-                volatile short *expSeq, pthread_mutex_t *mutex) 
+                volatile short *expSeq, pthread_mutex_t *mutex, volatile int *statusCode, volatile int *cmdCode, pthread_mutex_t *statusMutex, pthread_mutex_t *mutexSenderOstreamInput, pthread_mutex_t *mutexDemibradFudgeFactorInput, volatile long long *fudgeFactorDemibrad) 
                     :   theRF(RFLayer),  infoToSend(theQueue), ackReceived(receivedFlag), 
                         macAddr_Sender(ourMAC), expSeqNum(expSeq), mutexSender(mutex), 
                         seqTable(MAXSEQNUM) {} 
