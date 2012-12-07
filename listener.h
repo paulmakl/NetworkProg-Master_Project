@@ -26,7 +26,7 @@ public:
      * constructor for the listener class that sets up all our sexy varribles and
      * starts the thread listening for imcoming messages
      */
-    Listener(RF* RFLayer, queue<Packet>* incomingQueue, volatile bool* receivedFlag, short myMAC, pthread_mutex_t * mutexListenr, volatile short* exSN)
+    Listener(RF* RFLayer, queue<Packet>* incomingQueue, volatile bool* receivedFlag, short myMAC, pthread_mutex_t * mutexListenr, volatile short* exSN, pthread_mutex_t *statusMutex, pthread_mutex_t *mutexSenderOstreamInput, pthread_mutex_t *mutexDemibradFudgeFactorInput, volatile long long *fudgeFactorDemibrad)
     : seqNumMang(MAXSEQNUM), MACaddrList(myMAC), ackReceivedL(receivedFlag), daLoopLine(incomingQueue), daRF(RFLayer), expectedSN(exSN), mutexListener(mutexListenr), prints(true) {}
     
     /*
