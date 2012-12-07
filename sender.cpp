@@ -8,9 +8,7 @@
 #include <iostream> //For cout & endl
 #include "sender.h"
 #include <unistd.h> //For sleep()
-#include <stdlib.h> //For rand()
-//FROM PAUL: This was removed since we now have
-// our own power function
+//#include <stdlib.h> //For rand()
 #include <math.h> //for pwr
 
 //Wait IFS (SIFS + 2*slotTime)
@@ -18,6 +16,8 @@
 
 //Items used
 using std::queue;
+using std::rand;
+
 
 /*
 //FROM PAUL: impolementing the intPow function
@@ -35,7 +35,7 @@ int Sender::intPow(int base, int power){
 
 void 
 Sender::MasterSend() {
-    //FOR TESTING PURPOSES
+    //Run forever doing all the things that sneder does
     while (true) {
         //Lock mutex, block until you can
         pthread_mutex_lock(mutexSender);
@@ -64,7 +64,6 @@ Sender::MasterSend() {
             pachyderm.buildByteArray(&theFrame[0]); //Fill theFrame
             
             //Transmit
-            //FROM PAUL: need to check the result of send. So I store it in a temp variable.
             //wcerr << "sending data" << endl;
             *ackReceived = false;   //Set acknowlegement to false because message has not
                                                 //yet been sent, so it cant have been acknowleged 
@@ -72,14 +71,7 @@ Sender::MasterSend() {
                                                                                                               //which seqNum to look for
             int doesItSend = send(&theFrame[0], pachyderm.frame_size, false, aCWmin);
             //wcerr << "data sent!" << endl;
-           //TODO start Timer to check for timeouts
-            //CAN ONLY RESEND 5 TIMES AND CONTENTION WINDOWN CAN ONLY GET UP TO 31
-            //while(NoackReceived && notAtEndofTimer) {
-            //          usleep(1000);
-            //    }
-            //     if (noackReceived) {
-            //          retransmit
-            //       }
+
             //Handle retransmit
             while (pachyderm.resTransAttempts < dot11RetryLimit || !*ackReceived) {    //Less than max resend
                                                                                                                                   // and no ack recieved 
@@ -87,17 +79,14 @@ Sender::MasterSend() {
                 if (!*ackReceived)   {   //No ack recieved
                     resend();   //retransmit 
                 }
-
             }
-
+            //Check for stsus update
+            if (pachyderm.resTransAttempts = dot11RetryLimit) {
+                //TODO WRITE STATUS CODE 5 TO OSTREAM
+            }
         }
     }
              //Free memory because this is c++
-}
-
-//void
-//Sender::endTimer() {
-
 }
 
 int
@@ -131,7 +120,7 @@ Sender::send(char* frame, int size, bool reSend, int cWparam) {
                 }
                if (theRF->transmit(frame, size) != size) {  //Makes the transmission
                 //wcerr << "Did not send correctly" << endl;
-                    return 0; //Did not send all of frame or something failed internally
+                    return 2; //Did not send all of frame or something failed internally
                     //TODO Add status output
                 } else {
                     //wcerr << "sent correctly" << endl;
@@ -174,7 +163,7 @@ Sender::send(char* frame, int size, bool reSend, int cWparam) {
                 waitIFS
         } else {
             if (theRF->transmit(frame, size) != size) {  //Makes the transmission 
-                return 0; //Did not send all of frame or something failed internally
+                return 2; //Did not send all of frame or something failed internally
             } else {
                 return 1; //Frame transmitted properly 
             }

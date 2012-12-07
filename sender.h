@@ -57,7 +57,10 @@ class Sender {
                     pthread_mutex_t *mutexSenderOstreamInput, 
                     pthread_mutex_t *mtxDemibradFdgFctr, 
                     volatile long long *fdgFctrDemibrad,
-                    ostream *output) 
+                    ostream *output,
+                    volatile int *cmdval,
+                    volatile int *status,
+                    pthread_mutex_t *mutexStatus) 
                     :   theRF(RFLayer),  
                         infoToSend(theQueue), 
                         ackReceived(receivedFlag), 
@@ -69,7 +72,10 @@ class Sender {
                         statMutex(statusMutex),
                         mutexFudgeFactor(mtxDemibradFdgFctr),
                         fudgeFactor(fdgFctrDemibrad),
-                        seqTable(MAXSEQNUM)  {} 
+                        seqTable(MAXSEQNUM),
+                        cmdVals(cmdval),
+                        statusCode(status),
+                        mutexStatCode(mutexStatus)  {} 
         
         /**
          * Invokes the sender object to do all of its duties
@@ -88,9 +94,13 @@ class Sender {
         volatile int *statCode; //Pointer to the  current status code
         volatile int *cmd;  //Pointer to commands we are issued
         pthread_mutex_t *statMutex; //Pointer to the mutex protecting statuses 
-        pthread_mutex_t *mutexSenderOstream;
-        pthread_mutex_t *mutexFudgeFactor;
-        volatile long long *fudgeFactor;
+        pthread_mutex_t *mutexSenderOstream;    //Lock for the ostream
+        pthread_mutex_t *mutexFudgeFactor;  //lock for accessing the fudge factor
+        volatile long long *fudgeFactor;    //pointer to the fudge factor to align our clock 
+                                                              //with the RF layer clock
+        volatile int *cmdVals;   //Pointer to first item in the cmd value array
+        volatile int *statusCode;   //pointer to the most recent 
+        pthread_mutex_t *mutexStatCode; //Mutex for the status code pointer
 
         //Internal fields  
         Packet pachyderm; //The packet to send
@@ -98,6 +108,8 @@ class Sender {
         static const int WAITTIME = 1000;    //Wait time (milsec)between ack's 
         char* frame; //The byte array to be transmitted on RF
         SeqNumManager seqTable; //Manages all seqNums for all MAC addr's
+        static const long long TRANSTIME = 1000;    //The amount of time it takes to build
+                                                                               //and send a frame, used for beacons
 
     //Methods
         /**
