@@ -35,8 +35,16 @@ int Sender::intPow(int base, int power){
 
 void 
 Sender::MasterSend() {
+    int cmd0, cmd1, cmd2, cmd3;     //Get cmd values
+
     //Run forever doing all the things that sneder does
     while (true) {
+        //Check for updated cmd values
+        cmd0 = cmdVals[0];
+        cmd1 = cmdVals[1];
+        cmd2 = cmdVals[2];
+        cmd3 = cmdVals[3];
+
         //Lock mutex, block until you can
         pthread_mutex_lock(mutexSender);
 
@@ -80,6 +88,7 @@ Sender::MasterSend() {
                     resend();   //retransmit 
                 }
             }
+
             //Check for stsus update
             if (pachyderm.resTransAttempts = dot11RetryLimit) {
                 //TODO WRITE STATUS CODE 5 TO OSTREAM
@@ -96,6 +105,17 @@ Sender::buildFrame(short frm, bool resend,  short seqNum, int CS) {
     pachyderm.sequence_number = seqNum;
     pachyderm.sender = macAddr_Sender;
     pachyderm.CRC = CS;
+}
+
+void
+Sender::buildBeacon (char* frame, const long long fudgeFctr) {
+
+}
+
+unsigned char
+Sender::pullByte(long long *number, int index) {
+    unsigned long long temp = (unsinged long long) *number;  
+    unsigned long long ii = 0x1111;
 }
 
 int 
@@ -144,12 +164,13 @@ Sender::send(char* frame, int size, bool reSend, int cWparam) {
                 idleFlag = true;    //Break
             }
         }
-    } //Possibility for this to be a resend
+    } 
+
     //Exponential backoff:
+    //Possibility for this to be a resend
     int cWindow = cWparam;
     int waitTime = rand() % (int)pow((float)2, (float)cWindow);  //Random number in range 
                                                                                                 //[0,2^aCWmin) 
-
     while (true) {
         while (waitTime>0 && !theRF->inUse()) {     //We havent waited waitTime and 
                                                                             //No one else is transmitting

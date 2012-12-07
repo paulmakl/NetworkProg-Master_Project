@@ -1,13 +1,13 @@
 CC = g++
 CFLAGS = -c -g -Wall
-LAYER_SRCS = Demibrad.cpp packet.cpp sender.cpp listener.cpp
+LAYER_SRCS = sender.cpp TESTSIZE.cpp packet.cpp
 STUB_SRCS = RF.cpp cppStubs.cpp
 JVM_INCLUDE = -I/System/Library/Frameworks/JavaVM.framework/Headers
 JVM_LIBRARY = -L/System/Library/Frameworks/JavaVM.framework/Libraries
 LINKFLAGS = -dynamiclib -ljvm -framework JavaVM
 
 all: $(LAYER_SRCS) $(STUB_SRCS) WiFiClient.class rf/RF.class
-	$(CC) $(LAYER_SRCS) $(STUB_SRCS) -o libnativelib.jnilib $(JVM_INCLUDE) $(JVM_LIBRARY) $(LINKFLAGS)
+	$(CC) $(LAYER_SRCS) $(STUB_SRCS) -arch i386 -o libnativelib.jnilib $(JVM_INCLUDE) $(JVM_LIBRARY) $(LINKFLAGS)
 	
 
 WiFiClient.class: WiFiClient.java
@@ -18,3 +18,4 @@ rf/RF.class:
 
 clean:
 	rm -f *.o *.so *.lib *.jnilib WiFiClient*.class
+
