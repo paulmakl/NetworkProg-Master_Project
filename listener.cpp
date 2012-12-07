@@ -31,10 +31,12 @@ Listener::read_Packet ()
     {
         case 0:
             if (prints) wcerr << "Data packet received." << endl;
+            //if (commands[0] == 1) streamy << "Data packet received." << endl;
             if (packetDest != MACaddrList && packetDest != -1)//compare the destination of this packet to our MAC address and to the broadcast address
             {
                 status = 0;//this packet isn't for us
                 if (prints) wcerr << "Packet not addressed to current MAC address. Our Mac address: " << MACaddrList << ".  Destination of incoming packet: " << packetDest << endl;
+                //if (commands[0] == 1) streamy << "Packet not addressed to current MAC address. Our Mac address: " << MACaddrList << ".  Destination of incoming packet: " << packetDest << endl;
                 return status;
             }
             status = 1;
@@ -42,10 +44,12 @@ Listener::read_Packet ()
 
         case 1:
             if (prints) wcerr << "ACK Received." << endl;
+            //if (commands[0] == 1) streamy << "ACK Received." << endl;
             if (packetDest != MACaddrList)//compare the destination of this packet to our MAC address and to the broadcast address
             {
                 status = 0;//this packet isn't for us
                 if (prints) wcerr << "Packet not addressed to current MAC address. Our Mac address: " << MACaddrList << ".  Destination of incoming packet: " << packetDest << endl;
+                //if (commands[0] == 1) streamy << "Packet not addressed to current MAC address. Our Mac address: " << MACaddrList << ".  Destination of incoming packet: " << packetDest << endl;
                 return status;
             }
             status = 2;
@@ -53,11 +57,13 @@ Listener::read_Packet ()
 
         case 2:
             if (prints) wcerr << "Beacon Received." << endl;
+            //if (commands[0] == 1) streamy << "Beacon Received." << endl;
             status = 3;
             break;
 
         default:
             if (prints) wcerr << "Unknown packet type received." << endl;
+            //if (commands[0] == 1) streamy << "Unknown packet type received." << endl;
             status = 4;
             break;
     }
@@ -74,9 +80,11 @@ Listener::UltraListen()
             //print the bytes received and checks for errors
         if (bytesReceived != MAXPACKETSIZE){
             if (prints) wcerr << "Received  partial Packet with " << bytesReceived << " bytes of data!" << endl;
+            //if (commands[0] == 1) streamy << "Received  partial Packet with " << bytesReceived << " bytes of data!" << endl;
         }
         else{
             if (prints) wcerr << bytesReceived << " !Full Packet Received! woo! ";
+            //if (commands[0] == 1) streamy << " !Full Packet Received! woo! ";
         }
         if (buf.size < 10)
         {
@@ -104,6 +112,7 @@ Listener::UltraListen()
             else
             {
                 if (prints) wcerr << "Unexpected sequence number" << endl;
+                //if (commands[0] == 1) streamy << "Unexpected sequence number" << endl;
             }
         }
         if (PRR == 2)//if the packet is relevent and is an ACK adjust ack recived flag
@@ -116,6 +125,7 @@ Listener::UltraListen()
             else
             {
                 if (prints) wcerr << "Unexpected sequence number" << endl;
+                //if (commands[0] == 1) streamy << "Unexpected sequence number" << endl;
             }
         }
         if (PRR == 3)//if a beacon comes in
@@ -139,10 +149,12 @@ Listener::queue_data()
     {
         //status = 10; // report that the queue for incoming data is full
         if (prints) wcerr << "Queue too full to recive incoming Packets" << endl;
+        //if (commands[0] == 1) streamy << "Queue too full to recive incoming Packets" << endl;
     }
     else
     {
         if (prints) wcerr << "putting data in queue" << endl;
+        //if (commands[0] == 1) streamy << "putting data in queue" << endl;
         Packet toDemiBrad(&buf[0], bytesReceived);//create a packet
         /*
          * testing shiz to make sure the right data is being sent out

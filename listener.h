@@ -52,7 +52,7 @@ private:
     pthread_mutex_t *ostreamMutex;//a mutex for the output stream
     pthread_mutex_t *fugFacMutex;//a mutex for the fudge factor on our time stamp
     volatile long long *fudgeFactor = 0;// the fudge factor for the time stamp we get from the RF layer
-    pthread_mutex_t *statusCode
+    pthread_mutex_t *statusCode;
     int *commands[4];// an array of command code values where the index repersents the command to be altered and the returned value is the command level
     int *status;//an int that hold the most recent error code returned
 
