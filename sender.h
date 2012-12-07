@@ -58,8 +58,6 @@ class Sender {
                     pthread_mutex_t *mtxDemibradFdgFctr, 
                     volatile long long *fdgFctrDemibrad,
                     ostream *output,
-                    volatile int *cmdval,
-                    volatile int *status,
                     pthread_mutex_t *mutexStatus) 
                     :   theRF(RFLayer),  
                         infoToSend(theQueue), 
@@ -97,7 +95,6 @@ class Sender {
         pthread_mutex_t *mutexFudgeFactor;  //lock for accessing the fudge factor
         volatile long long *fudgeFactor;    //pointer to the fudge factor to align our clock 
                                                               //with the RF layer clock
-        volatile int *statusCode;   //pointer to the most recent status code 
         pthread_mutex_t *mutexStatCode; //Mutex for the status code pointer
 
         //Internal fields  
