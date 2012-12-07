@@ -14,7 +14,7 @@
 #include <math.h> //for pwr
 
 //Wait IFS (SIFS + 2*slotTime)
-#define waitIFS usleep((aSIFSTime + 2*aSlotTime)*SLEEPTIME);
+#define waitIFS usleep((aSIFSTime + 2*aSlotTime)*1000);
 
 //Items used
 using std::queue;
@@ -36,7 +36,6 @@ int Sender::intPow(int base, int power){
 void 
 Sender::MasterSend() {
     //FOR TESTING PURPOSES
-
     while (true) {
         //Lock mutex, block until you can
         pthread_mutex_lock(mutexSender);
@@ -45,7 +44,7 @@ Sender::MasterSend() {
         if (infoToSend->empty()) {
             //wcerr << "QUEUE IS EMPTY" << endl;
             pthread_mutex_unlock(mutexSender); //Unlock because the queue is not ready
-            usleep(SLEEPTIME);
+            usleep(1000);
         }
         else {
             //wcerr << " pop should happen" << endl;
@@ -67,18 +66,29 @@ Sender::MasterSend() {
             //Transmit
             //FROM PAUL: need to check the result of send. So I store it in a temp variable.
             //wcerr << "sending data" << endl;
+            *ackReceived = false;   //Set acknowlegement to false because message has not
+                                                //yet been sent, so it cant have been acknowleged 
+            *expSeqNum = seqTable.getSeqNum(pachyderm.destination); //Alert reciever of 
+                                                                                                              //which seqNum to look for
             int doesItSend = send(&theFrame[0], pachyderm.frame_size, false, aCWmin);
             //wcerr << "data sent!" << endl;
            //TODO start Timer to check for timeouts
             //CAN ONLY RESEND 5 TIMES AND CONTENTION WINDOWN CAN ONLY GET UP TO 31
-            //while(NoAckRecieved && notAtEndofTimer) {
-            //          usleep(SLEEPTIME);
+            //while(NoackReceived && notAtEndofTimer) {
+            //          usleep(1000);
             //    }
-            //     if (noAckRecieved) {
+            //     if (noackReceived) {
             //          retransmit
             //       }
-            // FROM PAUL: If the frame sent properly, then we want to check for a timeout.
+            //Handle retransmit
+            while (pachyderm.resTransAttempts < dot11RetryLimit || !*ackReceived) {    //Less than max resend
+                                                                                                                                  // and no ack recieved 
+                usleep(WAITTIME);   //Sleep for predetermined amount of time
+                if (!*ackReceived)   {   //No ack recieved
+                    resend();   //retransmit 
+                }
 
+            }
 
         }
     }
@@ -117,7 +127,7 @@ Sender::send(char* frame, int size, bool reSend, int cWparam) {
                 //wcerr << "The RF layer is still not in use yay!" << endl;
                 //Align the send with a 50 milsec interval
                 while ((theRF->clock() + fudFact) % 50) {
-                        usleep(SLEEPTIME);  //Sleep 1 milsec  
+                        usleep(1000);  //Sleep 1 milsec  
                 }
                if (theRF->transmit(frame, size) != size) {  //Makes the transmission
                 //wcerr << "Did not send correctly" << endl;
@@ -137,7 +147,7 @@ Sender::send(char* frame, int size, bool reSend, int cWparam) {
             while ((theRF->clock() + fudFact) % 50 || theRF->inUse() ) {    //They are sending
                                                                                                                 //And aligns with 50 
                                                                                                                 //milsec mark
-                usleep(SLEEPTIME); //Sleep 1 milSec
+                usleep(1000); //Sleep 1 milSec
             }
             waitIFS
             //Check is channel is idle
@@ -154,12 +164,12 @@ Sender::send(char* frame, int size, bool reSend, int cWparam) {
     while (true) {
         while (waitTime>0 && !theRF->inUse()) {     //We havent waited waitTime and 
                                                                             //No one else is transmitting
-            usleep(SLEEPTIME);   //Sleep 1 milSec
+            usleep(1000);   //Sleep 1 milSec
             waitTime--;
         }   //StopClock:
         if (waitTime>0) {   //We havent finished waiting, but someone had transmitted
                 while (theRF->inUse()) {    //They are transmitting
-                    usleep(SLEEPTIME);   //Sleep 1 milSec
+                    usleep(1000);   //Sleep 1 milSec
                 }
                 waitIFS
         } else {
