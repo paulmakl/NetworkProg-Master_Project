@@ -45,12 +45,30 @@ class Sender {
          * param expSeq Pointer to the Seq num to be expected in an ack
          * param mutex Pointer to the mutex to lock the queue
          */
-        Sender(RF* RFLayer, queue<Packet> *theQueue,
-                volatile bool *receivedFlag, short ourMAC, 
-                volatile short *expSeq, pthread_mutex_t *mutex, volatile int *statusCode, volatile int *cmdCode, pthread_mutex_t *statusMutex, pthread_mutex_t *mutexSenderOstreamInput, pthread_mutex_t *mutexDemibradFudgeFactorInput, volatile long long *fudgeFactorDemibrad) 
-                    :   theRF(RFLayer),  infoToSend(theQueue), ackReceived(receivedFlag), 
-                        macAddr_Sender(ourMAC), expSeqNum(expSeq), mutexSender(mutex), 
-                        seqTable(MAXSEQNUM) {} 
+        Sender(RF* RFLayer, 
+                    queue<Packet> *theQueue,
+                    volatile bool *receivedFlag, 
+                    short ourMAC, 
+                    volatile short *expSeq, 
+                    pthread_mutex_t *mutex, 
+                    volatile int *statusCode, 
+                    volatile int *cmdCode, 
+                    pthread_mutex_t *statusMutex, 
+                    pthread_mutex_t *mutexSenderOstreamInput, 
+                    pthread_mutex_t *mtxDemibradFdgFctr, 
+                    volatile long long *fdgFctrDemibrad) 
+                    :   theRF(RFLayer),  
+                        infoToSend(theQueue), 
+                        ackReceived(receivedFlag), 
+                        macAddr_Sender(ourMAC), 
+                        expSeqNum(expSeq), 
+                        mutexSender(mutex), 
+                        statCode(statusCode),
+                        cmd(cmdCode),
+                        statMutex(statusMutex),
+                        mutexDemibradFudgeFactor(mtxDemibradFdgFctr),
+                        fudgeFactorDemibrad(fdgFctrDemibrad)
+                        seqTable(MAXSEQNUM)  {} 
         
         /**
          * Invokes the sender object to do all of its duties
@@ -59,13 +77,20 @@ class Sender {
 
     private:
     //Fields
+        //From paramaters (in order)
         RF* theRF; //Pointer to the RF layer
         queue<Packet> *infoToSend; //A queue to check for outgoing data 
         volatile bool* ackReceived; //Pointer to flag for received acks
         short macAddr_Sender; //Our MAC address
         volatile short *expSeqNum; //The expected seq num to see in an incomming ack
-        volatile short *macAckSeqNum; //The seqNum for to acknowlege that we have recieved
         pthread_mutex_t *mutexSender; //pointer to the lock for the queue
+        volatile int *statCode; //Pointer to the  current status code
+        volatile int *cmd;  //Pointer to commands we are issued
+        pthread_mutex_t *statMutex; //Pointer to the mutex protecting statuses 
+        pthread_mutex_t *mutexSenderOstream;
+        pthread_mutex_t *mutexDemibradFudgeFactor;
+        volatile long long *fudgeFactorDemibrad;
+
         //Internal fields  
         Packet pachyderm; //The packet to send
         static const short MAXSEQNUM = 4095;
@@ -73,9 +98,6 @@ class Sender {
                                                             //the network is free 
         char* frame; //The byte array to be transmitted on RF
         SeqNumManager seqTable; //Manages all seqNums for all MAC addr's
-        pthread_mutex_t *mutexSenderOstream;
-        pthread_mutex_t *mutexDemibradFudgeFactor;
-        volatile long long *fudgeFactorDemibrad;
 
     //Methods
         /**
