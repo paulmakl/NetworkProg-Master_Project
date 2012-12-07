@@ -68,12 +68,11 @@ class Sender {
                         expSeqNum(expSeq), 
                         mutexSender(mutex), 
                         statCode(statusCode),
-                        cmd(cmdCode),
+                        cmdVals(cmdCode),
                         statMutex(statusMutex),
                         mutexFudgeFactor(mtxDemibradFdgFctr),
                         fudgeFactor(fdgFctrDemibrad),
                         seqTable(MAXSEQNUM),
-                        cmdVals(cmdval),
                         statusCode(status),
                         mutexStatCode(mutexStatus)  {} 
         
@@ -92,23 +91,22 @@ class Sender {
         volatile short *expSeqNum; //The expected seq num to see in an incomming ack
         pthread_mutex_t *mutexSender; //pointer to the lock for the queue
         volatile int *statCode; //Pointer to the  current status code
-        volatile int *cmd;  //Pointer to commands we are issued
+        volatile int *cmdVals;  //Pointer to 1st item in cmd value array
         pthread_mutex_t *statMutex; //Pointer to the mutex protecting statuses 
         pthread_mutex_t *mutexSenderOstream;    //Lock for the ostream
         pthread_mutex_t *mutexFudgeFactor;  //lock for accessing the fudge factor
         volatile long long *fudgeFactor;    //pointer to the fudge factor to align our clock 
                                                               //with the RF layer clock
-        volatile int *cmdVals;   //Pointer to first item in the cmd value array
-        volatile int *statusCode;   //pointer to the most recent 
+        volatile int *statusCode;   //pointer to the most recent status code 
         pthread_mutex_t *mutexStatCode; //Mutex for the status code pointer
 
         //Internal fields  
         Packet pachyderm; //The packet to send
         static const short MAXSEQNUM = 4095;
         static const int WAITTIME = 1000;    //Wait time (milsec)between ack's 
-        char* frame; //The byte array to be transmitted on RF
+        //char* frame; //The byte array to be transmitted on RF
         SeqNumManager seqTable; //Manages all seqNums for all MAC addr's
-        static const long long TRANSTIME = 1000;    //The amount of time it takes to build
+        static const long long TRANSTIME = 0;    //The amount of time it takes to build      TODO: ALTER THIS VALUE TO ONE GATHERED EMPERICALLY 
                                                                                //and send a frame, used for beacons
 
     //Methods
@@ -118,14 +116,13 @@ class Sender {
         * power to raise the base to
         */
         int intPow(int base, int power);
-                 
+
         /**
-         * Checks for an acknowledgment received
-         * return 0 No ack received
-         * return Mac address of received ack  
-         */
-        //TODO How will you tell which message an ack is for using this system?
-        short check_ReceivedAck();
+        * Builds a beacon frame
+        * param fudgeFctr The amoutn of time it takes to build a beacon and transmit it
+        * param frame pointer to the byte array to fill
+        */
+        void buildBeacon(char* frame, const long long fudgeFctr);
 
         /**
          * Builds a packet object for sending
