@@ -26,8 +26,32 @@ public:
      * constructor for the listener class that sets up all our sexy varribles and
      * starts the thread listening for imcoming messages
      */
-    Listener(RF* RFLayer, queue<Packet>* incomingQueue, volatile bool* receivedFlag, short myMAC, pthread_mutex_t * mutexListenr, volatile short* exSN, pthread_mutex_t *statusCodeMutex, pthread_mutex_t *mutexListenerOstreamInput, pthread_mutex_t *mutexDemibradFudgeFactorInput, volatile long long *fudgeFactorDemibrad, int *cmds [4], int *statusCode)
-    : seqNumMang(MAXSEQNUM), MACaddrList(myMAC), ackReceivedL(receivedFlag), daLoopLine(incomingQueue), daRF(RFLayer), expectedSN(exSN), mutexListener(mutexListenr), prints(true), fugFacMutex(mutexDemibradFudgeFactorInput), ostreamMutex(mutexListenerOstreamInput), fudgeFactor(fudgeFactorDemibrad), commands(cmds), status(statusCode), statusMutex(statusCodeMutex) {}
+    Listener(RF* RFLayer, 
+        queue<Packet>* incomingQueue, 
+        volatile bool* receivedFlag, 
+        short myMAC, 
+        pthread_mutex_t * mutexListenr, 
+        volatile short* exSN, 
+        pthread_mutex_t *statusCodeMutex, 
+        pthread_mutex_t *mutexListenerOstreamInput, 
+        pthread_mutex_t *mutexDemibradFudgeFactorInput, 
+        volatile long long *fudgeFactorDemibrad, 
+        volatile int *cmds, 
+        volatile int *statusCode) 
+    : seqNumMang(MAXSEQNUM), 
+    MACaddrList(myMAC), 
+    ackReceivedL(receivedFlag), 
+    daLoopLine(incomingQueue), 
+    daRF(RFLayer), 
+    expectedSN(exSN), 
+    mutexListener(mutexListenr), 
+    prints(true), 
+    fugFacMutex(mutexDemibradFudgeFactorInput), 
+    ostreamMutex(mutexListenerOstreamInput), 
+    fudgeFactor(fudgeFactorDemibrad), 
+    commands(cmds), 
+    status(statusCode), 
+    statusMutex(statusCodeMutex) {}
     
     /*
      * the heart of the listener watches activity on the RF layer and blocks until a packet is recived
@@ -51,10 +75,11 @@ private:
     static const short MAXSEQNUM = 4095;//the largest possible sequence number that can be used
     pthread_mutex_t *ostreamMutex;//a mutex for the output stream
     pthread_mutex_t *fugFacMutex;//a mutex for the fudge factor on our time stamp
-    volatile long long *fudgeFactor = 0;// the fudge factor for the time stamp we get from the RF layer
+    volatile long long *fudgeFactor;// the fudge factor for the time stamp we get from the RF layer
     pthread_mutex_t *statusCode;
-    int *commands[4];// an array of command code values where the index repersents the command to be altered and the returned value is the command level
-    int *status;//an int that hold the most recent error code returned
+    volatile int *commands;// an array of command code values where the index repersents the command to be altered and the returned value is the command level
+    volatile int *status;//an int that hold the most recent error code returned
+    pthread_mutex_t *statusMutex;
 
     /*
      * looks at a packet to check for three things from every packet that comes across the the RF layer

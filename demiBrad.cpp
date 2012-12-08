@@ -9,10 +9,31 @@ DemiBrad theDemibrad;
  * creates a sender thread
  */
 void *create_sender_thread(void *cnt){
+	//wcerr << "S" << endl;
+	//pthread_mutex_lock(&theDemibrad.mutex_attach_rflayer);
+	//wcerr << "LISTENER HAS ACCESS TO THE RF LAYER." << endl;
+	usleep(100);
+	wcerr << "S" << endl;
 	theDemibrad.RFLayer_demibrad->attachThread();
+	wcerr << "T" << endl;
+	//pthread_mutex_unlock(&theDemibrad.mutex_attach_rflayer);
+	//wcerr << "T" << endl;
+	//wcerr << "LISTENER HAS LET GO OF THE RF LAYER." << endl;
 	//wcerr << "sender thread";
-
-	Sender sendy(theDemibrad.RFLayer_demibrad, &theDemibrad.send_Queue_demibrad, &theDemibrad.ack_Received_demibrad, theDemibrad.MACaddr_demibrad, &theDemibrad.expected_sequence_number, &theDemibrad.mutex_Demibrad_Sender);
+	Sender sendy(theDemibrad.RFLayer_demibrad, 
+		&theDemibrad.send_Queue_demibrad, 
+		&theDemibrad.ack_Received_demibrad, 
+		theDemibrad.MACaddr_demibrad, 
+		&theDemibrad.expected_sequence_number, 
+		&theDemibrad.mutex_Demibrad_Sender, 
+		&theDemibrad.statusCode, 
+		&theDemibrad.cmdCode[0], 
+		&theDemibrad.statusMutex, 
+		&theDemibrad.mutex_Demibrad_ostream, 
+		&theDemibrad.mtxDemibradFdgFctr, 
+		&theDemibrad.fdgFctrDemibrad, 
+		theDemibrad.streamy_demibrad);
+	//wcerr << "D" << endl;
 	sendy.MasterSend();
 	wcerr << "This should not appear";
 	return (void *)0;
@@ -21,41 +42,72 @@ void *create_sender_thread(void *cnt){
   * create receiver thread
   */
 void *create_and_run_receiver_thread(void *cnt){
+	//wcerr << "L" << endl;
+	//pthread_mutex_lock(&theDemibrad.mutex_attach_rflayer);
+	usleep(1000);
+	wcerr << "L" << endl;
 	theDemibrad.RFLayer_demibrad->attachThread();
-	//wcerr << "receiver thread";
-	Listener listen(theDemibrad.RFLayer_demibrad, &theDemibrad.receive_Queue_demibrad, &theDemibrad.ack_Received_demibrad, theDemibrad.MACaddr_demibrad, &theDemibrad.mutex_Demibrad_Receiver, &theDemibrad.expected_sequence_number);
+	wcerr << "M" << endl;
+	//pthread_mutex_unlock(&theDemibrad.mutex_attach_rflayer);
+	//wcerr << "M" << endl;
+	Listener listen(theDemibrad.RFLayer_demibrad, 
+		&theDemibrad.receive_Queue_demibrad, 
+		&theDemibrad.ack_Received_demibrad, 
+		theDemibrad.MACaddr_demibrad, 
+		&theDemibrad.mutex_Demibrad_Receiver, 
+		&theDemibrad.expected_sequence_number, 
+		&theDemibrad.statusMutex, 
+		&theDemibrad.mutex_Demibrad_ostream, 
+		&theDemibrad.mutex_Demibrad_fudge_factor, 
+		&theDemibrad.fudge_factor_Demibrad, 
+		&theDemibrad.cmdCode[0], 
+		&theDemibrad.status);
+	//wcerr << "E" << endl;
 	listen.UltraListen();
 	wcerr << "This should not appear again";
 	return (void *)0;
 }
 
 DemiBrad::DemiBrad(short MACadr, ostream* stremy){
+	RFLayer_demibrad = new RF();
 	MACaddr_demibrad = MACadr;
 
 	streamy_demibrad = stremy;
-	RFLayer_demibrad = new RF();
-	mutex_Demibrad_fudge_factor = 0;
+	
+	fudge_factor_Demibrad = 0;
 	pthread_mutexattr_init(&attr);
 	pthread_mutex_init(&mutex_Demibrad_Sender, &attr);
 	pthread_mutex_init(&mutex_Demibrad_Receiver, &attr);
 	pthread_mutex_init(&mutex_Demibrad_ostream, &attr);
-	pthread_mutex_init(&mutex_Demibrad_fudge_factor);
+	pthread_mutex_init(&mutex_Demibrad_fudge_factor, &attr);
+	pthread_mutex_init(&mutex_attach_rflayer, &attr);
 	// create the threads
 	pthread_t ids[3];
-    pthread_attr_t attr;
-    pthread_attr_init(&attr);
-    pthread_attr_setscope(&attr, PTHREAD_SCOPE_SYSTEM);  
-    pthread_setconcurrency(3);
-    int counts[3];
-    RFLayer_demibrad->attachThread();
+
+      
+    pthread_setconcurrency(5);
+    int counts[8];
+    //RFLayer_demibrad->attachThread();
     // create the sender and receiver threads
-    pthread_create(&(ids[0]), &attr, create_sender_thread, &(counts[0]));
-    pthread_create(&(ids[1]), &attr, create_and_run_receiver_thread, &(counts[1]));
+	statusCode = 0; 
+    cmdCode[0] = 0;
+    cmdCode[1] = 0;
+    cmdCode[2] = 0;
+    cmdCode[3] = 30;
+    pthread_mutex_init(&statusMutex, &attr);
+    pthread_mutex_init(&mutex_Demibrad_ostream, &attr);
+    pthread_mutex_init(&mtxDemibradFdgFctr, &attr);
+    fdgFctrDemibrad = 5; // CHANGE THIS
+    pthread_attr_t attrr;
+    pthread_attr_init(&attrr);
+    pthread_attr_setscope(&attrr, PTHREAD_SCOPE_SYSTEM);
+    pthread_create(&(ids[0]), &attrr, create_sender_thread, &(counts[0]));
+    
+    pthread_create(&(ids[1]), &attrr, create_and_run_receiver_thread, &(counts[1]));
+    wcerr << "D" << endl;
 }
 
 int dot11_init(short MACadr, ostream* stremy){
-    char x;
-    cin >> x;
 	DemiBrad temp(MACadr, stremy);
 	theDemibrad = temp;
 	return 1;

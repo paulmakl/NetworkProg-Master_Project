@@ -30,11 +30,12 @@ unsigned char bcastAddr[] = {255, 255, 255, 255};
  */
 void RF::attachThread() {
     JNIEnv* envPtrs;
-
+    wcerr << "O" << endl;
     if (jvm->AttachCurrentThread((void**)&envPtrs, NULL) != 0) {
         cerr << "Attach failed!" << endl;
         exit(1);
     }
+    wcerr << "T" << endl;
 }
 
 

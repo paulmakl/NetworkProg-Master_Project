@@ -23,11 +23,15 @@ class Packet {
 	// takes the data out of a physical array and coppies it into the packet class
 	void pointer_data_to_physical(char* data);
 	// takes a pointer to an array and filles the first four blocks with the CRC-32
-	void build_CRC(char *data, int data_length);
+	//void build_CRC(char *data, int data_length);
 	// shifts an entire array of characters over by 1 character
-	void shift_char_array(char *data, int size);
+	//void shift_char_array(char *data, int size);
 	// this is super complicated i will explain it when its done
-	void xor_crc(char *data, int CRC_TT, int sizenum);
+	//void xor_crc(char *data, int CRC_TT, int sizenum);
+	//char get_nth_bit(char dta, int n);
+	//char get_nth_bit(int dta, int n);
+	//void flip_nth_bit(char *dta, int n);
+	//void calc_CRC(char *dta, int size, int CRCTT);
 	// Fields
     static const short MAXDATASIZE = 2038;  //The max amount of bytes
                                             //that can be held in the 
