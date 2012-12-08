@@ -8,7 +8,6 @@
 #include <iostream> //For cout & endl
 #include "sender.h"
 #include <unistd.h> //For sleep()
-//#include <stdlib.h> //For rand()
 #include <math.h> //for pwr
 
 //Wait IFS (SIFS + 2*slotTime)
@@ -18,24 +17,11 @@
 using std::queue;
 using std::rand;
 
-
-/*
-//FROM PAUL: impolementing the intPow function
-// it simply does powers for ints. The native c++ 
-// pow function does not like ints, it uses doubles and floats.
-int Sender::intPow(int base, int power){
-    int acc = 0;
-    while(power > 0){
-        acc = acc * base;
-        power--;
-    }
-    return acc;
-}
-*/
-
 void 
 Sender::MasterSend() {
-    int cmd0, cmd1, cmd2, cmd3;     //Get cmd values
+    int cmd0, cmd1, cmd2, cmd3 = 0;     //Get cmd values, but start at 0
+    long long sendBeaconTime = theRF->clock() + (cmd0 * 1000);  //Current time + 
+                                                                                                        //cmd 3 val (sec)
 
     //Run forever doing all the things that sneder does
     while (true) {
@@ -44,6 +30,24 @@ Sender::MasterSend() {
         cmd1 = cmdVals[1];
         cmd2 = cmdVals[2];
         cmd3 = cmdVals[3];
+
+        //Send Beacon if it is time:
+        if (theRF->clock() >= sendBeaconTime) {     //Current time is at or past the time to 
+                                                                            //send a beacon
+            //update time fudge factor
+            pthread_mutex_lock(mutexFudgeFactor);   //lock the mutex
+            long long fudFact = *fudgeFactor;   //update fudge factor
+            pthread_mutex_unlock(mutexFudgeFactor); //unlock mutex
+
+            buildBeacon(theRF->clock() + *fudgeFactor, TRANSTIME);  //Fill pachyderm with a beacon
+            char beaconFrame[pachyderm.frame_size]; //Gets the byte array to send
+            pachyderm.buildByteArray(&beaconFrame[0]);  //Fill the frame
+
+            int beaconSent = send(&beaconFrame[0], pachyderm.frame_size, false, aCWmin);
+            sendBeaconTime = theRF->clock() + *fudgeFactor + (cmd0 * 1000); //Set a new beacon
+                                                                                                                        //time 
+        }   //End send beacon
+
 
         //Lock mutex, block until you can
         pthread_mutex_lock(mutexSender);
