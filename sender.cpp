@@ -68,14 +68,13 @@ Sender::MasterSend() {
             
             //Construct the frame to transmit
             seqTable.increment(pachyderm.destination); //Increment the seq nume
-            buildFrame(0, false, seqTable.getSeqNum(pachyderm.destination), 1111); 
+            buildFrame(0, false, seqTable.getSeqNum(pachyderm.destination), 0xff); 
 
             //Build the byte[] to be send
             char theFrame[pachyderm.frame_size];
             pachyderm.buildByteArray(&theFrame[0]); //Fill theFrame
             
             //Transmit
-            //wcerr << "sending data" << endl;
             *ackReceived = false;   //Set acknowlegement to false because message has not
                                                 //yet been sent, so it cant have been acknowleged 
             *expSeqNum = seqTable.getSeqNum(pachyderm.destination); //Alert reciever of 
