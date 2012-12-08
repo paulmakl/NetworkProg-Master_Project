@@ -28,7 +28,7 @@ Listener::read_Packet ()
     unsigned short temp = buf[3];
     temp = temp << 8;
     temp = temp >> 8;
-    wcerr << temp << endl;
+    //wcerr << temp << endl;
     packetDest = temp_dest + temp;
     unsigned char frameType = buf[0];
 
@@ -109,7 +109,7 @@ Listener::UltraListen()
         
         if (PRR == 1)//if the packet is relevent to us and is data queue it up
         {
-            wcerr << "SILLYNESS " << seqNumMang.getSeqNum(dataSource) + 1 << " :: " << seqNum << endl;
+            //wcerr << "SILLYNESS " << seqNumMang.getSeqNum(dataSource) + 1 << " :: " << seqNum << endl;
             if ( seqNumMang.getSeqNum(dataSource) + 1 == seqNum )
             {
                 Packet paulLovesPBR( extractSourceAddress(), extractSequenceNumber() );
