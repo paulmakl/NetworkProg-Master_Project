@@ -41,7 +41,7 @@ Sender::MasterSend() {
                                     "4- Display transmittion state information only \n \n" <<
                                     "Current Diagnostic level: " << cmd1 <<
                                     "Beacon window: " << cmd0 * 1000 << "seconds" <<
-                                    "Collision window choice: " << if ()
+                                    "Collision window choice: " << endl;
 
             pthread_mutex_unlock(mutexSenderOstream);   //Unlock the ostream
         }
