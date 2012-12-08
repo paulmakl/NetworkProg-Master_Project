@@ -84,8 +84,8 @@ Listener::UltraListen()
         // wait for data
         bytesReceived = daRF->receive(buf, MAXPACKETSIZE);//block until data comes our way 
         if (prints) wcerr << "FROM: " << extractSourceAddress() << "..." << endl;
-        if (prints) wcerr << "Sequence Number in Packet :: " << extractSequenceNumber() << " :: " << endl;
-        if (prints) wcerr << "Sequence Number in SEQNUMMANG :: " << seqNumMang.getSeqNum(extractSequenceNumber()) + 1 << " :: " << endl;
+        //if (prints) wcerr << "Sequence Number in Packet :: " << extractSequenceNumber() << " :: " << endl;
+        //if (prints) wcerr << "Sequence Number in SEQNUMMANG :: " << seqNumMang.getSeqNum(extractSequenceNumber()) + 1 << " :: " << endl;
 
             //print the bytes received and checks for errors
         if (bytesReceived != MAXPACKETSIZE){
