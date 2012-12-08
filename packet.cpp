@@ -135,7 +135,6 @@ int Packet::buildByteArray(char *buffer){
 	// Now we break up the short into two packets. 
 	temp_short_two = temp_short << 8;
 	temp_short_two = temp_short_two >> 8;
-	//wcerr << temp_short_two << endl;
 	buffer[1] = temp_short_two;
 	temp_short_two = temp_short >> 8;
 	buffer[0] = temp_short_two;
