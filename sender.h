@@ -70,6 +70,7 @@ class Sender {
                         mutexSenderOstream(mutexSenderOstreamInput),
                         mutexFudgeFactor(mtxDemibradFdgFctr),
                         fudgeFactor(fdgFctrDemibrad),
+                        outputBuff(output),
                         seqTable(MAXSEQNUM) {}
         
         /**
@@ -93,6 +94,7 @@ class Sender {
         pthread_mutex_t *mutexFudgeFactor;  //lock for accessing the fudge factor
         volatile long long *fudgeFactor;    //pointer to the fudge factor to align our clock 
                                                               //with the RF layer clock
+        ostream *outputBuff; //Pointer to the diagnostic ostream
         //Internal fields  
         Packet pachyderm; //The packet to send
         static const short MAXSEQNUM = 4095;
@@ -101,6 +103,10 @@ class Sender {
         SeqNumManager seqTable; //Manages all seqNums for all MAC addr's
         static const long long TRANSTIME = 0;    //The amount of time it takes to build      TODO: ALTER THIS VALUE TO ONE GATHERED EMPERICALLY 
                                                                                //and send a frame, used for beacons
+        int cmd0;   //Gets cmd 0 value 
+        int cmd1;   //Gets cmd 1 value 
+        int cmd2;   //Gets cmd 2 value 
+        int cmd3;   //Gets cmd 3 value 
 
     //Methods
         /**
