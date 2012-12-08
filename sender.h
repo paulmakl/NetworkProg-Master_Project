@@ -96,7 +96,7 @@ class Sender {
         //Internal fields  
         Packet pachyderm; //The packet to send
         static const short MAXSEQNUM = 4095;
-        static const int WAITTIME = 1000;    //Wait time (milsec)between ack's 
+        static const int WAITTIME = 100000;    //Wait time (milsec)between ack's 
         //char* frame; //The byte array to be transmitted on RF
         SeqNumManager seqTable; //Manages all seqNums for all MAC addr's
         static const long long TRANSTIME = 0;    //The amount of time it takes to build      TODO: ALTER THIS VALUE TO ONE GATHERED EMPERICALLY 

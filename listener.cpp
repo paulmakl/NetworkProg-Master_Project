@@ -132,8 +132,7 @@ Listener::UltraListen()
         {
             if (seqNum == *expectedSN)
             {
-                bool temp = true;
-                ackReceivedL = &temp;
+                *ackReceivedL = true;
             }
             else
             {
