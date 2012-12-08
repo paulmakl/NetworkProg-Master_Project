@@ -13,9 +13,9 @@ void *create_sender_thread(void *cnt){
 	//pthread_mutex_lock(&theDemibrad.mutex_attach_rflayer);
 	//wcerr << "LISTENER HAS ACCESS TO THE RF LAYER." << endl;
 	usleep(100);
-	wcerr << "S" << endl;
+	//wcerr << "S" << endl;
 	theDemibrad.RFLayer_demibrad->attachThread();
-	wcerr << "T" << endl;
+	//wcerr << "T" << endl;
 	//pthread_mutex_unlock(&theDemibrad.mutex_attach_rflayer);
 	//wcerr << "T" << endl;
 	//wcerr << "LISTENER HAS LET GO OF THE RF LAYER." << endl;
@@ -45,9 +45,9 @@ void *create_and_run_receiver_thread(void *cnt){
 	//wcerr << "L" << endl;
 	//pthread_mutex_lock(&theDemibrad.mutex_attach_rflayer);
 	usleep(1000);
-	wcerr << "L" << endl;
+	//wcerr << "L" << endl;
 	theDemibrad.RFLayer_demibrad->attachThread();
-	wcerr << "M" << endl;
+	//wcerr << "M" << endl;
 	//pthread_mutex_unlock(&theDemibrad.mutex_attach_rflayer);
 	//wcerr << "M" << endl;
 	Listener listen(theDemibrad.RFLayer_demibrad, 
@@ -104,7 +104,7 @@ DemiBrad::DemiBrad(short MACadr, ostream* stremy){
     pthread_create(&(ids[0]), &attrr, create_sender_thread, &(counts[0]));
     
     pthread_create(&(ids[1]), &attrr, create_and_run_receiver_thread, &(counts[1]));
-    wcerr << "D" << endl;
+    //wcerr << "D" << endl;
 }
 
 int dot11_init(short MACadr, ostream* stremy){
@@ -166,10 +166,10 @@ int DemiBrad::dot11_recv_DemiBrad(short *srcAddr, short *destAddr, char *buf, in
 		receive_Queue_demibrad.pop(); // pop of the front to a packet
 		
 		int size = temp.frame_size;
-		wcerr << "************ destination Address:" << size << endl;
+		//wcerr << "************ destination Address:" << size << endl;
 		//char * tempBufP = &tempBuf[0];
-		wcerr << "Entering troubled function ..." << endl;
-		wcerr << "Exiting troubled function ..." << endl; // BRAD LOOK HERE
+		//wcerr << "Entering troubled function ..." << endl;
+		//wcerr << "Exiting troubled function ..." << endl; // BRAD LOOK HERE
 		int i = 0;
 		//char tempBuf[temp.frame_size]; // BRAD LOOK HERE: I have created a temporary buffer
 		while(i < temp.bytes_to_send){ // put the data in the buffer into the buffer that is being returned
@@ -180,7 +180,7 @@ int DemiBrad::dot11_recv_DemiBrad(short *srcAddr, short *destAddr, char *buf, in
 		*destAddr = temp.destination;
 		*srcAddr = temp.sender;
 		pthread_mutex_unlock(&mutex_Demibrad_Receiver);
-		wcerr << endl << "Bytes Sent :: " << temp.bytes_to_send << endl;
+		//wcerr << endl << "Bytes Sent :: " << temp.bytes_to_send << endl;
 		return temp.bytes_to_send;
 	}else{
 		//if it is empty, unlock the mutex and return -1
