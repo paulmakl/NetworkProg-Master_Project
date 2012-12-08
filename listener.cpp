@@ -132,8 +132,8 @@ Listener::UltraListen()
         {
             if (seqNum == *expectedSN)
             {
-                bool temp = true;
-                ackReceivedL = &temp;
+                wcerr << "WE GOT AN ACK RAWR from: " << extractSourceAddress() << endl;
+                *ackReceivedL = true;
             }
             else
             {
