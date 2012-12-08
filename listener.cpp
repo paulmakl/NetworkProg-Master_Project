@@ -28,7 +28,7 @@ Listener::read_Packet ()
     unsigned short temp = buf[3];
     temp = temp << 8;
     temp = temp >> 8;
-    wcerr << temp << endl;
+    //wcerr << temp << endl;
     packetDest = temp_dest + temp;
     unsigned char frameType = buf[0];
 
@@ -84,8 +84,8 @@ Listener::UltraListen()
         // wait for data
         bytesReceived = daRF->receive(buf, MAXPACKETSIZE);//block until data comes our way 
         if (prints) wcerr << "FROM: " << extractSourceAddress() << "..." << endl;
-        if (prints) wcerr << "Sequence Number in Packet :: " << extractSequenceNumber() << " :: " << endl;
-        if (prints) wcerr << "Sequence Number in SEQNUMMANG :: " << seqNumMang.getSeqNum(extractSequenceNumber()) + 1 << " :: " << endl;
+        //if (prints) wcerr << "Sequence Number in Packet :: " << extractSequenceNumber() << " :: " << endl;
+        //if (prints) wcerr << "Sequence Number in SEQNUMMANG :: " << seqNumMang.getSeqNum(extractSequenceNumber()) + 1 << " :: " << endl;
 
             //print the bytes received and checks for errors
         if (bytesReceived != MAXPACKETSIZE){
@@ -109,7 +109,7 @@ Listener::UltraListen()
         
         if (PRR == 1)//if the packet is relevent to us and is data queue it up
         {
-            wcerr << "SILLYNESS " << seqNumMang.getSeqNum(dataSource) + 1 << " :: " << seqNum << endl;
+            //wcerr << "SILLYNESS " << seqNumMang.getSeqNum(dataSource) + 1 << " :: " << seqNum << endl;
             if ( seqNumMang.getSeqNum(dataSource) + 1 == seqNum )
             {
                 Packet paulLovesPBR( extractSourceAddress(), extractSequenceNumber() );

@@ -45,7 +45,7 @@ public:
     daRF(RFLayer), 
     expectedSN(exSN), 
     mutexListener(mutexListenr), 
-    prints(true), 
+    prints(false), 
     fugFacMutex(mutexDemibradFudgeFactorInput), 
     ostreamMutex(mutexListenerOstreamInput), 
     fudgeFactor(fudgeFactorDemibrad), 

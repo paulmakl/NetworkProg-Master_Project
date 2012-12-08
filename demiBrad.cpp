@@ -140,13 +140,19 @@ int dot11_send(short destAddr, char *buf, int bufSize){
   * unimplemented
   */
 int DemiBrad::dot11_command_DemiBrad(int cmd, int val){
-	return 1;
+	if (cmd > 3 || cmd < 0)
+	{
+		return -1;
+	}else{
+		cmdCode[cmd] = val;
+		return 1;
+	}
 }
  /*
   * unimplemented
   */
 int DemiBrad::status_DemiBrad(){
-	return 0;
+	return statusCode;
 }
 /*
  * receive data
@@ -192,9 +198,15 @@ int DemiBrad::dot11_send_DemiBrad(short destAddr, char *buf, int bufSize){
 	Packet temp(destAddr,buf,bufSize); // make a temporary packet
 	//memory_buffer_demibrad[memory_buffer_number_count_demibrad] = temp; //put the temporary packet in the memory buffer
 	pthread_mutex_lock(&mutex_Demibrad_Sender);
-	send_Queue_demibrad.push(temp);
-	pthread_mutex_unlock(&mutex_Demibrad_Sender);
-	return bufSize;
+	if (send_Queue_demibrad.size() > 4)
+	{
+		pthread_mutex_unlock(&mutex_Demibrad_Sender);
+		return -1;
+	}else{
+		send_Queue_demibrad.push(temp);
+		pthread_mutex_unlock(&mutex_Demibrad_Sender);
+		return bufSize;
+	}
 }
 
 
