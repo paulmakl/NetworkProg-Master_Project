@@ -70,6 +70,7 @@ class Sender {
                         mutexSenderOstream(mutexSenderOstreamInput),
                         mutexFudgeFactor(mtxDemibradFdgFctr),
                         fudgeFactor(fdgFctrDemibrad),
+                        outputBuff(output),
                         seqTable(MAXSEQNUM) {}
         
         /**
@@ -93,6 +94,7 @@ class Sender {
         pthread_mutex_t *mutexFudgeFactor;  //lock for accessing the fudge factor
         volatile long long *fudgeFactor;    //pointer to the fudge factor to align our clock 
                                                               //with the RF layer clock
+        ostream *outputBuff; //Pointer to the diagnostic ostream
         //Internal fields  
         Packet pachyderm; //The packet to send
         static const short MAXSEQNUM = 4095;
