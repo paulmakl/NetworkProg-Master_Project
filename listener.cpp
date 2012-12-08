@@ -23,9 +23,19 @@ Listener::read_Packet ()
 {
     int status;//will be returned with different status code to help ultra listen react
     short packetDest = buf[2];//bitwise terribleness
-    packetDest = packetDest << 8;
-    packetDest = packetDest + buf[3];
-    char frameType = buf[0];
+    unsigned short temp_dest = packetDest;
+    wcerr << temp_dest << endl;
+    temp_dest = temp_dest << 8;
+    wcerr << temp_dest << endl;
+    unsigned short temp = buf[3];
+    temp = temp << 8;
+    temp = temp >> 8;
+    wcerr << temp << endl;
+    temp_dest = temp_dest + temp;
+    packetDest = temp_dest;
+    wcerr << temp_dest << endl;
+    unsigned char frameType = buf[0];
+
     frameType = frameType >> 5;
     switch (frameType)//compare the frame type of the packet given to known types to figure out what kind of packet it is
     {
@@ -103,7 +113,7 @@ Listener::UltraListen()
                 char theFrame[paulLovesPBR.frame_size];
                 //char* pointerToTheFrame = &theFrame[0];
                 paulLovesPBR.buildByteArray(&theFrame[0]);
-                if (prints) wcerr << "Paul loves PBR :: " << paulLovesPBR.frame_size << endl;
+                if (prints) wcerr << "Paul loaths PBR :: " << paulLovesPBR.frame_size << endl;
                 usleep(aSIFSTime * 1000);
                 daRF->transmit( &theFrame[0], paulLovesPBR.frame_size );
                 seqNumMang.increment(dataSource);
@@ -187,7 +197,7 @@ Listener::queue_data()
 short
 Listener::extractSequenceNumber()
 {
-    short SN = buf[0];//extract the sequence number 
+    unsigned short SN = buf[0];//extract the sequence number 
     SN = SN << 8;
     SN = SN + buf[1] + 0;
     SN = SN << 4;//shift other data off the sequence number
