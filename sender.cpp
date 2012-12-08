@@ -39,15 +39,15 @@ Sender::MasterSend() {
                                     "2- Display beacon state information only \n" <<
                                     "3- Display transmittion and sender state information together \n" <<
                                     "4- Display transmittion state information only \n \n" <<
-                                    "Current Diagnostic level: " << cmd1 <<
-                                    "Beacon window: " << cmd0 * 1000 << "seconds" <<
+                                    "Current Diagnostic level: " << cmd1 << "\n" <<
+                                    "Beacon window: " << cmd3 * 1000 << "seconds \n" <<
                                     "Collision window choice: " << endl;
 
             pthread_mutex_unlock(mutexSenderOstream);   //Unlock the ostream
         }
 
         //Send Beacon if it is time:
-        if (theRF->clock() >= sendBeaconTime) {     //Current time is at or past the time to 
+        if (theRF->clock() + *fudgeFactor >= sendBeaconTime) {     //Current time is at or past the time to 
                                                                             //send a beacon
             //update time fudge factor
             pthread_mutex_lock(mutexFudgeFactor);   //lock the mutex
@@ -57,7 +57,8 @@ Sender::MasterSend() {
             //Write to ostream
             if (cmd1 == 1 || cmd1 == 2) {
                 pthread_mutex_lock(mutexSenderOstream);   //lock the ostream 
-                *outputBuff << "Sending Beacon with timestamp: " << fudFact + TRANSTIME << endl;
+                *outputBuff << "Sending Beacon with timestamp: " << 
+                theRF->clock() + fudFact + TRANSTIME << endl;
                 pthread_mutex_unlock(mutexSenderOstream);   //Unlock the ostream
             }
 
@@ -66,7 +67,7 @@ Sender::MasterSend() {
             pachyderm.buildByteArray(&beaconFrame[0]);  //Fill the frame
 
             int beaconSent = send(&beaconFrame[0], pachyderm.frame_size, false, aCWmin);
-            sendBeaconTime = theRF->clock() + *fudgeFactor + (cmd0 * 1000); //Set a new beacon
+            sendBeaconTime = theRF->clock() + *fudgeFactor + (cmd3 * 1000); //Set a new beacon
                                                                                                                         //time 
             //Write to ostream
             if (cmd1 == 1 || cmd1  == 2) { 
