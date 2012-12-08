@@ -63,9 +63,10 @@ Sender::MasterSend() {
             pthread_mutex_unlock(mutexSender); //Unlock bc we are done with queue 
             //wcerr << "Got stuff off the queue" << endl;
             seqTable.increment(pachyderm.destination);  //Increment the sequence number 
-
+            
             //Construct the frame to transmit
-            buildFrame(0, false, seqTable.increment(pachyderm.destination), 1111); 
+            seqTable.increment(pachyderm.destination); //Increment the seq nume
+            buildFrame(0, false, seqTable.getSeqNum(pachyderm.destination), 1111); 
 
             //Build the byte[] to be send
             char theFrame[pachyderm.frame_size];
