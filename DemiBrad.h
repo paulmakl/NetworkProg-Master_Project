@@ -15,6 +15,7 @@
 #include "listener.h"
 #include <queue>
 #include <iostream>
+#include <time.h>
 
 using namespace std;
 
@@ -46,6 +47,7 @@ class DemiBrad{
 		pthread_mutex_t mutex_Demibrad_Sender;// = PTHREAD_MUTEX_INITIALIZER;
 		pthread_mutex_t mutex_Demibrad_ostream;
 		pthread_mutex_t mutex_Demibrad_fudge_factor;
+		pthread_mutex_t mutex_attach_rflayer;
 		volatile long long fudge_factor_Demibrad;
 		pthread_mutexattr_t attr;
 
