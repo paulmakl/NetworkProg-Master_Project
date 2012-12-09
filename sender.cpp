@@ -37,24 +37,30 @@ Sender::MasterSend() {
         //Write to ostream
         if (cmd0) {
             pthread_mutex_lock(mutexSenderOstream);   //lock the ostream 
-            *outputBuff << "Diagnostic levels: \n" << 
-                                    "1- Full, display all state information \n" <<
-                                    "2- Display beacon state information only \n" <<
-                                    "3- Display transmittion and sender state information together \n" <<
-                                    "4- Display transmittion state information only \n" <<
-                                    "5- Display reciever state information only \n \n" <<
-                                    "Current Diagnostic level: " << cmd1 << "\n" <<
-                                    "Beacon window: " << cmd3 * 1000 << "seconds \n" << endl;
+            *outputBuff << "---------------Commands and Settings-------------------- \n" <<
+                                    "Cmd #0: Display command options and cureent settings \n" <<
+                                    "Cmd #1: Set Diagnostic level \n" << 
+                                    "   Possible Diagnostic Levels: \n" << 
+                                    "       1- Full, display all state information \n" <<
+                                    "       2- Display beacon state information only \n" <<
+                                    "       3- Display transmittion and sender state information together \n" <<
+                                    "       4- Display transmittion state information only \n" <<
+                                    "       5- Display reciever state information only \n" <<
+                                    "   Current Diagnostic level: " << cmd1 << "\n" <<
+                                    "Cmd #2: Sets beacon window \n" << 
+                                    "   Current beacon window: " << cmd3 << "seconds" << endl;
                         if (cmd2) {
                             *outputBuff << 
-                                "Collision window: set to Max(" << waitTime << ")" << "\n" << endl;
+                                "Cmd #3: Sets collision window: \n" << 
+                                "   Curently set to Max(" << waitTime << ")" << endl;
                         } else {
                             *outputBuff << 
-                                "Collision window: set to Random(" << waitTime << 
-                                ")" << "\n" << endl;
+                                "Cmd #3: Sets collision window: \n" <<
+                                "   Currently set to Random(" << waitTime << ")" << endl;
                         }
+            *outputBuff << "--------------------------------------------------------" << endl;
             pthread_mutex_unlock(mutexSenderOstream);   //Unlock the ostream
-            cmd0 = 0;   //So that this does not keep printing
+            cmdVals[0] = 0;   //So that this does not keep printing
         }
 
         //Send Beacon if it is time:
