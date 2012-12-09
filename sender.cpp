@@ -21,8 +21,7 @@ void
 Sender::MasterSend() {
     cmd3 = 0;     //Initialize to 0 so we send a beacond right away
     long long sendBeaconTime = theRF->clock() + (cmd0 * 1000);  //Current time + 
-                                                                            //cmd 3 val (sec)
-
+                                                                                                         //cmd 3 val (sec)
     //Run forever doing all the things that sneder does
     while (true) {
         //Check for updated cmd values
@@ -38,12 +37,20 @@ Sender::MasterSend() {
                                     "1- Full, display all state information \n" <<
                                     "2- Display beacon state information only \n" <<
                                     "3- Display transmittion and sender state information together \n" <<
-                                    "4- Display transmittion state information only \n \n" <<
+                                    "4- Display transmittion state information only \n" <<
+                                    "5- Display reciever state information only \n \n" <<
                                     "Current Diagnostic level: " << cmd1 << "\n" <<
-                                    "Beacon window: " << cmd3 * 1000 << "seconds \n" <<
-                                    "Collision window choice: " << endl;
-
+                                    "Beacon window: " << cmd3 * 1000 << "seconds \n" << endl;
+                        if (cmd2) {
+                            *outputBuff << 
+                                "Collision window: set to Max(" << waitTime << ")" << "\n" << endl;
+                        } else {
+                            *outputBuff << 
+                                "Collision window: set to Random(" << waitTime << 
+                                ")" << "\n" << endl;
+                        }
             pthread_mutex_unlock(mutexSenderOstream);   //Unlock the ostream
+            cmd0 = 0;   //So that this does not keep printing
         }
 
         //Send Beacon if it is time:
@@ -108,7 +115,7 @@ Sender::MasterSend() {
             *ackReceived = false;   //Set acknowlegement to false because message has not
                                                 //yet been sent, so it cant have been acknowleged 
             *expSeqNum = seqTable.getSeqNum(pachyderm.destination); //Alert reciever of 
-                                                                   //which seqNum to look for
+                                                                                                             //which seqNum to look for
             //Write to ostream
             if (cmd1 == 1 || cmd1 == 3) {
                 pthread_mutex_lock(mutexSenderOstream);   //lock the ostream 
@@ -121,7 +128,7 @@ Sender::MasterSend() {
 
             //Handle retransmit
             while (pachyderm.resTransAttempts < dot11RetryLimit && !*ackReceived) {    //Less than max resend
-                                                                                      // and no ack recieved 
+                                                                                                                                     // and no ack recieved 
                 usleep(WAITTIME);   //Sleep for predetermined amount of time
                 if (!(*ackReceived))   {   //No ack recieved
 
@@ -239,8 +246,8 @@ Sender::send(char* frame, int size, bool reSend, int cWparam) {
         //Wait for channel to open
         while (!idleFlag) { 
             while ((theRF->clock() + fudFact) % 50 || theRF->inUse() ) {    //They are sending
-                                                                            //And aligns with 50 
-                                                                            //milsec mark
+                                                                                                            //And aligns with 50 
+                                                                                                            //milsec mark
                 usleep(1000); //Sleep 1 milSec
             }
             waitIFS
@@ -254,8 +261,13 @@ Sender::send(char* frame, int size, bool reSend, int cWparam) {
     //Exponential backoff:
     //Possibility for this to be a resend
     int cWindow = cWparam;
-    int waitTime = rand() % (int)pow((float)2, (float)cWindow);  //Random number in range 
-                                                                                                //[0,2^aCWmin) 
+    if (cmd2) {
+        waitTime = (int)pow((float)2, (float)cWindow)); //Pick max size for collision window
+    } else {
+        waitTime = rand() % (int)pow((float)2, (float)cWindow);  //Random number in range 
+                                                                                              //[0,2^aCWmin) 
+    }  
+
     //Write to ostream
     if (cmd1 == 1 || cmd1 == 3 || cmd1 == 4) {
         pthread_mutex_lock(mutexSenderOstream);   //lock the ostream 

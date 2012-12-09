@@ -72,7 +72,8 @@ class Sender {
                         fudgeFactor(fdgFctrDemibrad),
                         outputBuff(output),
                         seqTable(MAXSEQNUM),
-                        cmd0(0), cmd1(0), cmd2(0), cmd3(0) {}
+                        cmd0(0), cmd1(0), cmd2(0), cmd3(0) 
+                        waitTime(0) {}
         
         /**
          * Invokes the sender object to do all of its duties
@@ -108,6 +109,7 @@ class Sender {
         int cmd1;   //Gets cmd 1 value 
         int cmd2;   //Gets cmd 2 value 
         int cmd3;   //Gets cmd 3 value 
+        int waitTime; //Gets collision windo choice
 
     //Methods
         /**
