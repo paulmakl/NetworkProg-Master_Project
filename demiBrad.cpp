@@ -1,16 +1,16 @@
-#include "DemiBrad.h"
 
+// includes
+#include "DemiBrad.h"
 using namespace std;
 DemiBrad theDemibrad;
 
-// NONMEMBER FUNCTIONS
-
 /*
- * creates a sender thread and calls its infinite loop method
+ * creates a sender thread that will send packets
+ * on the queue send_Queue_demibrad
  */
 void *create_sender_thread(void *cnt){
-	usleep(100);
-	theDemibrad.RFLayer_demibrad->attachThread();
+	usleep(100); // allow time for demibrad's constructor to finish
+	theDemibrad.RFLayer_demibrad->attachThread(); // attach this thread to the RF layer
 	Sender sendy(theDemibrad.RFLayer_demibrad, 
 		&theDemibrad.send_Queue_demibrad, 
 		&theDemibrad.ack_Received_demibrad, 
@@ -23,17 +23,17 @@ void *create_sender_thread(void *cnt){
 		&theDemibrad.mutex_Demibrad_ostream,
 		&theDemibrad.mutex_Demibrad_fudge_factor, 
 		&theDemibrad.fudge_factor_Demibrad, 
-		theDemibrad.streamy_demibrad);
-	sendy.MasterSend();
-	wcerr << "This should not appear";
+		theDemibrad.streamy_demibrad); // init sender
+	sendy.MasterSend(); // have sender send
 	return (void *)0;
 }
  /*
-  * create receiver thread and calls its infinite loop method
+  * create receiver thread that puts incoming packets on
+  * the queue receive_Queue_demibrad
   */
 void *create_and_run_receiver_thread(void *cnt){
-	usleep(1000);
-	theDemibrad.RFLayer_demibrad->attachThread();
+	usleep(1000); // wait for demibrad and sender to finish initing
+	theDemibrad.RFLayer_demibrad->attachThread(); 
 	Listener listen(theDemibrad.RFLayer_demibrad, 
 		&theDemibrad.receive_Queue_demibrad, 
 		&theDemibrad.ack_Received_demibrad, 
@@ -53,12 +53,22 @@ void *create_and_run_receiver_thread(void *cnt){
 }
 
 DemiBrad::DemiBrad(short MACadr, ostream* stremy){
-	RFLayer_demibrad = new RF();
-	MACaddr_demibrad = MACadr;
-
+	RFLayer_demibrad = new RF(); // attach RF layer
 	streamy_demibrad = stremy;
+	*theDemibrad.streamy_demibrad << "RF layer created!" << endl;
+	theDemibrad.statusCode = 1;
 	
 	fudge_factor_Demibrad = 0;
+	if (MACadr < 101 || MACadr > 1800) // check for improper mac address
+	{
+		pthread_mutex_lock(&statusMutex);
+		statusCode = 8;
+		pthread_mutex_unlock(&statusMutex);
+		MACaddr_demibrad = 723; // set to 723 if mac address provided is bad
+	}else{
+		MACaddr_demibrad = MACadr;
+	}
+	// set up the mutexs
 	pthread_mutexattr_init(&attr);
 	pthread_mutex_init(&mutex_Demibrad_Sender, &attr);
 	pthread_mutex_init(&mutex_Demibrad_Receiver, &attr);
@@ -68,8 +78,8 @@ DemiBrad::DemiBrad(short MACadr, ostream* stremy){
 	// create the threads
 	pthread_t ids[3];     
     pthread_setconcurrency(5);
+    // initialize status codes
     int counts[8];
-    // create the sender and receiver threads
 	statusCode = 0; 
     cmdCode[0] = 0;
     cmdCode[1] = 0;
@@ -82,8 +92,8 @@ DemiBrad::DemiBrad(short MACadr, ostream* stremy){
     pthread_attr_t attrr;
     pthread_attr_init(&attrr);
     pthread_attr_setscope(&attrr, PTHREAD_SCOPE_SYSTEM);
+    // create the sender and receiver threads
     pthread_create(&(ids[0]), &attrr, create_sender_thread, &(counts[0]));
-    
     pthread_create(&(ids[1]), &attrr, create_and_run_receiver_thread, &(counts[1]));
 }
 
@@ -130,8 +140,10 @@ int dot11_send(short destAddr, char *buf, int bufSize){
 int DemiBrad::dot11_command_DemiBrad(int cmd, int val){
 	if (cmd > 3 || cmd < 0)
 	{
-
-		return -1;
+		pthread_mutex_lock(&statusMutex);
+		theDemibrad.statusCode = 9;
+		pthread_mutex_unlock(&statusMutex);
+		return 9;
 	}else{
 		cmdCode[cmd] = val;
 		return 1;
@@ -144,10 +156,24 @@ int DemiBrad::status_DemiBrad(){
 	return statusCode;
 }
 /*
- * receive data
- * from the incoming data queue that is filled by listner
+ * receive data from the RF layer, and return the oldest piece of data.
+ * 
  */
 int DemiBrad::dot11_recv_DemiBrad(short *srcAddr, short *destAddr, char *buf, int bufSize){
+	if (srcAddr == NULL || destAddr == NULL || buf == NULL) // check for null pointers
+	{
+		pthread_mutex_lock(&statusMutex);
+		statusCode = 7;
+		pthread_mutex_unlock(&statusMutex);
+		return 7;
+	}
+	if (bufSize < 0) // check if the bufsize is negative
+	{
+		pthread_mutex_lock(&statusMutex);
+		statusCode = 6;
+		pthread_mutex_unlock(&statusMutex);
+		return 6;
+	}
 	pthread_mutex_lock(&mutex_Demibrad_Receiver); // Lock the receiver's mutex so the receiver cannot access data while we do.
 	if(!receive_Queue_demibrad.empty()){// check if the queue containing packets addressed to us is empty
 		//if not
@@ -176,6 +202,27 @@ int DemiBrad::dot11_recv_DemiBrad(short *srcAddr, short *destAddr, char *buf, in
   * sends data by putting it in a packet and putting that in a queue for sender
   */
 int DemiBrad::dot11_send_DemiBrad(short destAddr, char *buf, int bufSize){
+	if (buf == NULL) // check if the buffer is null
+	{
+		pthread_mutex_lock(&statusMutex);
+		statusCode = 7;
+		pthread_mutex_unlock(&statusMutex);
+		return 7;
+	}
+	if (bufSize < 0) // check if the size is negative
+	{
+		pthread_mutex_lock(&statusMutex);
+		statusCode = 6;
+		pthread_mutex_unlock(&statusMutex);
+		return 6;
+	}
+	if (destAddr < 101 || destAddr > 1800) // check for proper mac address
+	{
+		pthread_mutex_lock(&statusMutex);
+		statusCode = 8;
+		pthread_mutex_unlock(&statusMutex);
+		return 8;
+	}
 	Packet temp(destAddr,buf,bufSize); // make a temporary packet
 	pthread_mutex_lock(&mutex_Demibrad_Sender);
 	if (send_Queue_demibrad.size() > 4)
