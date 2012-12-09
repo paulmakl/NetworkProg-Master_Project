@@ -17,7 +17,7 @@ void *create_sender_thread(void *cnt){
 	theDemibrad.RFLayer_demibrad->attachThread();
 	//wcerr << "T" << endl;
 	//pthread_mutex_unlock(&theDemibrad.mutex_attach_rflayer);
-	//wcerr << "T" << endl;
+	//wcerr << "T" << endl; rawr
 	//wcerr << "LISTENER HAS LET GO OF THE RF LAYER." << endl;
 	//wcerr << "sender thread";
 	Sender sendy(theDemibrad.RFLayer_demibrad, 
