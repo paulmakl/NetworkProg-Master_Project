@@ -415,6 +415,12 @@ public class WiFiClient implements ActionListener, Runnable {
       Random rand = new Random();
       short mac;
 
+      try {
+        System.in.read();
+    } catch (IOException e) {
+        // TODO Auto-generated catch block
+        e.printStackTrace();
+    }
       // Take MAC on command-line if it's available, or create a random MAC
       
       if (args.length > 0) {
