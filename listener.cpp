@@ -22,7 +22,7 @@ Listener::read_Packet ()
     {
         case 0:
             if (prints) wcerr << "Data packet received." << endl;
-            if ( commands[1] == 1 || commands[1] == 5 ) *streamy << "Data packet received." << endl
+            if ( commands[1] == 1 || commands[1] == 5 ) *streamy << "Data packet received." << endl;
             if (packetDest != MACaddrList && packetDest != -1)//compare the destination of this packet to our MAC address and to the broadcast address
             {
                 status = 0;//this packet isn't for us

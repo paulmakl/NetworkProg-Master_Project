@@ -72,7 +72,7 @@ class Sender {
                         fudgeFactor(fdgFctrDemibrad),
                         outputBuff(output),
                         seqTable(MAXSEQNUM),
-                        cmd0(0), cmd1(0), cmd2(0), cmd3(0) 
+                        cmd0(0), cmd1(0), cmd2(0), cmd3(0),
                         waitTime(0) {}
         
         /**

@@ -280,7 +280,7 @@ Sender::send(char* frame, int size, bool reSend, int cWparam) {
     //Possibility for this to be a resend
     int cWindow = cWparam;
     if (cmd2) {
-        waitTime = (int)pow((float)2, (float)cWindow)); //Pick max size for collision window
+        waitTime = (int)pow((float)2, (float)cWindow); //Pick max size for collision window
     } else {
         waitTime = rand() % (int)pow((float)2, (float)cWindow);  //Random number in range 
                                                                                               //[0,2^aCWmin) 
