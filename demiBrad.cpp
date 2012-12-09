@@ -55,8 +55,8 @@ void *create_and_run_receiver_thread(void *cnt){
 DemiBrad::DemiBrad(short MACadr, ostream* stremy){
 	RFLayer_demibrad = new RF(); // attach RF layer
 	streamy_demibrad = stremy;
-	*theDemibrad.streamy_demibrad << "RF layer created!" << endl;
-	theDemibrad.statusCode = 1;
+	//*theDemibrad.streamy_demibrad << "RF layer created!" << endl;
+	statusCode = 1;
 	
 	fudge_factor_Demibrad = 0;
 	if (MACadr < 101 || MACadr > 1800) // check for improper mac address
@@ -140,9 +140,9 @@ int dot11_send(short destAddr, char *buf, int bufSize){
 int DemiBrad::dot11_command_DemiBrad(int cmd, int val){
 	if (cmd > 3 || cmd < 0)
 	{
-		pthread_mutex_lock(&theDemibrad.statusMutex);
-		theDemibrad.statusCode = 9;
-		pthread_mutex_unlock(&theDemibrad.statusMutex);
+		pthread_mutex_lock(&statusMutex);
+		statusCode = 9;
+		pthread_mutex_unlock(&statusMutex);
 		return 9;
 	}else{
 		cmdCode[cmd] = val;
@@ -162,23 +162,23 @@ int DemiBrad::status_DemiBrad(){
 int DemiBrad::dot11_recv_DemiBrad(short *srcAddr, short *destAddr, char *buf, int bufSize){
 	if (srcAddr == NULL || destAddr == NULL || buf == NULL) // check for null pointers
 	{
-		pthread_mutex_lock(&theDemibrad.statusMutex);
-		theDemibrad.statusCode = 7;
-		pthread_mutex_unlock(&theDemibrad.statusMutex);
+		pthread_mutex_lock(&statusMutex);
+		statusCode = 7;
+		pthread_mutex_unlock(&statusMutex);
 		return 7;
 	}
 	if (bufSize < 0) // check if the bufsize is negative
 	{
-		pthread_mutex_lock(&theDemibrad.statusMutex);
-		theDemibrad.statusCode = 6;
-		pthread_mutex_unlock(&theDemibrad.statusMutex);
+		pthread_mutex_lock(&statusMutex);
+		statusCode = 6;
+		pthread_mutex_unlock(&statusMutex);
 		return 6;
 	}
-	pthread_mutex_lock(&theDemibrad.mutex_Demibrad_Receiver); // Lock the receiver's mutex so the receiver cannot access data while we do.
+	pthread_mutex_lock(&mutex_Demibrad_Receiver); // Lock the receiver's mutex so the receiver cannot access data while we do.
 	if(!receive_Queue_demibrad.empty()){// check if the queue containing packets addressed to us is empty
 		//if not
 		Packet temp = receive_Queue_demibrad.front(); // make a temporary packet
-		theDemibrad.receive_Queue_demibrad.pop(); // pop of the front to a packet
+		receive_Queue_demibrad.pop(); // pop of the front to a packet
 		
 		int size = temp.frame_size;
 		int i = 0;
@@ -190,11 +190,11 @@ int DemiBrad::dot11_recv_DemiBrad(short *srcAddr, short *destAddr, char *buf, in
 		*destAddr = temp.destination;
 		*srcAddr = temp.sender;
 		wcerr << temp.sender << " is the sender address " << temp.destination << " is the destination address. " << endl;
-		pthread_mutex_unlock(&theDemibrad.mutex_Demibrad_Receiver);
+		pthread_mutex_unlock(&mutex_Demibrad_Receiver);
 		return temp.bytes_to_send;
 	}else{
 		//if it is empty, unlock the mutex and return -1
-		pthread_mutex_unlock(&theDemibrad.mutex_Demibrad_Receiver);
+		pthread_mutex_unlock(&mutex_Demibrad_Receiver);
 		return -1;
 	}
 }
@@ -204,34 +204,34 @@ int DemiBrad::dot11_recv_DemiBrad(short *srcAddr, short *destAddr, char *buf, in
 int DemiBrad::dot11_send_DemiBrad(short destAddr, char *buf, int bufSize){
 	if (buf == NULL) // check if the buffer is null
 	{
-		pthread_mutex_lock(&theDemibrad.statusMutex);
-		theDemibrad.statusCode = 7;
-		pthread_mutex_unlock(&theDemibrad.statusMutex);
+		pthread_mutex_lock(&statusMutex);
+		statusCode = 7;
+		pthread_mutex_unlock(&statusMutex);
 		return 7;
 	}
 	if (bufSize < 0) // check if the size is negative
 	{
-		pthread_mutex_lock(&theDemibrad.statusMutex);
-		theDemibrad.statusCode = 6;
-		pthread_mutex_unlock(&theDemibrad.statusMutex);
+		pthread_mutex_lock(&statusMutex);
+		statusCode = 6;
+		pthread_mutex_unlock(&statusMutex);
 		return 6;
 	}
 	if (destAddr < 101 || destAddr > 1800) // check for proper mac address
 	{
-		pthread_mutex_lock(&theDemibrad.statusMutex);
-		theDemibrad.statusCode = 8;
-		pthread_mutex_unlock(&theDemibrad.statusMutex);
+		pthread_mutex_lock(&statusMutex);
+		statusCode = 8;
+		pthread_mutex_unlock(&statusMutex);
 		return 8;
 	}
 	Packet temp(destAddr,buf,bufSize); // make a temporary packet
-	pthread_mutex_lock(&theDemibrad.mutex_Demibrad_Sender);
-	if (theDemibrad.send_Queue_demibrad.size() > 4)
+	pthread_mutex_lock(&mutex_Demibrad_Sender);
+	if (send_Queue_demibrad.size() > 4)
 	{
-		pthread_mutex_unlock(&theDemibrad.mutex_Demibrad_Sender);
+		pthread_mutex_unlock(&mutex_Demibrad_Sender);
 		return -1;
 	}else{
-		theDemibrad.send_Queue_demibrad.push(temp);
-		pthread_mutex_unlock(&theDemibrad.mutex_Demibrad_Sender);
+		send_Queue_demibrad.push(temp);
+		pthread_mutex_unlock(&mutex_Demibrad_Sender);
 		return bufSize;
 	}
 }
