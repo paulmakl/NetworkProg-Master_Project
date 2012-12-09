@@ -66,6 +66,11 @@ class DemiBrad{
         short MACaddr_demibrad; // users mac address
 };
 
+
+// outside methods, these are the methods that are available to the layer above that then call the corresponding
+// method that is located in demibrad.
 int dot11_init(short MACadr, ostream* stremy);
 int dot11_send(short destAddr, char *buf, int bufSize);
 int dot11_recv(short *srcAddr, short *destAddr, char *buf, int bufSize);
+int dot11_command(int cmd, int val);
+int dot11_status();
