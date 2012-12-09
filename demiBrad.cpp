@@ -6,20 +6,11 @@ DemiBrad theDemibrad;
 // NONMEMBER FUNCTIONS
 
 /*
- * creates a sender thread
+ * creates a sender thread and calls its infinite loop method
  */
 void *create_sender_thread(void *cnt){
-	//wcerr << "S" << endl;
-	//pthread_mutex_lock(&theDemibrad.mutex_attach_rflayer);
-	//wcerr << "LISTENER HAS ACCESS TO THE RF LAYER." << endl;
 	usleep(100);
-	//wcerr << "S" << endl;
 	theDemibrad.RFLayer_demibrad->attachThread();
-	//wcerr << "T" << endl;
-	//pthread_mutex_unlock(&theDemibrad.mutex_attach_rflayer);
-	//wcerr << "T" << endl;
-	//wcerr << "LISTENER HAS LET GO OF THE RF LAYER." << endl;
-	//wcerr << "sender thread";
 	Sender sendy(theDemibrad.RFLayer_demibrad, 
 		&theDemibrad.send_Queue_demibrad, 
 		&theDemibrad.ack_Received_demibrad, 
@@ -29,27 +20,20 @@ void *create_sender_thread(void *cnt){
 		&theDemibrad.statusCode, 
 		&theDemibrad.cmdCode[0], 
 		&theDemibrad.statusMutex, 
-		&theDemibrad.mutex_Demibrad_ostream, 
-		&theDemibrad.mtxDemibradFdgFctr, 
-		&theDemibrad.fdgFctrDemibrad, 
+		&theDemibrad.mutex_Demibrad_ostream,
+		&theDemibrad.mutex_Demibrad_fudge_factor, 
+		&theDemibrad.fudge_factor_Demibrad, 
 		theDemibrad.streamy_demibrad);
-	//wcerr << "D" << endl;
 	sendy.MasterSend();
 	wcerr << "This should not appear";
 	return (void *)0;
 }
  /*
-  * create receiver thread
+  * create receiver thread and calls its infinite loop method
   */
 void *create_and_run_receiver_thread(void *cnt){
-	//wcerr << "L" << endl;
-	//pthread_mutex_lock(&theDemibrad.mutex_attach_rflayer);
 	usleep(1000);
-	//wcerr << "L" << endl;
 	theDemibrad.RFLayer_demibrad->attachThread();
-	//wcerr << "M" << endl;
-	//pthread_mutex_unlock(&theDemibrad.mutex_attach_rflayer);
-	//wcerr << "M" << endl;
 	Listener listen(theDemibrad.RFLayer_demibrad, 
 		&theDemibrad.receive_Queue_demibrad, 
 		&theDemibrad.ack_Received_demibrad, 
@@ -61,8 +45,7 @@ void *create_and_run_receiver_thread(void *cnt){
 		&theDemibrad.mutex_Demibrad_fudge_factor, 
 		&theDemibrad.fudge_factor_Demibrad, 
 		&theDemibrad.cmdCode[0], 
-		&theDemibrad.status);
-	//wcerr << "E" << endl;
+		&theDemibrad.statusCode);
 	listen.UltraListen();
 	wcerr << "This should not appear again";
 	return (void *)0;
@@ -82,12 +65,9 @@ DemiBrad::DemiBrad(short MACadr, ostream* stremy){
 	pthread_mutex_init(&mutex_Demibrad_fudge_factor, &attr);
 	pthread_mutex_init(&mutex_attach_rflayer, &attr);
 	// create the threads
-	pthread_t ids[3];
-
-      
+	pthread_t ids[3];     
     pthread_setconcurrency(5);
     int counts[8];
-    //RFLayer_demibrad->attachThread();
     // create the sender and receiver threads
 	statusCode = 0; 
     cmdCode[0] = 0;
@@ -96,28 +76,35 @@ DemiBrad::DemiBrad(short MACadr, ostream* stremy){
     cmdCode[3] = 30;
     pthread_mutex_init(&statusMutex, &attr);
     pthread_mutex_init(&mutex_Demibrad_ostream, &attr);
-    pthread_mutex_init(&mtxDemibradFdgFctr, &attr);
-    fdgFctrDemibrad = 5; // CHANGE THIS
+    pthread_mutex_init(&mutex_Demibrad_fudge_factor, &attr);
+    fudge_factor_Demibrad = 5; // CHANGE THIS
     pthread_attr_t attrr;
     pthread_attr_init(&attrr);
     pthread_attr_setscope(&attrr, PTHREAD_SCOPE_SYSTEM);
     pthread_create(&(ids[0]), &attrr, create_sender_thread, &(counts[0]));
     
     pthread_create(&(ids[1]), &attrr, create_and_run_receiver_thread, &(counts[1]));
-    //wcerr << "D" << endl;
 }
 
+/*
+ * intializes this layer 
+ */
 int dot11_init(short MACadr, ostream* stremy){
 	DemiBrad temp(MACadr, stremy);
 	theDemibrad = temp;
 	return 1;
 }
 
-
+/*
+ * recives data
+ */
 int dot11_recv(short *srcAddr, short *destAddr, char *buf, int bufSize){
 	return theDemibrad.dot11_recv_DemiBrad(srcAddr, destAddr, buf, bufSize); //BRAD LOOK HERE: jump to line 96
 }
 
+/*
+ * adjust the current command levels
+ */
 int dot11_command(int cmd, int val){
 	return theDemibrad.dot11_command_DemiBrad(cmd,val);
 }
@@ -129,7 +116,7 @@ int status(){
 }
 
  /*
-  * send data
+  * takes data from the layer above and hands it off to the sender thread
   */
 int dot11_send(short destAddr, char *buf, int bufSize){
 	return theDemibrad.dot11_send_DemiBrad(destAddr, buf, bufSize);
@@ -137,11 +124,12 @@ int dot11_send(short destAddr, char *buf, int bufSize){
 //MEMBER FUNCTIONS
 
  /*
-  * unimplemented
+  * sets the command levels that are used by the listener and sender threads
   */
 int DemiBrad::dot11_command_DemiBrad(int cmd, int val){
 	if (cmd > 3 || cmd < 0)
 	{
+
 		return -1;
 	}else{
 		cmdCode[cmd] = val;
@@ -149,14 +137,14 @@ int DemiBrad::dot11_command_DemiBrad(int cmd, int val){
 	}
 }
  /*
-  * unimplemented
+  * returns the most recent status/error code 
   */
 int DemiBrad::status_DemiBrad(){
 	return statusCode;
 }
 /*
  * receive data
- * BRAD LOOK HERE: This is the function that receives data! 
+ * from the incoming data queue that is filled by listner
  */
 int DemiBrad::dot11_recv_DemiBrad(short *srcAddr, short *destAddr, char *buf, int bufSize){
 	pthread_mutex_lock(&mutex_Demibrad_Receiver); // Lock the receiver's mutex so the receiver cannot access data while we do.
@@ -166,12 +154,7 @@ int DemiBrad::dot11_recv_DemiBrad(short *srcAddr, short *destAddr, char *buf, in
 		receive_Queue_demibrad.pop(); // pop of the front to a packet
 		
 		int size = temp.frame_size;
-		//wcerr << "************ destination Address:" << size << endl;
-		//char * tempBufP = &tempBuf[0];
-		//wcerr << "Entering troubled function ..." << endl;
-		//wcerr << "Exiting troubled function ..." << endl; // BRAD LOOK HERE
 		int i = 0;
-		//char tempBuf[temp.frame_size]; // BRAD LOOK HERE: I have created a temporary buffer
 		while(i < temp.bytes_to_send){ // put the data in the buffer into the buffer that is being returned
 			buf[i] = temp.physical_data_array[i];
 			wcerr << buf[i] << " :: ";
@@ -180,7 +163,6 @@ int DemiBrad::dot11_recv_DemiBrad(short *srcAddr, short *destAddr, char *buf, in
 		*destAddr = temp.destination;
 		*srcAddr = temp.sender;
 		pthread_mutex_unlock(&mutex_Demibrad_Receiver);
-		//wcerr << endl << "Bytes Sent :: " << temp.bytes_to_send << endl;
 		return temp.bytes_to_send;
 	}else{
 		//if it is empty, unlock the mutex and return -1
@@ -189,14 +171,10 @@ int DemiBrad::dot11_recv_DemiBrad(short *srcAddr, short *destAddr, char *buf, in
 	}
 }
  /*
-  * send data
+  * sends data by putting it in a packet and putting that in a queue for sender
   */
 int DemiBrad::dot11_send_DemiBrad(short destAddr, char *buf, int bufSize){
-	//char test[] = "RAWR MY NAME IS PAUL RAWR RAWR\n";
-	//char * pointer = &test[0];
-	//theDemibrad.*streamy_demibrad.write(pointer, 31);
 	Packet temp(destAddr,buf,bufSize); // make a temporary packet
-	//memory_buffer_demibrad[memory_buffer_number_count_demibrad] = temp; //put the temporary packet in the memory buffer
 	pthread_mutex_lock(&mutex_Demibrad_Sender);
 	if (send_Queue_demibrad.size() > 4)
 	{

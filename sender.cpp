@@ -21,7 +21,7 @@ void
 Sender::MasterSend() {
     cmd3 = 0;     //Initialize to 0 so we send a beacond right away
     long long sendBeaconTime = theRF->clock() + (cmd0 * 1000);  //Current time + 
-                                                                                                        //cmd 3 val (sec)
+                                                                            //cmd 3 val (sec)
 
     //Run forever doing all the things that sneder does
     while (true) {
@@ -32,10 +32,6 @@ Sender::MasterSend() {
         cmd3 = cmdVals[3];
 
         //Write to ostream
-        //wcerr << "cmd0: " << cmd0 << endl;
-        //wcerr << "cmd1: " << cmd1 << endl;
-        //wcerr << "cmd2: " << cmd2 << endl;
-        //wcerr << "cmd3: " << cmd3 << endl;
         if (cmd0) {
             pthread_mutex_lock(mutexSenderOstream);   //lock the ostream 
             *outputBuff << "Diagnostic levels: \n" << 
@@ -112,7 +108,7 @@ Sender::MasterSend() {
             *ackReceived = false;   //Set acknowlegement to false because message has not
                                                 //yet been sent, so it cant have been acknowleged 
             *expSeqNum = seqTable.getSeqNum(pachyderm.destination); //Alert reciever of 
-                                                                                                              //which seqNum to look for
+                                                                   //which seqNum to look for
             //Write to ostream
             if (cmd1 == 1 || cmd1 == 3) {
                 pthread_mutex_lock(mutexSenderOstream);   //lock the ostream 
@@ -125,7 +121,7 @@ Sender::MasterSend() {
 
             //Handle retransmit
             while (pachyderm.resTransAttempts < dot11RetryLimit && !*ackReceived) {    //Less than max resend
-                                                                                                                                  // and no ack recieved 
+                                                                                      // and no ack recieved 
                 usleep(WAITTIME);   //Sleep for predetermined amount of time
                 if (!(*ackReceived))   {   //No ack recieved
 
@@ -152,7 +148,6 @@ Sender::MasterSend() {
             }
         }
     }
-             //Free memory because this is c++
 }
 
 int
@@ -244,8 +239,8 @@ Sender::send(char* frame, int size, bool reSend, int cWparam) {
         //Wait for channel to open
         while (!idleFlag) { 
             while ((theRF->clock() + fudFact) % 50 || theRF->inUse() ) {    //They are sending
-                                                                                                                //And aligns with 50 
-                                                                                                                //milsec mark
+                                                                            //And aligns with 50 
+                                                                            //milsec mark
                 usleep(1000); //Sleep 1 milSec
             }
             waitIFS
@@ -301,7 +296,6 @@ int
 Sender::resend() {
     buildFrame(0, true, seqTable.getSeqNum(pachyderm.destination), 1111);
     char theFrame[pachyderm.frame_size];
-    //char* pointerToTheFrame = &theFrame[0];
     pachyderm.buildByteArray(&theFrame[0]); //Fill theFrame
     pachyderm.resTransAttempts++;     //Increment the times we have tried to resend 
 

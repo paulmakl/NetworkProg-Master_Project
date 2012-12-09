@@ -154,10 +154,45 @@ int Packet::buildByteArray(char *buffer){
 	//wcerr << "FIN" << endl;
 }
 
-//void Packet::build_CRC(char *data, int size){
+void Packet::build_CRC(char *data, int size, int CRCTT){
+	int CRC_index = 0;
+	int final_size_bits = ((size+4)*8);
+	int final_size_bytes = size+4;
+	char temp_physical_array[2048];
+	pointer_data_to_physical_universal(data,&temp_physical_array[0],size+4);
+	for (int i = 0; i < final_size_bits; ++i)
+	{
+		char n_crc_bit = get_nth_bit(CRCTT, (32 - CRC_index));
+		unsigned char n_data_bit = get_nth_bit(data[i/8],(8-(i%8)));
+		char result_xor = n_data_bit ^ n_crc_bit;
+		/*if (n_data_bit != result_xor)
+		{
+			//flip_nth_bit()
+		}*/
+	}
 
+}
 
-//}
+char Packet::get_nth_bit(char dta, int n){
+	unsigned char nbit = dta;
+	nbit = nbit << (8-n);
+	nbit = nbit >> 7;
+	return nbit;
+}
+
+void Packet::flip_nth_bit(char *dta, int n){
+	unsigned char flipper = 1;
+	flipper = flipper << (n-1);
+	*dta = *dta ^ flipper;
+}
+
+void Packet::pointer_data_to_physical_universal(char* data, char *put_data_here, int size){
+	int i = 0;
+	while(i < size){
+		put_data_here[i] = data[i];
+		i++;
+	}
+}
 
 /*void Packet::shift_char_array(char *data, int size){
 	int i = 0;
