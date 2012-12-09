@@ -111,14 +111,6 @@ class Sender {
         int cmd3;   //Gets cmd 3 value 
         int waitTime; //Gets collision windo choice
 
-    //Methods
-        /**
-        * Temporary method for computing an exponent
-        * param base the base to raise
-        * power to raise the base to
-        */
-        int intPow(int base, int power);
-
         /**
         * Builds a beacon frame
         * param timeParam The RF time plus our fudge factor for adjustment
