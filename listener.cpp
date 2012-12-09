@@ -113,6 +113,7 @@ Listener::UltraListen()
                 if (seqNum == *expectedSN)//confirm that the ack matches the data packet last sent by sender
                 {
                     *ackReceivedL = true;//let sender know that an ack has come in and to send the next packet
+                        //TODO UPDATE STATUS CODE HERE: SET TO 4 TX_DELIVERED
                 }
                 else
                 {

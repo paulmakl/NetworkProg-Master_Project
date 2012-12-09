@@ -19,10 +19,14 @@ using std::rand;
 
 void 
 Sender::MasterSend() {
+    //Overhead
     cmd3 = 0;     //Initialize to 0 so we send a beacond right away
     long long sendBeaconTime = theRF->clock() + (cmd0 * 1000);  //Current time + 
                                                                                                          //cmd 3 val (sec)
-    //Run forever doing all the things that sneder does
+    int packetSent = 0; //Flag to mark if data was sent
+    int beaconSent = 0; //Flag to mark if a beacon was sent
+
+    //Run forever doing all the things that sender does
     while (true) {
         //Check for updated cmd values
         cmd0 = cmdVals[0];
@@ -75,11 +79,11 @@ Sender::MasterSend() {
 
             int beaconSent = send(&beaconFrame[0], pachyderm.frame_size, false, aCWmin);
             sendBeaconTime = theRF->clock() + *fudgeFactor + (cmd3 * 1000); //Set a new beacon
-                                                                            //time 
+                                                                                                                        //time 
             //Write to ostream
             if (cmd1 == 1 || cmd1  == 2) { 
                 pthread_mutex_lock(mutexSenderOstream);   //lock the ostream 
-                if (beaconSent == 1) {
+                if (beaconSent) {
                     *outputBuff << "Beacon transmitted" << endl;
                 } else {
                     *outputBuff << "Beacon failed to transmit" << endl;
@@ -111,7 +115,7 @@ Sender::MasterSend() {
             char theFrame[pachyderm.frame_size];
             pachyderm.buildByteArray(&theFrame[0]); //Fill theFrame
             
-            //Transmit
+            //Prepare to transmit
             *ackReceived = false;   //Set acknowlegement to false because message has not
                                                 //yet been sent, so it cant have been acknowleged 
             *expSeqNum = seqTable.getSeqNum(pachyderm.destination); //Alert reciever of 
@@ -124,7 +128,13 @@ Sender::MasterSend() {
                 pthread_mutex_unlock(mutexSenderOstream);   //Unlock the ostream
             }
 
-            int doesItSend = send(&theFrame[0], pachyderm.frame_size, false, aCWmin);
+            //Transmit
+            int packetSent = send(&theFrame[0], pachyderm.frame_size, false, aCWmin);
+
+            //Write to ostream
+            pthread_mutex_unlock(mutexSenderOstream);
+            *outputBuff << "Data transmitted" << endl;
+            pthread_mutex_unlock(mutexSenderOstream);
 
             //Handle retransmit
             while (pachyderm.resTransAttempts < dot11RetryLimit && !*ackReceived) {    //Less than max resend
@@ -138,6 +148,11 @@ Sender::MasterSend() {
                         *outputBuff << "Sender timeout: Restransmitting("<< pachyderm.resTransAttempts << ")" << endl;
                         pthread_mutex_unlock(mutexSenderOstream);   //Unlock the ostream
                     }
+
+                    //Update status code
+                    pthread_mutex_lock(mutexStatus);    //Lock the status mutex
+                    *statCode = 5;      //TX_FAILED
+                    pthread_mutex_unlock(mutexStatus);  //Unlock the mutex
 
                     resend();   //retransmit 
                 }
@@ -220,16 +235,19 @@ Sender::send(char* frame, int size, bool reSend, int cWparam) {
                         usleep(1000);  //Sleep 1 milsec  
                 }
                if (theRF->transmit(frame, size) != size) {  //Makes the transmission
-                    return 2; //Did not send all of frame or something failed internally
-                    //TODO Add status output
+                    //Update status code
+                    pthread_mutex_lock(mutexStatus);    //Lock the status mutex
+                    *statCode = 2;      //UNSPECIFIED_ERROR
+                    pthread_mutex_unlock(mutexStatus);  //Unlock the mutex
+
+                    return 0; //Did not send all of frame or something failed internally
                 } else {
                     //Write to ostream
                     if (cmd1 == 1 || cmd1 == 3 || cmd1 == 4) {
                         pthread_mutex_lock(mutexSenderOstream);   //lock the ostream 
-                        *outputBuff << "Channel status: idle -> transmitting" << endl;
+                        *outputBuff << "Channel status: idle" << endl;
                         pthread_mutex_unlock(mutexSenderOstream);   //Unlock the ostream
                     }
-
                     return 1; //Frame transmitted properly 
                 }
             }
@@ -237,7 +255,7 @@ Sender::send(char* frame, int size, bool reSend, int cWparam) {
         //Write to ostream
         if (cmd1 == 1 || cmd1 == 3 || cmd1 == 4) {
             pthread_mutex_lock(mutexSenderOstream);   //lock the ostream 
-            *outputBuff << "Channel status: busy -> waiting" << endl;
+            *outputBuff << "Channel status: busy -> waiting for transmittion to end" << endl;
             pthread_mutex_unlock(mutexSenderOstream);   //Unlock the ostream
         }
 
@@ -289,12 +307,12 @@ Sender::send(char* frame, int size, bool reSend, int cWparam) {
                 waitIFS
         } else {
             if (theRF->transmit(frame, size) != size) {  //Makes the transmission 
-                return 2; //Did not send all of frame or something failed internally
+                return 0; //Did not send all of frame or something failed internally
             } else {
                 //Write to ostream
                 if (cmd1 == 1 || cmd1 == 3 || cmd1 == 4) {
                     pthread_mutex_lock(mutexSenderOstream);   //lock the ostream 
-                    *outputBuff << "Channel status: idle -> transmitting" << endl;
+                    *outputBuff << "Channel status: idle" << endl;
                     pthread_mutex_unlock(mutexSenderOstream);   //Unlock the ostream
                 }
 
