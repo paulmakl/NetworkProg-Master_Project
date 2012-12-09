@@ -37,7 +37,8 @@ public:
         pthread_mutex_t *mutexDemibradFudgeFactorInput, 
         volatile long long *fudgeFactorDemibrad, 
         volatile int *cmds, 
-        volatile int *statusCode) 
+        volatile int *statusCode,
+        ostream * streamypaul) 
     : seqNumMang(MAXSEQNUM), 
     MACaddrList(myMAC), 
     ackReceivedL(receivedFlag), 
@@ -51,7 +52,9 @@ public:
     fudgeFactor(fudgeFactorDemibrad), 
     commands(cmds), 
     status(statusCode), 
-    statusMutex(statusCodeMutex) {}
+    statusMutex(statusCodeMutex),
+    streamy(streamypaul)
+     {}
     
     /*
      * the heart of the listener watches activity on the RF layer and blocks until a packet is recived
