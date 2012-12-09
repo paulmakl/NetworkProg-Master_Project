@@ -69,11 +69,11 @@ Listener::UltraListen()
         bytesReceived = daRF->receive(buf, MAXPACKETSIZE);//block until data comes our way 
         if (prints) wcerr << "Received a Packet with " << bytesReceived << " bytes of data!" << endl;
         if (commands[1] == 1 || commands[1] == 5) *streamy << "Received a Packet with " << bytesReceived << " bytes of data!" << endl;
-        PRR = read_Packet();//determin frame type
         short dataSource;
         dataSource = extractSourceAddress();
         short seqNum;
         seqNum = extractSequenceNumber();
+        PRR = read_Packet();
         switch (PRR)// based on the frame type do different things
         {
            case 1:
@@ -132,10 +132,14 @@ Listener::UltraListen()
                 long long diff = newTimeStamp - ourTmSmp;// compute the difference 
                 if (diff > 0)//if their clock is running faster than ours go to their time
                 {
+                    if (commands[1] == 1 || commands[1] == 5) *streamy << "Adjusting our time stamp" <<endl;
                     pthread_mutex_lock(fugFacMutex);
                     fudgeFactor = &diff;// update the fudge factor 
                     pthread_mutex_unlock(fugFacMutex);
-                    //TODO figure our our program times for sending and reciving
+                }
+                else
+                {
+                    if (commands[1] == 1 || commands[1] == 5) *streamy << "Didn't adjust timeStamp" << endl; //KILL ME
                 }
                 }
                 break;
