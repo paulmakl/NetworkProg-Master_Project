@@ -20,7 +20,8 @@ void *create_sender_thread(void *cnt){
 		&theDemibrad.statusCode, 
 		&theDemibrad.cmdCode[0], 
 		&theDemibrad.statusMutex, 
-		&theDemibrad.mutex_Demibrad_ostream, 
+		&theDemibrad.mutex_Demibrad_ostream,
+		&theDemibrad.mutex_Demibrad_fudge_factor, 
 		&theDemibrad.fudge_factor_Demibrad, 
 		theDemibrad.streamy_demibrad);
 	sendy.MasterSend();
@@ -44,7 +45,7 @@ void *create_and_run_receiver_thread(void *cnt){
 		&theDemibrad.mutex_Demibrad_fudge_factor, 
 		&theDemibrad.fudge_factor_Demibrad, 
 		&theDemibrad.cmdCode[0], 
-		&theDemibrad.status);
+		&theDemibrad.statusCode);
 	listen.UltraListen();
 	wcerr << "This should not appear again";
 	return (void *)0;
@@ -75,7 +76,7 @@ DemiBrad::DemiBrad(short MACadr, ostream* stremy){
     cmdCode[3] = 30;
     pthread_mutex_init(&statusMutex, &attr);
     pthread_mutex_init(&mutex_Demibrad_ostream, &attr);
-    pthread_mutex_init(&fudge_factor_Demibrad, &attr);
+    pthread_mutex_init(&mutex_Demibrad_fudge_factor, &attr);
     fudge_factor_Demibrad = 5; // CHANGE THIS
     pthread_attr_t attrr;
     pthread_attr_init(&attrr);

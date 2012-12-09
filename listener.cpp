@@ -54,7 +54,7 @@ Listener::read_Packet ()
 
         default:
             if (prints) wcerr << "Unknown packet type received." << endl;
-            if (commands[1] == 1 || commands[1] == 5) *streamy streamy << "Unknown packet type received." << endl;
+            if (commands[1] == 1 || commands[1] == 5) *streamy << "Unknown packet type received." << endl;
             status = 4;
             break;
     }
@@ -77,12 +77,13 @@ Listener::UltraListen()
         switch (PRR)// based on the frame type do different things
         {
             case 1:
+                {
                 if ( seqNumMang.getSeqNum(dataSource) + 1 == seqNum )
                 {
                     if ( daLoopLine->size() > 4)
                     {
                         pthread_mutex_lock(statusMutex);
-                        status = 10; // report that the queue for incoming data is full
+                        *status = 10; // report that the queue for incoming data is full
                         pthread_mutex_unlock(statusMutex);
                         if (prints) wcerr << "Queue too full to recive incoming Packets" << endl;
                         if (commands[1] == 1 || commands[1] == 5) *streamy << "Queue too full to recive incoming Packets" << endl;
@@ -104,9 +105,11 @@ Listener::UltraListen()
                     if (prints) wcerr << "Unexpected sequence number for DATA from " << extractSourceAddress() << endl;
                     if (commands[1] == 1 || commands[1] == 5) *streamy << "Unexpected sequence number" << endl;
                 }
+                }
                 break;
 
             case 2:
+                {
                 if (seqNum == *expectedSN)//confirm that the ack matches the data packet last sent by sender
                 {
                     *ackReceivedL = true;//let sender know that an ack has come in and to send the next packet
@@ -116,9 +119,11 @@ Listener::UltraListen()
                     if (prints) wcerr << "Unexpected sequence number for ACK" << endl;
                     if (commands[1] == 1 || commands[1] == 5) *streamy << "Unexpected sequence number" << endl;
                 }
+                }
                 break;
 
             case 3:
+                {
                 long long newTimeStamp = extractTimeStamp();//get their timpe stamp from them
                 volatile long long ourTmSmp = daRF->clock() + *fudgeFactor;//figure out what time we think it is
                 long long diff = newTimeStamp - ourTmSmp;// compute the difference 
@@ -127,13 +132,15 @@ Listener::UltraListen()
                     fudgeFactor = &diff;// update the fudge factor 
                     //TODO figure our our program times for sending and reciving
                 }
+                }
                 break;
 
             default:
+                {
                 pthread_mutex_lock(statusMutex);
-                status = 2; // report that the queue for incoming data is full
+                *status = 2; // report that the queue for incoming data is full
                 pthread_mutex_unlock(statusMutex);
-                break;
+                }break;
         }
     }
 }
