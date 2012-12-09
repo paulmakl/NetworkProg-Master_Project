@@ -38,7 +38,7 @@ Packet::Packet(char *pac, int byts)
     CRC = 0;
 }
 // Packet for acknowledgement
-Packet::Packet(short destaddr, short seqnum){
+Packet::Packet(short destaddr, short seqnum, short sourcey){
 	sequence_number = seqnum;
 	destination = destaddr;
 	bytes_to_send = 0;
@@ -46,6 +46,7 @@ Packet::Packet(short destaddr, short seqnum){
 	frametype = 1;
 	resend = false;
 	CRC = 0;
+	sender = sourcey;
 }
 
 // takes a pointer to an array of data and copies it into the phyical data array in the packet class
@@ -146,37 +147,75 @@ int Packet::buildByteArray(char *buffer){
 	// after the header. we go through the data in 'data' and 
 	// put it in the buffer.
 	//wcerr << "Checkpoint" << endl;
+
 	while(i < bytes_to_send){
 		buffer[i+6] = physical_data_array[i];
 		//wcerr << " ::" << i << physical_data_array[i];
 		i++;
 	}
+
+	//build_CRC(&buffer[0], bytes_to_send + 6, 79764919);
+
 	//wcerr << "FIN" << endl;
 }
 
-void Packet::build_CRC(char *data, int size, int CRCTT){
-	int CRC_index = 0;
-	int final_size_bits = ((size+4)*8);
+/*void Packet::build_CRC(char *data, int size, int CRCTT){
+	int CRC_index = -1;
+	int data_size_bits = ((size)*8);
 	int final_size_bytes = size+4;
 	char temp_physical_array[2048];
-	pointer_data_to_physical_universal(data,&temp_physical_array[0],size+4);
-	for (int i = 0; i < final_size_bits; ++i)
+	char n_crc_bit;
+	pointer_data_to_physical_universal(data,&temp_physical_array[0],final_size_bytes);
+	for (int i = 0; i < data_size_bits + 33; ++i)
 	{
-		char n_crc_bit = get_nth_bit(CRCTT, (32 - CRC_index));
-		unsigned char n_data_bit = get_nth_bit(data[i/8],(8-(i%8)));
-		char result_xor = n_data_bit ^ n_crc_bit;
-		/*if (n_data_bit != result_xor)
+		unsigned char n_data_bit = get_nth_bit(temp_physical_array[i/8],(8-(i%8)));
+
+		if(n_data_bit == 0 && CRC_index == -1)
 		{
-			//flip_nth_bit()
-		}*/
+			//cout << "skipping zero..." << endl;
+		}else{
+			if (CRC_index == -1)
+			{
+				n_crc_bit = 1;
+				//cout << "!";
+			}else{
+				n_crc_bit = get_nth_bit(CRCTT, (32 - CRC_index));
+				//cout << n_crc_bit + 0 << "D";
+			}
+			char result_xor = n_data_bit ^ n_crc_bit;
+			if (n_data_bit != result_xor)
+			{
+				flip_nth_bit(&temp_physical_array[i/8],(8-(i%8)));
+			}
+			//cout << get_nth_bit(temp_physical_array[i/8],(8-(i%8))) + 0 << "," << CRC_index << ":";
+			CRC_index++;
+			if (CRC_index > 32)
+			{
+				CRC_index = -1;
+				i = i - 32;
+				//cout << " END OF STEP" <<endl;
+			}
+		}
+
 	}
 
+	data[size + 0] = temp_physical_array[size + 0];
+	data[size + 1] = temp_physical_array[size + 1];
+	data[size + 2] = temp_physical_array[size + 2];
+	data[size + 3] = temp_physical_array[size + 3];
 }
 
 char Packet::get_nth_bit(char dta, int n){
 	unsigned char nbit = dta;
 	nbit = nbit << (8-n);
 	nbit = nbit >> 7;
+	return nbit;
+}
+
+char Packet::get_nth_bit(int dta, int n){
+	unsigned int nbit = dta;
+	nbit = nbit << (32-n);
+	nbit = nbit >> 31;
 	return nbit;
 }
 
@@ -192,7 +231,7 @@ void Packet::pointer_data_to_physical_universal(char* data, char *put_data_here,
 		put_data_here[i] = data[i];
 		i++;
 	}
-}
+}*/
 
 /*void Packet::shift_char_array(char *data, int size){
 	int i = 0;

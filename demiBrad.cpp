@@ -45,7 +45,8 @@ void *create_and_run_receiver_thread(void *cnt){
 		&theDemibrad.mutex_Demibrad_fudge_factor, 
 		&theDemibrad.fudge_factor_Demibrad, 
 		&theDemibrad.cmdCode[0], 
-		&theDemibrad.statusCode);
+		&theDemibrad.statusCode,
+		theDemibrad.streamy_demibrad);
 	listen.UltraListen();
 	wcerr << "This should not appear again";
 	return (void *)0;
@@ -162,6 +163,7 @@ int DemiBrad::dot11_recv_DemiBrad(short *srcAddr, short *destAddr, char *buf, in
 		}
 		*destAddr = temp.destination;
 		*srcAddr = temp.sender;
+		wcerr << temp.sender << " is the sender address " << temp.destination << " is the destination address. " << endl;
 		pthread_mutex_unlock(&mutex_Demibrad_Receiver);
 		return temp.bytes_to_send;
 	}else{

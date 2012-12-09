@@ -4,8 +4,9 @@ using namespace std;
 int main(int argc, char const *argv[])
 {
 	Packet p;
-	int size = 52;
-	char test[] = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz";
+	int normal_size = 104;
+	int size = 108;
+	char test[] = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz";
 	char testt[size+4];
 	int a = 7;
 	int b = 8;
@@ -22,7 +23,8 @@ int main(int argc, char const *argv[])
 		}
 		j++;
 	}
-	p.build_CRC(&test[0], size, 79764919);
+	p.build_CRC(&testt[0], size, 79764919);
+	cout << testt[104] + 0 << " " << testt[105] + 0 << " " << testt[106] + 0 << " " << testt[107] + 0 << endl;
 	/*
 	//p.shift_char_array(&test[0], size);
 	//p.flip_nth_bit(&testt[0], 5);

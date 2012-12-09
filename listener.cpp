@@ -90,11 +90,17 @@ Listener::UltraListen()
                     }
                     else
                     {
-                        Packet paulLovesPBR( extractSourceAddress(), extractSequenceNumber() );
+                        Packet paulLovesPBR( extractSourceAddress(), extractSequenceNumber(), MACaddrList);
+                        wcerr << extractSourceAddress() << "<-this is the source address. \n this is the seqNum -> " << extractSequenceNumber() << endl;
                         char theFrame[paulLovesPBR.frame_size];
                         paulLovesPBR.buildByteArray(&theFrame[0]);
                         if (prints) wcerr << "Paul loaths PBR :: " << paulLovesPBR.frame_size << endl;
                         usleep(aSIFSTime * 1000);
+                        int q = 0;
+                        while(q < paulLovesPBR.frame_size){
+                            wcerr << theFrame[q] + 0 << " :: " << endl;
+                            q++;
+                        }
                         daRF->transmit( &theFrame[0], paulLovesPBR.frame_size );
                         seqNumMang.increment(dataSource);
                         queue_data();//put data in the queue

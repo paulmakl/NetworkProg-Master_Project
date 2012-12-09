@@ -15,7 +15,7 @@ class Packet {
 	// Constructor for Receiver
     Packet(char *pac, int byts);
     // Creates a packet for an acknowledgement
-    Packet(short destaddr, short seqnum);
+    Packet(short destaddr, short seqnum, short sorcey);
     // Creates a resend packet
 	int make_resend();
 	// builds a packet into a byte array
@@ -29,6 +29,7 @@ class Packet {
 	// this is super complicated i will explain it when its done
 	//void xor_crc(char *data, int CRC_TT, int sizenum);
 	char get_nth_bit(char dta, int n);
+	char get_nth_bit(int dta, int n);
 	//char get_nth_bit(int dta, int n);
 	void flip_nth_bit(char *dta, int n);
 	//void calc_CRC(char *dta, int size, int CRCTT);
