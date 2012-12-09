@@ -9,6 +9,7 @@
 #include "sender.h"
 #include <unistd.h> //For sleep()
 #include <math.h> //for pwr
+//#include <algorithm> 
 
 //Wait IFS (SIFS + 2*slotTime)
 #define waitIFS usleep((aSIFSTime + 2*aSlotTime)*1000);
@@ -16,12 +17,13 @@
 //Items used
 using std::queue;
 using std::rand;
+using std::min;
 
 void 
 Sender::MasterSend() {
     //Overhead
-    cmd3 = 0;     //Initialize to 0 so we send a beacond right away
-    long long sendBeaconTime = theRF->clock() + (cmd0 * 1000);  //Current time + 
+    //cmdVals[3] = 0;     //Initialize to 0 so we send a beacond right away
+    long long sendBeaconTime = theRF->clock() + (cmdVals[3] * 1000);  //Current time + 
                                                                                                          //cmd 3 val (sec)
     int packetSent = 0; //Flag to mark if data was sent
     int beaconSent = 0; //Flag to mark if a beacon was sent
@@ -29,13 +31,13 @@ Sender::MasterSend() {
     //Run forever doing all the things that sender does
     while (true) {
         //Check for updated cmd values
-        cmd0 = cmdVals[0];
-        cmd1 = cmdVals[1];
-        cmd2 = cmdVals[2];
-        cmd3 = cmdVals[3];
+        //cmdVals[0] = cmdVals[0];
+        //cmdVals[1]; = cmdVals[1];
+        //cmdVals[2]; = cmdVals[2];
+        //cmdVals[3] = cmdVals[3];
 
         //Write to ostream
-        if (cmd0) {
+        if (cmdVals[0]) {
             pthread_mutex_lock(mutexSenderOstream);   //lock the ostream 
             *outputBuff << "---------------Commands and Settings-------------------- \n" <<
                                     "Cmd #0: Display command options and cureent settings \n" <<
@@ -46,19 +48,19 @@ Sender::MasterSend() {
                                     "       3- Display transmittion and sender state information together \n" <<
                                     "       4- Display transmittion state information only \n" <<
                                     "       5- Display reciever state information only \n" <<
-                                    "   Current Diagnostic level: " << cmd1 << "\n" <<
-                                    "Cmd #2: Sets beacon window \n" << 
-                                    "   Current beacon window: " << cmd3 << "seconds" << endl;
-                        if (cmd2) {
+                                    "   Current Diagnostic level: " << cmdVals[1] << endl;
+                        if (cmdVals[2]) {
                             *outputBuff << 
-                                "Cmd #3: Sets collision window: \n" << 
+                                "Cmd #2: Sets collision window: \n" << 
                                 "   Curently set to Max(" << waitTime << ")" << endl;
                         } else {
                             *outputBuff << 
-                                "Cmd #3: Sets collision window: \n" <<
+                                "Cmd #2: Sets collision window: \n" <<
                                 "   Currently set to Random(" << waitTime << ")" << endl;
                         }
-            *outputBuff << "--------------------------------------------------------" << endl;
+            *outputBuff << "Cmd #3: Sets beacon window \n" << 
+                                    "   Current beacon window: " << cmdVals[3] << "seconds \n" << 
+            "--------------------------------------------------------" << endl;
             pthread_mutex_unlock(mutexSenderOstream);   //Unlock the ostream
             cmdVals[0] = 0;   //So that this does not keep printing
         }
@@ -72,7 +74,7 @@ Sender::MasterSend() {
             pthread_mutex_unlock(mutexFudgeFactor); //unlock mutex
 
             //Write to ostream
-            if (cmd1 == 1 || cmd1 == 2) {
+            if (cmdVals[1] == 1 || cmdVals[1] == 2) {
                 pthread_mutex_lock(mutexSenderOstream);   //lock the ostream 
                 *outputBuff << "Sending Beacon with timestamp: " << 
                 theRF->clock() + fudFact + TRANSTIME << endl;
@@ -84,10 +86,10 @@ Sender::MasterSend() {
             pachyderm.buildByteArray(&beaconFrame[0]);  //Fill the frame
 
             int beaconSent = send(&beaconFrame[0], pachyderm.frame_size, false, aCWmin);
-            sendBeaconTime = theRF->clock() + *fudgeFactor + (cmd3 * 1000); //Set a new beacon
+            sendBeaconTime = theRF->clock() + *fudgeFactor + (cmdVals[3] * 1000); //Set a new beacon
                                                                                                                         //time 
             //Write to ostream
-            if (cmd1 == 1 || cmd1  == 2) { 
+            if (cmdVals[1] == 1 || cmdVals[1]  == 2) { 
                 pthread_mutex_lock(mutexSenderOstream);   //lock the ostream 
                 if (beaconSent) {
                     *outputBuff << "Beacon transmitted" << endl;
@@ -105,7 +107,14 @@ Sender::MasterSend() {
         //Check for data to send
         if (infoToSend->empty()) {
             pthread_mutex_unlock(mutexSender); //Unlock because the queue is not ready
+
+            //Write to ostream
+            if (cmdVals[1] ==1 || cmdVals[1] == 3) {
+            pthread_mutex_lock(mutexSenderOstream); //Lock the ostream
+           // *outputBuff << "No data to send, system idle" << endl;
+            pthread_mutex_unlock(mutexSenderOstream);   //Unlock ostream
             usleep(1000);
+            }
         }
         else {
             //Get incomplete packet to send
@@ -127,7 +136,7 @@ Sender::MasterSend() {
             *expSeqNum = seqTable.getSeqNum(pachyderm.destination); //Alert reciever of 
                                                                                                              //which seqNum to look for
             //Write to ostream
-            if (cmd1 == 1 || cmd1 == 3) {
+            if (cmdVals[1] == 1 || cmdVals[1] == 3) {
                 pthread_mutex_lock(mutexSenderOstream);   //lock the ostream 
                 *outputBuff << "Attempting to transmit packet with seqNum: " << 
                     seqTable.getSeqNum(pachyderm.destination) << endl;
@@ -135,7 +144,8 @@ Sender::MasterSend() {
             }
 
             //Transmit
-            int packetSent = send(&theFrame[0], pachyderm.frame_size, false, aCWmin);
+            pachyderm.resTransAttempts = 0; //New message, so reset retransmittion #
+            int packetSent = send(&theFrame[0], pachyderm.frame_size, false, 2);
 
             //Write to ostream
             pthread_mutex_unlock(mutexSenderOstream);
@@ -149,9 +159,9 @@ Sender::MasterSend() {
                 if (!(*ackReceived))   {   //No ack recieved
 
                     //Write to ostream
-                    if (cmd1 == 1 || cmd1 == 3) {
+                    if (cmdVals[1] == 1 || cmdVals[1] == 3) {
                         pthread_mutex_lock(mutexSenderOstream);   //lock the ostream 
-                        *outputBuff << "Sender timeout: Restransmitting("<< pachyderm.resTransAttempts << ")" << endl;
+                        *outputBuff << "Sender timeout: Restransmitting("<< pachyderm.resTransAttempts + 1<< ")" << endl;
                         pthread_mutex_unlock(mutexSenderOstream);   //Unlock the ostream
                     }
 
@@ -167,9 +177,9 @@ Sender::MasterSend() {
             //Check for status update
             if (pachyderm.resTransAttempts == dot11RetryLimit) {
                 //Write to ostream
-                if (cmd1 == 1 || cmd1 == 3) {
+                if (cmdVals[1] == 1 || cmdVals[1] == 3) {
                     pthread_mutex_lock(mutexSenderOstream);   //lock the ostream 
-                    *outputBuff << "Sender timeout: Resend limit reached -> transmition terminated: Attempt # " << pachyderm.resTransAttempts <<  endl;
+                    *outputBuff << "Sender timeout: Resend limit reached -> transmition terminated" << endl;
                     pthread_mutex_unlock(mutexSenderOstream);   //Unlock the ostream
                 }
                 
@@ -185,9 +195,9 @@ Sender::buildFrame(short frm, bool resend,  short seqNum, int CS) {
     pachyderm.sequence_number = seqNum;
     pachyderm.sender = macAddr_Sender;
     pachyderm.CRC = CS;
-    if (!resend) {
-        pachyderm.resTransAttempts = 0;
-    }
+    //if (!resend) {
+     //   pachyderm.resTransAttempts = 0;
+    //}
 }
 
 void
@@ -202,11 +212,11 @@ Sender::buildBeacon (long long timeParam, const long long beaconTime) {
     pachyderm.CRC = 0xff;   //CRC of -1
     pachyderm.bytes_to_send = 8;    //8 bytes of data
     pachyderm.frame_size = 18;  //18 total bytes to transmit
-    pachyderm.resTransAttempts = 0; //Because we dont retrans these
+  
 
     //Get time
     long long timeTemp = timeParam + beaconTime;    //Our clock time plus how long 
-                                                   //it takes to build and send a beacon
+                                                                                     //it takes to build and send a beacon
 
     //Fill the data array 
     for (int ii=sizeof(timeParam) - 1; ii>=0; ii--) {
@@ -249,7 +259,7 @@ Sender::send(char* frame, int size, bool reSend, int cWparam) {
                     return 0; //Did not send all of frame or something failed internally
                 } else {
                     //Write to ostream
-                    if (cmd1 == 1 || cmd1 == 3 || cmd1 == 4) {
+                    if (cmdVals[1] == 1 || cmdVals[1] == 3 || cmdVals[1] == 4) {
                         pthread_mutex_lock(mutexSenderOstream);   //lock the ostream 
                         *outputBuff << "Channel status: idle" << endl;
                         pthread_mutex_unlock(mutexSenderOstream);   //Unlock the ostream
@@ -259,7 +269,7 @@ Sender::send(char* frame, int size, bool reSend, int cWparam) {
             }
         } 
         //Write to ostream
-        if (cmd1 == 1 || cmd1 == 3 || cmd1 == 4) {
+        if (cmdVals[1] == 1 || cmdVals[1] == 3 || cmdVals[1] == 4) {
             pthread_mutex_lock(mutexSenderOstream);   //lock the ostream 
             *outputBuff << "Channel status: busy -> waiting for transmittion to end" << endl;
             pthread_mutex_unlock(mutexSenderOstream);   //Unlock the ostream
@@ -285,18 +295,19 @@ Sender::send(char* frame, int size, bool reSend, int cWparam) {
     //Exponential backoff:
     //Possibility for this to be a resend
     int cWindow = cWparam;
-    if (cmd2) {
-        waitTime = (int)pow((float)2, (float)cWindow); //Pick max size for collision window
+    if (cmdVals[2]) {
+        waitTime = aSlotTime * ((int)pow((float)2, (float)cWindow)-1); //Pick max size for collision window
     } else {
-        waitTime = rand() % (int)pow((float)2, (float)cWindow);  //Random number in range 
-                                                                                              //[0,2^aCWmin) 
+        waitTime = aSlotTime * (rand() % (int)pow((float)2, (float)cWindow)-1);  //Random number of
+                                                                                                                        //slot times in range 
+                                                                                                                        //[0,2^aCWmin) 
     }  
 
     //Write to ostream
-    if (cmd1 == 1 || cmd1 == 3 || cmd1 == 4) {
+    if (cmdVals[1] == 1 || cmdVals[1] == 3 || cmdVals[1] == 4) {
         pthread_mutex_lock(mutexSenderOstream);   //lock the ostream 
         *outputBuff << "Channel status: busy -> picking wait time in range [0, " << 
-                (int)pow((float)2, (float)cWindow) << "]" << endl;
+                (int)(pow((float)2, (float)cWindow)-1) << "] (" << waitTime << ")" << endl;
         pthread_mutex_unlock(mutexSenderOstream);   //Unlock the ostream
     }
 
@@ -316,7 +327,7 @@ Sender::send(char* frame, int size, bool reSend, int cWparam) {
                 return 0; //Did not send all of frame or something failed internally
             } else {
                 //Write to ostream
-                if (cmd1 == 1 || cmd1 == 3 || cmd1 == 4) {
+                if (cmdVals[1] == 1 || cmdVals[1] == 3 || cmdVals[1] == 4) {
                     pthread_mutex_lock(mutexSenderOstream);   //lock the ostream 
                     *outputBuff << "Channel status: idle" << endl;
                     pthread_mutex_unlock(mutexSenderOstream);   //Unlock the ostream
@@ -333,10 +344,10 @@ Sender::resend() {
     buildFrame(0, true, seqTable.getSeqNum(pachyderm.destination), 1111);
     char theFrame[pachyderm.frame_size];
     pachyderm.buildByteArray(&theFrame[0]); //Fill theFrame
-    pachyderm.resTransAttempts++;     //Increment the times we have tried to resend 
+    pachyderm.resTransAttempts++;      //Increments transmits
 
     return send(&theFrame[0], pachyderm.frame_size, true, 
-                        aCWmin + pachyderm.resTransAttempts); 
+                        min(2 + pachyderm.resTransAttempts, 5)); 
 }
 
 
