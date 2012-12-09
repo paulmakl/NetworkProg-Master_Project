@@ -91,16 +91,10 @@ Listener::UltraListen()
                     else
                     {
                         Packet paulLovesPBR( extractSourceAddress(), extractSequenceNumber(), MACaddrList);
-                        wcerr << extractSourceAddress() << "<-this is the source address. \n this is the seqNum -> " << extractSequenceNumber() << endl;
                         char theFrame[paulLovesPBR.frame_size];
                         paulLovesPBR.buildByteArray(&theFrame[0]);
                         if (prints) wcerr << "Paul loaths PBR :: " << paulLovesPBR.frame_size << endl;
                         usleep(aSIFSTime * 1000);
-                        int q = 0;
-                        while(q < paulLovesPBR.frame_size){
-                            wcerr << theFrame[q] + 0 << " :: " << endl;
-                            q++;
-                        }
                         daRF->transmit( &theFrame[0], paulLovesPBR.frame_size );
                         seqNumMang.increment(dataSource);
                         queue_data();//put data in the queue
@@ -119,7 +113,9 @@ Listener::UltraListen()
                 if (seqNum == *expectedSN)//confirm that the ack matches the data packet last sent by sender
                 {
                     *ackReceivedL = true;//let sender know that an ack has come in and to send the next packet
-                        //TODO UPDATE STATUS CODE HERE: SET TO 4 TX_DELIVERED
+                    pthread_mutex_lock(statusMutex);
+                    *status = 4;//sucsessful tx sent
+                    pthread_mutex_unlock(statusMutex);
                 }
                 else
                 {
@@ -136,7 +132,9 @@ Listener::UltraListen()
                 long long diff = newTimeStamp - ourTmSmp;// compute the difference 
                 if (diff > 0)//if their clock is running faster than ours go to their time
                 {
+                    pthread_mutex_lock(fugFacMutex);
                     fudgeFactor = &diff;// update the fudge factor 
+                    pthread_mutex_unlock(fugFacMutex);
                     //TODO figure our our program times for sending and reciving
                 }
                 }
@@ -145,7 +143,7 @@ Listener::UltraListen()
             default:
                 {
                 pthread_mutex_lock(statusMutex);
-                *status = 2; // report that the queue for incoming data is full
+                *status = 2; // general error code
                 pthread_mutex_unlock(statusMutex);
                 }break;
         }

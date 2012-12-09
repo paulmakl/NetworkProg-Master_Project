@@ -63,26 +63,27 @@ public:
 
 private:
 
-    short MACaddrList; //a pointer to our MAC address
     ostream *streamy; //the given output stream for data to the layer above
-    volatile bool* ackReceivedL;// a pointer to a boolean that indicates whether or not a ACK has been recived
-    static const int MAXPACKETSIZE = 2048; //size guarenteed to hold all properly formated packets
-    char buf[aMPDUMaximumLength];// buffer for the incoming packets
+    SeqNumManager seqNumMang;//a hashmap with added funtionality for dealing with sequence numbers
     queue<Packet> * daLoopLine;//a queue for the outgoing data
-    volatile short* expectedSN;//the sequence number to check against incoming acks
     RF* daRF;//the reference to the RF layer
     int bytesReceived;// bytes from the last packet
+    int *statusCode;// the most recent error to happen in any of the threads
+    short MACaddrList; //a pointer to our MAC address
+    char buf[aMPDUMaximumLength];// buffer for the incoming packets
     bool prints;//bool for turning prints on or off
-    SeqNumManager seqNumMang;//a hashmap with added funtionality for dealing with sequence numbers
-    pthread_mutex_t* mutexListener;//a mutex for locking the queue
-    static const short MAXSEQNUM = 4095;//the largest possible sequence number that can be used
-    pthread_mutex_t *ostreamMutex;//a mutex for the output stream
-    pthread_mutex_t *fugFacMutex;//a mutex for the fudge factor on our time stamp
+    static const int MAXPACKETSIZE = 2048; //size guarenteed to hold all properly formated packets
+    static const short MAXSEQNUM = 4095;//the largest possible sequence number that can be used00
+    volatile bool* ackReceivedL;// a pointer to a boolean that indicates whether or not a ACK has been recived
     volatile long long *fudgeFactor;// the fudge factor for the time stamp we get from the RF layer
-    pthread_mutex_t *statusCode;
     volatile int *commands;// an array of command code values where the index repersents the command to be altered and the returned value is the command level
     volatile int *status;//an int that hold the most recent error code returned
-    pthread_mutex_t *statusMutex;
+    volatile short* expectedSN;//the sequence number to check against incoming acks
+    pthread_mutex_t *fugFacMutex;//a mutex for the fudge factor on our time stamp
+    pthread_mutex_t *statusMutex;//mutex for changing the status code
+    pthread_mutex_t *ostreamMutex;//a mutex for the output stream
+    pthread_mutex_t* mutexListener;//a mutex for locking the queue
+
 
     /*
      * looks at a packet to check for three things from every packet that comes across the the RF layer
