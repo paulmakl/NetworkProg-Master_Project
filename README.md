@@ -7,14 +7,14 @@ Usage
 =====
 
 This system was designed on MAC OS 10.8 running java 7. The current version will only work on an ethernet network. All computers using this system must have a copy of the RF layer in thier working directory. To run the current version:
-*Run the make file with flag -f
-*Run the newly created java file WifiClient
-*Issue command 0 to see diagnostic settings and debugging options
+* Run the make file with flag -f
+* Run the newly created java file WifiClient
+* Issue command 0 to see diagnostic settings and debugging options
 
 Testing
 =======
 
-*Can be tested by communicating with client wifi.jar
+* Can be tested by communicating with client wifi.jar
 
 
 - Designed by Erin Jamroz, Paul Makl & Weston Thornburg 
