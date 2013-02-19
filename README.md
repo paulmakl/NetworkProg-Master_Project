@@ -5,7 +5,6 @@ Our team is trying to simulate a combined LLC and MAC 802.11 wireless layer. Thi
 
 Usage
 =====
-
 This system was designed on MAC OS 10.8 running java 7. The current version will only work on an ethernet network. All computers using this system must have a copy of the RF layer in thier working directory. To run the current version:
 * Run the make file with flag -f
 * Run the newly created java file WifiClient
@@ -13,8 +12,7 @@ This system was designed on MAC OS 10.8 running java 7. The current version will
 
 Testing
 =======
-
 * Can be tested by communicating with client wifi.jar
 
 
-- Designed by Erin Jamroz, Paul Makl & Weston Thornburg 
+Designed by Erin Jamroz, Paul Makl & Weston Thornburg 
