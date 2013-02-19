@@ -40,7 +40,7 @@ Sender::MasterSend() {
         if (cmdVals[0]) {
             pthread_mutex_lock(mutexSenderOstream);   //lock the ostream 
             *outputBuff << "---------------Commands and Settings-------------------- \n" <<
-                                    "Cmd #0: Display command options and cureent settings \n" <<
+                                    "Cmd #0: Display command options and current settings \n" <<
                                     "Cmd #1: Set Diagnostic level \n" << 
                                     "   Possible Diagnostic Levels: \n" << 
                                     "       1- Full, display all state information \n" <<
